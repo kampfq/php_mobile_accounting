@@ -18,7 +18,9 @@
  * USA
  */
 
-class BuchungController {
+namespace Controller;
+
+class Booking {
 
 private $dispatcher, $mandant_id;
 

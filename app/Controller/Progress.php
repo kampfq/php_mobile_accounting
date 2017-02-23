@@ -18,7 +18,9 @@
  * USA
  */
 
-class VerlaufController {
+namespace Controller;
+
+class Progress {
 
 private $dispatcher, $mandant_id;
 

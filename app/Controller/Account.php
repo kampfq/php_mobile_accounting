@@ -18,7 +18,9 @@
  * USA
  */
 
-class KontoController {
+namespace Controller;
+
+class Account {
 
 private $dispatcher, $mandant_id;
 

@@ -18,7 +18,9 @@
  * USA
  */
 
-class OfficeController {
+namespace Controller;
+
+class Office {
 
 private $dispatcher, $mandant_id;
 

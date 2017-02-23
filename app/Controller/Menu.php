@@ -18,8 +18,9 @@
  * USA
  */
 
+namespace Controller;
 # Controller für die Schnellbuchungs-Menüeinträge
-class MenuController {
+class Menu {
 
 private $dispatcher, $mandant_id;
 

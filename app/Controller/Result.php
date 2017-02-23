@@ -18,7 +18,9 @@
  * USA
  */
 
-class ErgebnisController {
+namespace Controller;
+
+class Result {
 
 private $dispatcher, $mandant_id;
 

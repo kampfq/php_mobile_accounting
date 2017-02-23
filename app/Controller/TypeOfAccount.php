@@ -18,7 +18,9 @@
  * USA
  */
 
-class KontenartController {
+namespace Controller;
+
+class TypeOfAccount {
 
 private $dispatcher;
 

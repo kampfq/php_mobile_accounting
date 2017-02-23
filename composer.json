@@ -1,0 +1,21 @@
+{
+  "name": "wolfgang_wiedermann/php_mobile_accounting",
+  "description": "description_text",
+  "minimum-stability": "stable",
+  "license": "GPL v3",
+  "authors": [
+    {
+      "name": "Wolfgang Wiedermann",
+      "email": "email@example.com"
+    },
+    {
+      "name": "Benjamin Issleib",
+      "email": "ben@kampfq.eu"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0",
+    "ikkez/f3-cortex": "1.4.1",
+    "zendframework/zend-diactoros": "1.3.7"
+  }
+}

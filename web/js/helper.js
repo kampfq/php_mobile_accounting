@@ -9,11 +9,11 @@
 function doGET(controller, action, parameters, successHandler, errorHandler) {
     var additionalParams = "";
     for(var key in parameters) {
-        additionalParams += "&"+key+"="+parameters[key];
+        additionalParams += "/"+parameters[key];
     }
     $.ajax({
         type: 'GET',
-        url: "../index.php?controller="+controller+"&action="+action+additionalParams,
+        url: "/"+controller+"/"+action+additionalParams,
         dataType:"json",
     }).done(function(data) {
         broker.setConnected();
@@ -39,7 +39,7 @@ function doGET(controller, action, parameters, successHandler, errorHandler) {
 function doPOST(controller, action, parameterObject, successHandler, errorHandler) {
     $.ajax({
         type: 'POST',
-        url: "../index.php?controller="+controller+"&action="+action,
+        url: "/"+controller+"/"+action,
         dataType:"json",
         contentType:"application/json",
         data: parameterObject,

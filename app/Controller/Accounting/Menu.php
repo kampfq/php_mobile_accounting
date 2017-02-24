@@ -19,14 +19,18 @@
  */
 
 namespace Controller\Accounting;
+use Model\Accounting\Template;
+use Traits\ViewControllerTrait;
 # Controller für die Schnellbuchungs-Menüeinträge
 class Menu {
+
+    use ViewControllerTrait;
 
 private $dispatcher, $mandant_id;
 
 function invoke($action, $request, $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
+    $this->client -> mandant_id = $dispatcher->getMandantId();
     switch($action) {
         case 'quick':
     	     return $this->getQuickMenu();
@@ -42,42 +46,35 @@ function invoke($action, $request, $dispatcher) {
 }
 
 function getQuickMenu() {
-    $db = getDbConnection();
-    $lst = array();
-    $rs = mysqli_query($db, "select * from fi_quick_config where mandant_id = $this->mandant_id order by config_knz");
-    while($obj = mysqli_fetch_object($rs)) {
-        $lst[] = $obj;
-    }
-    mysqli_close($db);
-    return wrap_response($lst);
+    $db = $this -> f3->get('DB');
+    $result = $result = $db -> exec("select * from fi_quick_config where mandant_id = ".$this->client->mandant_id." order by config_knz");
+    return $this -> wrap_response($result);
 }
 
 
 function getQuickMenuById($request) {
-    $db = getDbConnection();
-    $id = $request['id'];
-    if(is_numeric($id)) {
-        $rs = mysqli_query($db, "select * from fi_quick_config where mandant_id = $this->mandant_id and config_id = $id");
-        if($obj = mysqli_fetch_object($rs)) {
-            mysqli_close($db);
-            return wrap_response($obj);
-        } else {
-            mysqli_close($db);
-            return wrap_response(null);
-        }
-    } else {
-        throw new ErrorException("Die fi_quick_config id ist fehlerhaft");
+    $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
+    if(!is_numeric($idParsedFromRequest)){
+        throw new \ErrorException("Die fi_quick_config id ist fehlerhaft");
     }
+    $template = new Template();
+    $template -> load([
+        'mandant_id = ? AND config_id = ?',$this->client -> mandant_id,$idParsedFromRequest
+    ]);
+    if($template -> loaded() === 0){
+        return $this -> wrap_response(null);
+    }
+    return $this -> wrap_response($template);
 }
 
 function addQuickMenu($request) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $inputJSON = file_get_contents('php://input');
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidQuickMenu($input)) { 
         $sql = "insert into fi_quick_config(config_knz, sollkonto, habenkonto, buchungstext,";
         $sql .= " betrag, mandant_id) values ('".$input['config_knz']."', '".$input['sollkonto']."', ";
-        $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->mandant_id.")";
+        $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->client -> mandant_id.")";
 
         mysqli_query($db, $sql);
         $error = mysqli_error($db);
@@ -86,7 +83,7 @@ function addQuickMenu($request) {
            error_log($sql);
         }
         mysqli_close($db);
-        return wrap_response("Fehler: $error");
+        return $this -> wrap_response("Fehler: $error");
     } else {
         mysqli_close($db);
         throw new ErrorException("Die uebergebene Schnellbuchungsvorlage ist nicht valide: ".$inputJSON);
@@ -94,16 +91,16 @@ function addQuickMenu($request) {
 }
 
 function removeQuickMenu($request) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $id = $request['id'];
     if(is_numeric($id)) {
-        $sql =  "delete from fi_quick_config where mandant_id = $this->mandant_id";
+        $sql =  "delete from fi_quick_config where mandant_id = $this->client -> mandant_id";
         $sql .= " and config_id = $id";
 
         mysqli_query($db, $sql);
         mysqli_close($db);
 
-        return wrap_response(null);
+        return $this -> wrap_response(null);
     } else {
         throw new ErrorException("Die id der Schnellbuchungsvorlage muss numerisch sein!");
     }
@@ -139,5 +136,8 @@ function isValidFieldAndValue($key, $value) {
             return false;
     }
 }
+
+
+
 }
 ?>

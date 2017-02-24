@@ -184,7 +184,7 @@ showVerlaufCacheFlow : function() {
 },
 
 loadBilanz : function() {
-    doGETwithCache("ergebnis", "bilanz", [], 
+    doGETwithCache("Result", "getBilanz", [],
         function(data) {
             var html = "Bilanzdarstellung:<br/>";
             html += "<table>";
@@ -218,7 +218,7 @@ loadGuV : function() {
 
     params = {'year': $("#ergebnis_form_guv_years").val()};
 
-    doGETwithCache("ergebnis", "guv", params, 
+    doGETwithCache("Result", "getGuV", params,
         function(data) {
             var html = "Gewinn und Verlust:<br/><table>";
             for(var key in data.zeilen) {
@@ -247,7 +247,7 @@ loadGuV : function() {
 },
 
 loadGuVPrognose : function() {
-    doGETwithCache("ergebnis", "guv_prognose", [],
+    doGETwithCache("Result", "getGuVPrognose", [],
         function(data) {
             html = "<b>GuV-Monatsvergleich</b><br/>";
             html += "<table>";
@@ -294,7 +294,7 @@ loadGuVMonth : function() {
     // Alte Anzeige (alte GuV-Inhalte) löschen
     var bitteWarten = "Bitte warten, die Ergebnisse werden geladen";
     $("#ergebnis_form_guv_inner").html(bitteWarten);
-    doGETwithCache("ergebnis", "guv_month", {'id':selectedMonth}, 
+    doGETwithCache("Result", "getGuVMonth", {'id':selectedMonth},
         function(data) {
             var html = "<b>Gewinn und Verlust</b><br/> einzelner Monat:<br/><table>";
             for(var key in data.zeilen) {
@@ -328,7 +328,7 @@ loadCacheFlow : function(konto) {
     $("#account_show_monatssalden").html("Cacheflow-Darstellung wird geladen");
 
     // Side muss auch noch dynamisch werden
-    doGETwithCache('verlauf', 'cashflow', {'id':konto.kontonummer(), 'side': model.sollhaben()},
+    doGETwithCache('Progress', 'getCashFlow', {'id':konto.kontonummer(), 'side': model.sollhaben()},
         function(data) {
             var table = "<table>";
             var type = "Mittelzufluss";
@@ -391,7 +391,7 @@ loadVerlaufIntraMonth : function() {
     $("#ergebnis_form_intra_months").selectmenu('refresh');
     var month_id = $("#ergebnis_form_intra_months").val(); 
   
-    doGETwithCache("verlauf", "intramonth", {'month_id': month_id},
+    doGETwithCache("Progress", "getIntraMonth", {'month_id': month_id},
         function(data) {
             var table = '<table width="100%" style="max-width:400px">';
             var code = "<b>Verlauf innerhalb des Monats:</b><br/>";

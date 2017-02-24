@@ -19,8 +19,11 @@
  */
 
 namespace Controller\Accounting;
+use Traits\ViewControllerTrait;
 
 class TypeOfAccount {
+
+    use ViewControllerTrait;
 
 private $dispatcher;
 
@@ -41,11 +44,11 @@ function invoke($action, $request, $dispatcher) {
 # sie als Objekt zurück
 function getKontenart($id) {
     if(is_numeric($id)) {
-        $db = getDbConnection();
-        $rs = mysqli_query($db, "select * from fi_kontenart where kontenart_id = $id");
+        $db = $this -> f3->get('DB');
+        $result = $db -> exec("select * from fi_kontenart where kontenart_id = $id");
         $erg = mysqli_fetch_object($rs);
         mysqli_close($db);
-        return wrap_response($erg);
+        return $this -> wrap_response($erg);
     } else {
         throw new ErrorException("Eine nicht numerische Kontenart-ID ist ungültig");
     }
@@ -53,14 +56,14 @@ function getKontenart($id) {
 
 # Erstellt eine Liste aller Kontenarten
 function getKontenarten() {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $result = array();
-    $rs = mysqli_query($db, "select * from fi_kontenart");
+    $result = $db -> exec("select * from fi_kontenart");
     while($obj = mysqli_fetch_object($rs)) {
         $result[] = $obj;
     }
     mysqli_close($db);
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 }

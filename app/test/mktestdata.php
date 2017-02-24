@@ -24,7 +24,7 @@
 # Antwortzeitverhalten.
 #
 require_once("../lib/Database.php");
-$db = getDbConnection();
+$db = $this -> f3->get('DB');
 
 $mandantenzahl = 100;
 
@@ -33,7 +33,7 @@ $passivkonten = array();
 $aufwandkonten = array();
 $ertragskonten = array();
 
-$rs = mysqli_query($db, "select * from fi_konto");
+$result = $db -> exec("select * from fi_konto");
 
 while($obj = mysqli_fetch_object($rs)) {
     if($obj->kontenart_id == 1) {

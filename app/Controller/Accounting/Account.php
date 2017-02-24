@@ -19,15 +19,17 @@
  */
 
 namespace Controller\Accounting;
-
+use Traits\ViewControllerTrait;
 class Account {
+
+    use ViewControllerTrait;
 
 private $dispatcher, $mandant_id;
 
 # Einsprungpunkt, hier übergibt das Framework
 function invoke($action, $request, $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
+    $this->client -> mandant_id = $dispatcher->getMandantId();
     switch($action) {
         case "get":
             return $this->getKonto($request['id']);
@@ -48,49 +50,45 @@ function invoke($action, $request, $dispatcher) {
 # sie als Objekt zurück
 function getKonto($id) {
     if(is_numeric($id)) {
-        $db = getDbConnection();
-        $rs = mysqli_query($db, "select * from fi_konto where kontonummer = $id and mandant_id = $this->mandant_id");
+        $db = $this -> f3->get('DB');
+        $result = $db -> exec("select * from fi_konto where kontonummer = $id and mandant_id = $this->client -> mandant_id");
         $erg = mysqli_fetch_object($rs);
         mysqli_close($db); 
-        return wrap_response($erg);
+        return $this -> wrap_response($erg);
     } else throw Exception("Kontonummer nicht numerisch");
 }
 
 # Ermittelt den aktuellen Saldo des Kontos
 function getSaldo($id) {
     if(is_numeric($id)) {
-        $db = getDbConnection();
-        $rs = mysqli_query($db, "select saldo from fi_ergebnisrechnungen where mandant_id = $this->mandant_id and konto = '$id'");
+        $db = $this -> f3->get('DB');
+        $result = $db -> exec("select saldo from fi_ergebnisrechnungen where mandant_id = $this->client -> mandant_id and konto = '$id'");
         $erg = mysqli_fetch_object($rs);
         mysqli_close($db);
-        return wrap_response($erg->saldo);
+        return $this -> wrap_response($erg->saldo);
     } else throw Exception("Kontonummer nicht numerisch");
 }
 
 # Erstellt eine Liste aller Kontenarten
 function getKonten() {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $result = array();
-    $rs = mysqli_query($db, "select * from fi_konto where mandant_id = $this->mandant_id order by kontenart_id, kontonummer");
-    while($obj = mysqli_fetch_object($rs)) {
-        $result[] = $obj;
-    }
-    mysqli_close($db);
-    return wrap_response($result);
+    $result = $db -> exec("select * from fi_konto where mandant_id = $this->client -> mandant_id order by kontenart_id, kontonummer");
+    return $this -> wrap_response($result);
 }
 
 # Speichert das als JSON-Objekt übergebene Konto
 function saveKonto($request) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $inputJSON = file_get_contents('php://input');
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidKonto($input)) { 
         $sql = "update fi_konto set bezeichnung = '".$input['bezeichnung']."', kontenart_id = ".$input['kontenart_id']
-              ." where kontonummer = ".$input['kontonummer']." and mandant_id = ".$this->mandant_id;
+              ." where kontonummer = ".$input['kontonummer']." and mandant_id = ".$this->client -> mandant_id;
         mysqli_query($db, $sql);
         mysqli_close($db);
         $void = array();
-        return wrap_response($void);
+        return $this -> wrap_response($void);
     } else {
         throw new Exception("Kontenobjekt enthaelt ungueltige Zeichen");
     }
@@ -98,17 +96,17 @@ function saveKonto($request) {
 
 # legt das als JSON-Objekt übergebene Konto an
 function createKonto($request) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $inputJSON = file_get_contents('php://input');
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidKonto($input)) {
         $sql = "insert into fi_konto (kontonummer, bezeichnung, kontenart_id, mandant_id) values ('"
               .$input['kontonummer']."', '".$input['bezeichnung']
-              ."', ".$input['kontenart_id'].", ".$this->mandant_id.")";
+              ."', ".$input['kontenart_id'].", ".$this->client -> mandant_id.")";
         mysqli_query($db, $sql);
         mysqli_close($db);
         $void = array();
-        return wrap_response($void);
+        return $this -> wrap_response($void);
     } else {
         throw new Exception("Kontenobjekt enthaelt ungueltige Zeichen");
     }

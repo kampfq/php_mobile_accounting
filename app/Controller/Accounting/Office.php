@@ -19,15 +19,18 @@
  */
 
 namespace Controller\Accounting;
+use Traits\ViewControllerTrait;
 
 class Office {
+
+    use ViewControllerTrait;
 
 private $dispatcher, $mandant_id;
 
 # Einsprungpunkt, hier übergibt das Framework
 function invoke($action, $request, $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
+    $this->client -> mandant_id = $dispatcher->getMandantId();
 	
     switch($action) {
         case "journal":
@@ -51,21 +54,15 @@ function getJournal($request) {
     } 
 	
     $result = array();
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
 
     $query = new QueryHandler("export_journal_to_excel.sql");
-    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
-		
-    while($obj = mysqli_fetch_object($rs)) {
-        $result[] = $obj;
-    }
-    	
-    mysqli_close($db);
+    $result = $db -> exec($sql);
 	
-    return wrap_response($result, $format);
+    return $this -> wrap_response($result, $format);
 }
 
 # Erstellt eine Liste aller GuV-Monatssalden
@@ -80,21 +77,14 @@ function getGuvMonate($request) {
     } 
         
     $result = array();
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
 
     $query = new QueryHandler("guv_monat_csv.sql");
-    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
-
-    while($obj = mysqli_fetch_object($rs)) {
-        $result[] = $obj;
-    }
-
-    mysqli_close($db);
-
-    return wrap_response($result, $format);
+    $result = $db -> exec($sql);
+    return $this -> wrap_response($result, $format);
 }
 
 

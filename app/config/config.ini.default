@@ -12,7 +12,7 @@ UI = ../app/View/
 
 #Database
 DBHOST = 127.0.0.1
-DBPORT =
+DBPORT = 3306
 DBNAME =
 DBUSER =
 DBPASSWORD =

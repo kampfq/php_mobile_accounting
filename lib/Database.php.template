@@ -1,6 +1,6 @@
 <?php
 
-function getDbConnection() {
+function $this -> f3->get('DB') {
     $db = mysqli_connect("hostname", "username", "password");
     mysqli_select_db($db, "databasename");
     return $db;

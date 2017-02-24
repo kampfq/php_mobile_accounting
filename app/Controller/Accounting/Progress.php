@@ -19,15 +19,18 @@
  */
 
 namespace Controller\Accounting;
+use Traits\ViewControllerTrait;
 
 class Progress {
+
+    use ViewControllerTrait;
 
 private $dispatcher, $mandant_id;
 
 # Einsprungpunkt, hier übergibt das Framework
 function invoke($action, $request, $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
+    $this->client -> mandant_id = $dispatcher->getMandantId();
     switch($action) {
         case "monatssalden":
             return $this->getMonatsSalden($request['id']);
@@ -44,7 +47,7 @@ function invoke($action, $request, $dispatcher) {
 function getMonatsSalden($kontonummer) {
     if(is_numeric($kontonummer) || $this->is_numeric_list($kontonummer)) {
         $kto_prepared = $this->prepareKontoNummern($kontonummer);
-        $db = getDbConnection();
+        $db = $this -> f3->get('DB');
         $rechnungsart = $this->getRechnungsart($kto_prepared);
         if($rechnungsart != 0) {
            if($rechnungsart == 2) {
@@ -54,34 +57,25 @@ function getMonatsSalden($kontonummer) {
                       ."(select (year(v.datum)*100)+month(v.datum) as grouping, v.konto, v.betrag "
                       ."from fi_ergebnisrechnungen_base v inner join fi_konto kt "
                       ."on v.konto = kt.kontonummer and v.mandant_id = kt.mandant_id "
-                      ."where v.mandant_id = $this->mandant_id "
+                      ."where v.mandant_id = $this->client -> mandant_id "
                       ."and v.gegenkontenart_id <> 5) as x "
                       ."group by grouping, konto) as y "
                       ."where y.konto in ($kto_prepared) " 
                       ."and y.grouping > ((year(now())*100)+month(now()))-100 "
                       ."group by grouping ";
-
-                $rs = mysqli_query($db, $sql);
             } else if($rechnungsart == 1) {
                 // Laufende Summen, fuer Bestandskonten
                 $sql = "select x1.grouping, sum(x2.betrag) as saldo "
                       ."from (select distinct (year(datum)*100)+month(datum) as grouping from fi_buchungen_view "
-                      ."where mandant_id = '$this->mandant_id') x1 "
+                      ."where mandant_id = '$this->client -> mandant_id') x1 "
                       ."inner join (select (year(datum)*100+month(datum)) as grouping, konto, betrag "
-                      ."from fi_buchungen_view where mandant_id = '$this->mandant_id') x2 "
+                      ."from fi_buchungen_view where mandant_id = '$this->client -> mandant_id') x2 "
                       ."on x2.grouping <= x1.grouping "
                       ."where konto in ($kto_prepared) and x1.grouping > ((year(now())*100)+month(now()))-100 "
                       ."group by grouping";
-
-                $rs = mysqli_query($db, $sql);
             }
-            $result = array();
-            while($obj = mysqli_fetch_object($rs)) {
-                $result[] = $obj;
-            }
-            mysqli_free_result($rs);
-            mysqli_close($db);
-            return wrap_response($result);
+            $result = $db -> exec($sql);
+            return $this -> wrap_response($result);
         } else {
             mysqli_close($db);
             throw new Exception("Mindestens eine Kontonummer ist unbekannt");
@@ -97,14 +91,14 @@ function getMonatsSalden($kontonummer) {
 function getCashFlow($kontonummer, $side) {
     $values = array();
     if($this->isAktivKonto($kontonummer)) {
-        $db = getDbConnection();
+        $db = $this -> f3->get('DB');
         
         if($side == 'S') {
             $sql  = "select (year(datum)*100)+month(datum) as grouping, sum(b.betrag) as saldo ";
             $sql .= "from fi_buchungen as b ";
             $sql .= " inner join fi_konto as k ";
             $sql .= " on k.mandant_id = b.mandant_id and k.kontonummer = b.habenkonto ";
-            $sql .= " where b.mandant_id = ".$this->mandant_id;
+            $sql .= " where b.mandant_id = ".$this->client -> mandant_id;
             $sql .= " and b.sollkonto = '".$kontonummer."' ";
             $sql .= " and year(b.datum) >= year(now())-1 ";
             $sql .= " and year(b.datum) <= year(now()) ";
@@ -115,7 +109,7 @@ function getCashFlow($kontonummer, $side) {
             $sql .= "from fi_buchungen as b ";
             $sql .= " inner join fi_konto as k ";
             $sql .= " on k.mandant_id = b.mandant_id and k.kontonummer = b.sollkonto ";
-            $sql .= " where b.mandant_id = ".$this->mandant_id;
+            $sql .= " where b.mandant_id = ".$this->client -> mandant_id;
             $sql .= " and b.habenkonto = '".$kontonummer."' ";
             $sql .= " and year(b.datum) >= year(now())-1 ";
             $sql .= " and year(b.datum) <= year(now()) ";
@@ -126,21 +120,16 @@ function getCashFlow($kontonummer, $side) {
             throw new Exception("Gültige Werte für side sind S und H");
         }
 
-        $rs = mysqli_query($db, $sql);
-        while($obj = mysqli_fetch_object($rs)) {
-            $values[] = $obj;
-        }
-        mysqli_free_result($rs);
-        mysqli_close($db);
+        $result = $db -> exec($sql);
     } else {
         throw new Exception("getCashFlow ist nur für Aktiv-Konten verfügbar");
     }
-    return wrap_response($values);
+    return $this -> wrap_response($result);
 }
 
 # Monats-internen Verlauf ermitteln
 function getIntraMonth($request) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
 
     if(isset($request['month_id'])) { 
       if($this->is_number($request['month_id'])) {
@@ -149,36 +138,27 @@ function getIntraMonth($request) {
         $month_id2 = $request['month_id']+1;
 
         $query = new QueryHandler("guv_intramonth_aufwand.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+        $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
         $query->setParameterUnchecked("month_id1", $month_id1);
         $query->setParameterUnchecked("month_id2", $month_id2);
         $sql = $query->getSql();
-
-        $result = array();
-        $rs = mysqli_query($db, $sql);
-        while($obj = mysqli_fetch_object($rs)) {
-            $result[] = $obj;
-        }
-
-        mysqli_free_result($rs);
-        mysqli_close($db);
-
-        return wrap_response($result);
+        $result = $db -> exec($sql);
+        return $this -> wrap_response($result);
 
       } else {
-        return wrap_response("Parameter month_id ist nicht ausschließlich numerisch");
+        return $this -> wrap_response("Parameter month_id ist nicht ausschließlich numerisch");
       }
     } else {
-        return wrap_response("Parameter month_id fehlt");
+        return $this -> wrap_response("Parameter month_id fehlt");
     }
 }
 
 # Prüft, ob das angegebene Konto ein Aktiv-Konto ist.
 function isAktivKonto($kontonummer) {
     if(!is_numeric($kontonummer)) return false;
-    $db = getDbConnection();
-    $rs = mysqli_query($db, "select kontenart_id from fi_konto "
-                            ."where mandant_id = ".$this->mandant_id
+    $db = $this -> f3->get('DB');
+    $result = $db -> exec("select kontenart_id from fi_konto "
+                            ."where mandant_id = ".$this->client -> mandant_id
                             ." and kontonummer = '".$kontonummer."'");
     $isActive = false;
     if($obj = mysqli_fetch_object($rs)) {
@@ -237,12 +217,12 @@ function is_number($value) {
 # eine GUV-Betrachtung (nur Aufwand und Ertrag) oder
 # eine Bestandsbetrachtung (nur Aktiv und Passiv) handelt.
 function getRechnungsart($kto_prepared) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $kontenarten = array();
     $type = 0;
     $sql = "select distinct kontenart_id from fi_konto where kontonummer in ($kto_prepared)";
-    $rs = mysqli_query($db, $sql);
-    while($obj = mysqli_fetch_object($rs)) {
+    $result = $db -> exec($sql);
+    foreach ($result as $obj) {
         $kontenart_id = $obj->kontenart_id;
         if($type == 0) {
             // noch ERGEBNISOFFEN
@@ -256,8 +236,6 @@ function getRechnungsart($kto_prepared) {
             if($kontenart_id == 1 || $kontenart_id == 2) throw new Exception("Falsche Mischung von Kontenarten");
         }
     }
-    mysqli_free_result($rs);
-    mysqli_close($db);
     return $type;
 }
 

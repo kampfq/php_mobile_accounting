@@ -18,7 +18,7 @@
  * USA
  */
 
-class InstallationController {
+class Install {
 
 private $dispatcher;
 
@@ -70,7 +70,7 @@ function checkDatabaseSettings($request) {
 
     mysqli_close($db);
 
-    return wrap_response("Verbindung erfolgreich hergestellt, Test erfolgreich");
+    return $this -> wrap_response("Verbindung erfolgreich hergestellt, Test erfolgreich");
 }
 
 # Speichert die Datenbankeinstellungen in die Datei lib/Database.php
@@ -99,7 +99,7 @@ function storeDatabaseSettings($request) {
         error_log("Gespeichert!");
         $response['isError'] = FALSE;
         $response['message'] = "Erfolgreich als $path gespeichert.\nAktuelles Verzeichnis:".getcwd();
-        return wrap_response($response);
+        return $this -> wrap_response($response);
 
     } catch(Exception $ex) {
         if(file_exists($path)) {
@@ -110,7 +110,7 @@ function storeDatabaseSettings($request) {
           $response['message'] = "Die Datei $path konnte nicht geschrieben werden, keine Schreibrechte vorhanden!";
           $response['content'] = $content;
         }
-        return wrap_response($response);
+        return $this -> wrap_response($response);
     } 
 }
 
@@ -122,7 +122,7 @@ function createDatabaseSchema() {
 
     $sql_statements = explode(";", $sql);
 
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     foreach($sql_statements as $sql) {
       #error_log($sql);
       mysqli_query($db, $sql);
@@ -134,7 +134,7 @@ function createDatabaseSchema() {
         $result['isError'] = TRUE;
         $result['message'] = "Datenbankfehler aufgetreten: $error";
         $result['sql'] = $sql;
-        return wrap_response($result);
+        return $this -> wrap_response($result);
       }
  
    }
@@ -143,7 +143,7 @@ function createDatabaseSchema() {
    $result = array();
    $result['isError'] = FALSE;
    $result['message'] = "Schema erfolgreich angelegt.";
-   return wrap_response($result);
+   return $this -> wrap_response($result);
     
 }
 
@@ -177,7 +177,7 @@ function addUser($request) {
        $message['message'] = "Der Benutzer wurde erfolgreich in die Datei .htpasswd im Ordner $appRootDir geschrieben "
                             ."und in der Datenbank dem Mandanten 1 zugeordnet";
       
-       return wrap_response($message); 
+       return $this -> wrap_response($message);
     } else {
        // 2. Wenn nein, inhalt der .htpasswd bei Weiter anzeigen 
        //    (mit Hinweis wohin die Datei soll)
@@ -187,7 +187,7 @@ function addUser($request) {
                             ."manuell im Ordner $appRootDir an. Die Zuordnung des Benutzers zu Mandant 1 in der "
                             ."Datenbank wurde ausgeführt.";
        $message['htpasswd'] = $htpasswd;
-       return wrap_response($message);
+       return $this -> wrap_response($message);
     }
 }
 
@@ -206,19 +206,19 @@ function setHtAccess() {
          $message['isError'] = TRUE;
          $message['message'] = "Die .htaccess-Datei konnte nicht nach $appRootDir geschrieben werden.";
          $message['htaccess'] = $htaccess;
-         return wrap_response($message);
+         return $this -> wrap_response($message);
       }
 
       $message = array();
       $message['isError'] = FALSE;
       $message['message'] = "Der Passwortschutz Ihrer Anwendung wurde aktiviert";
-      return wrap_response($message);
+      return $this -> wrap_response($message);
    } else {
       $message = array();
       $message['isError'] = TRUE;
       $message['message'] = "Die .htaccess-Datei konnte nicht nach $appRootDir geschrieben werden.";
       $message['htaccess'] = $htaccess;
-      return wrap_response($message);
+      return $this -> wrap_response($message);
    }
 }
 
@@ -253,7 +253,7 @@ private function isValidBenutzerObject($input) {
 # Mit automatischer Zuordnung zu Mandant 1
 private function addUserToDb($username) {
     require_once("../lib/Database.php");
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
 
     $sql = "insert into fi_user values(0, '$username', 'Benutzer: $username', 1, now())";
     mysqli_query($db, $sql);

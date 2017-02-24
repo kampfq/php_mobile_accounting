@@ -108,12 +108,12 @@ function removeIllegalCsvChars($string) {
 }
 
 # Methode zum uebergeben des Benutzers an den Dispatcher
-# ermittelt den zugeordneten Mandanten und setzt dessen id in das Feld $this->mandant_id
+# ermittelt den zugeordneten Mandanten und setzt dessen id in das Feld $this->client -> mandant_id
 function setRemoteUser($user) {
     if($this->isValidUserName($user)) {
-        $db = getDbConnection();
+        $db = $this -> f3->get('DB');
         $this->user = $user;
-        $rs = mysqli_query($db, "select mandant_id, user_id from fi_user where user_name = '$user'");
+        $result = $db -> exec("select mandant_id, user_id from fi_user where user_name = '$user'");
         if($rs && $obj = mysqli_fetch_object($rs)) {
             $this->mandant = $obj->mandant_id;
             $this->user_id = $obj->user_id;

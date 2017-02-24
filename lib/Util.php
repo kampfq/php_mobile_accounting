@@ -21,7 +21,7 @@
 # 
 # Verpacken des Response von Controller-Methoden
 #
-function wrap_response($obj="", $format="json") {
+function $this -> wrap_response($obj="", $format="json") {
 
     #error_log("Objekt ".json_encode($obj));
     #error_log("Format ".$format);

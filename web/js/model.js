@@ -97,7 +97,7 @@ m.privat.initKontenarten = function(self) {
     // Kontenarten
     self.kontenarten = ko.observableArray([]);
     self.refreshKontenarten = function() {
-        doGETwithCache("kontenart", "list", [], 
+        doGETwithCache("TypeOfAccount", "getKontenarten", [],
             function(data) {
                 self.kontenarten($.map(data, function(item) {return new Kontenart(item); }));
             }, 
@@ -110,7 +110,7 @@ m.privat.initKontenarten = function(self) {
     self.refreshKontenarten();
 
     self.loadKontenart = function(kontenart_id) {
-        doGETwithCache("kontenart", "get", {'id':kontenart_id},
+        doGETwithCache("TypeOfAccount", "getKontenart", {'id':kontenart_id},
             function(data) {
                 self.kontenart().kontenart_id(data.kontenart_id);
                 self.kontenart().bezeichnung(data.bezeichnung);
@@ -137,7 +137,7 @@ m.privat.initKonten = function(self) {
     self.konten_selected = ko.observableArray([]);
 
     self.refreshKonten = function () {    
-        doGETwithCache("konto", "list", [], 
+        doGETwithCache("Account", "getKonten", [],
             function(data) {
                 self.konten($.map(data, function(item) {return new Konto(item) }));
                 self.konten_aktiv($.map(data, function(item) { if(item.kontenart_id == '1') { return new Konto(item); }}));
@@ -186,7 +186,7 @@ m.privat.initKonten = function(self) {
     }
 
     self.loadKonto = function(kontoNummer) {
-        doGETwithCache("konto", "get", {'id':kontoNummer},
+        doGETwithCache("Account", "getKonto", {'id':kontoNummer},
             function(data) {
                  self.konto().kontonummer(data.kontonummer);
                  self.konto().bezeichnung(data.bezeichnung);
@@ -215,7 +215,7 @@ m.privat.initQuick = function(self) {
     self.selectedquick = new Quick({config_id:0, config_knz:'', sollkonto:'', habenkonto:''
                                     , buchungstext:'', betrag:0, mandant_id:0});
     self.refreshQuick = function () {
-        doGETwithCache("menu", "quick", [],
+        doGETwithCache("Menu", "getQuickMenu", [],
             function(data) {
                 self.quickentries($.map(data, function(item) {return new Quick(item) }));
             },
@@ -268,7 +268,7 @@ m.privat.initMonate = function(self) {
     self.selectedMonat = ko.observable('201403'); 
 
     self.updateMonate = function(successHandler) {
-        doGETwithCache("ergebnis", "months", [], 
+        doGETwithCache("Result", "getMonths", [],
             function(data) {
                 self.buchungsmonate.removeAll();
                 for(var i = 0; i < data.length; i++) { 
@@ -305,7 +305,7 @@ m.privat.initJahre = function(self) {
     self.selectedJahr = ko.observable('2014');
 
     self.updateJahre = function(successHandler) {
-        doGETwithCache("ergebnis", "years", [], 
+        doGETwithCache("Result", "getYears", [],
             function(data) {
                 self.buchungsjahre.removeAll();
                 for(var i = 0; i < data.length; i++) {

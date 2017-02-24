@@ -19,8 +19,11 @@
  */
 
 namespace Controller\Accounting;
+use Traits\ViewControllerTrait;
 
 class Result {
+
+    use ViewControllerTrait;
 
 private $dispatcher, $mandant_id;
 
@@ -28,7 +31,7 @@ private $dispatcher, $mandant_id;
 function invoke($action, $request, $dispatcher) {
 
     $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
+    $this->client -> mandant_id = $dispatcher->getMandantId();
 
     switch($action) {
         case "bilanz":
@@ -58,12 +61,12 @@ function invoke($action, $request, $dispatcher) {
 # sie als Array zurück
 function getBilanz() {
     $result = array();
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
 
     $sql =  "select konto, kontenname, saldo from fi_ergebnisrechnungen ";
-    $sql .= "where mandant_id = $this->mandant_id and kontenart_id in (1, 2) ";
+    $sql .= "where mandant_id = $this->client -> mandant_id and kontenart_id in (1, 2) ";
     $sql .= "order by konto";
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
 
     $zeilen = array();
     while($erg = mysqli_fetch_object($rs)) {
@@ -72,35 +75,35 @@ function getBilanz() {
     $result['zeilen'] = $zeilen;
 
     $sql = "select kontenart_id, sum(saldo) saldo from fi_ergebnisrechnungen
-        where kontenart_id in (1, 2) and mandant_id = $this->mandant_id
+        where kontenart_id in (1, 2) and mandant_id = $this->client -> mandant_id
         group by kontenart_id
         union 
         select '5', sum(saldo) saldo from fi_ergebnisrechnungen 
-        where kontenart_id in (1, 2) and mandant_id = $this->mandant_id";
+        where kontenart_id in (1, 2) and mandant_id = $this->client -> mandant_id";
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
     $ergebnisse = array();
     while($erg = mysqli_fetch_object($rs)) {
         $ergebnisse[] = $erg;
     }
     $result['ergebnisse'] = $ergebnisse;
     mysqli_close($db); 
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Berechnet eine aktuelle GuV-Rechnung und liefert
 # sie als Array zurück
 function getGuV($request) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $year = $request['year'];
     if($this->isValidYear($year)) {
 
         $query = new QueryHandler("guv_jahr.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+        $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
         $query->setParameterUnchecked("jahr_id", $year);
         $sql = $query->getSql();
    
-        $rs = mysqli_query($db, $sql);
+        $result = $db -> exec($sql);
         $zeilen = array();
         $result = array();
         while($erg = mysqli_fetch_object($rs)) {
@@ -109,20 +112,20 @@ function getGuV($request) {
         $result['zeilen'] = $zeilen;
 
         $query = new QueryHandler("guv_jahr_summen.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+        $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
         $query->setParameterUnchecked("jahr_id", $year);
         $sql2  = $query->getSql();
 
-        $rs = mysqli_query($db, $sql2);
+        $result = $db -> exec($sql2);
         $ergebnisse = array();
         while($erg = mysqli_fetch_object($rs)) {
             $ergebnisse[] = $erg;
         }
         $result['ergebnisse'] = $ergebnisse;
         mysqli_close($db);
-        return wrap_response($result);
+        return $this -> wrap_response($result);
     } else {
-        return wrap_response("Der übergebene Parameter year erfüllt nicht die Formatvorgaben für gültige Jahre");
+        return $this -> wrap_response("Der übergebene Parameter year erfüllt nicht die Formatvorgaben für gültige Jahre");
     }
 }
 
@@ -131,13 +134,13 @@ function getGuV($request) {
 function getGuVMonth($request) {
     $month_id = $this->getMonthFromRequest($request);
 
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $query = new QueryHandler("guv_monat.sql");
-    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
     $query->setParameterUnchecked("monat_id", $month_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
     $zeilen = array();
     $result = array();
     while($erg = mysqli_fetch_object($rs)) {
@@ -146,11 +149,11 @@ function getGuVMonth($request) {
     $result['zeilen'] = $zeilen;
 
     $query = new QueryHandler("guv_monat_summen.sql");
-    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
     $query->setParameterUnchecked("monat_id", $month_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
     $ergebnisse = array();
     while($erg = mysqli_fetch_object($rs)) {
         $ergebnisse[] = $erg;
@@ -158,20 +161,20 @@ function getGuVMonth($request) {
     $result['ergebnisse'] = $ergebnisse;
 
     mysqli_close($db);
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 #
 # Laden der GuV-Prognose
 # (GuV aktuelles-Monat + Vormonat)
 function getGuVPrognose() {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
 
     $query = new QueryHandler("guv_prognose.sql");
-    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
 
     $result = array();
     $result['detail'] = array();
@@ -182,10 +185,10 @@ function getGuVPrognose() {
     mysqli_free_result($rs);
 
     $query = new QueryHandler("guv_prognose_summen.sql");
-    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
     
     $result['summen'] = array();
     while($erg = mysqli_fetch_object($rs)) {
@@ -193,7 +196,7 @@ function getGuVPrognose() {
     }
 
     mysqli_close($db);
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Ermittelt aus dem Request und dessen Parameter "id" das ausgewählte Monat
@@ -212,45 +215,45 @@ function getMonthFromRequest($request) {
 
 # Liefert eine Liste der gültigen Monate aus den Buchungen des Mandanten
 function getMonths() {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $months = array();
 
     $sql =  "select distinct (year(datum)*100)+month(datum) as yearmonth ";
-    $sql .= " from fi_buchungen where mandant_id = ".$this->mandant_id;
+    $sql .= " from fi_buchungen where mandant_id = ".$this->client -> mandant_id;
     $sql .= " order by yearmonth";
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
     while($obj = mysqli_fetch_object($rs)) {
         $months[] = $obj->yearmonth;
     }
 
     mysqli_free_result($rs);
     mysqli_close($db);
-    return wrap_response($months);
+    return $this -> wrap_response($months);
 }
 
 # Liefert eine Liste der gültigen Jahre aus den Buchungen des Mandanten
 function getYears() {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $years = array();
 
     $sql = "select distinct year(datum) as year ";
-    $sql .= "from fi_buchungen where mandant_id = ".$this->mandant_id;
+    $sql .= "from fi_buchungen where mandant_id = ".$this->client -> mandant_id;
     $sql .= " order by year";
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
     while($obj = mysqli_fetch_object($rs)) {
         $years[] = $obj->year;
     }
 
     mysqli_free_result($rs);
     mysqli_close($db);
-    return wrap_response($years);
+    return $this -> wrap_response($years);
 }
 
 # Verlauf Aufwand, Ertrag, Aktiva und Passiva in Monatsraster
 function getVerlauf($request) {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $result = array();
 
     if(!array_key_exists('id', $request)) 
@@ -259,14 +262,14 @@ function getVerlauf($request) {
     $kontenart_id = $request['id'];
     if(is_numeric($kontenart_id)) {
 
-        $db = getDbConnection();
+        $db = $this -> f3->get('DB');
 
         if($kontenart_id == 4 || $kontenart_id == 1)
             $sql =  "select (year(datum)*100)+month(datum) as grouping, sum(betrag)*-1 as saldo ";
         else
             $sql =  "select (year(datum)*100)+month(datum) as grouping, sum(betrag) as saldo ";
         $sql .= "from fi_ergebnisrechnungen_base ";
-        $sql .= "where kontenart_id = $kontenart_id and gegenkontenart_id <> 5 and mandant_id = $this->mandant_id ";
+        $sql .= "where kontenart_id = $kontenart_id and gegenkontenart_id <> 5 and mandant_id = $this->client -> mandant_id ";
 
         # Nur immer die letzten 12 Monate anzeigen
         $sql .= "and (year(datum)*100)+month(datum) >= ((year(now())*100)+month(now()))-100 ";
@@ -274,26 +277,26 @@ function getVerlauf($request) {
         $sql .= "group by kontenart_id, year(datum), month(datum) ";
         $sql .= "order by grouping";
 
-        $rs = mysqli_query($db, $sql);
+        $result = $db -> exec($sql);
         while($erg = mysqli_fetch_object($rs)) {
             $result[] = $erg;
         }
 
         mysqli_close($db);
     } 
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Verlauf des Gewinns in Monatsraster
 function getVerlaufGewinn() {
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
     $result = array();
 
-    $db = getDbConnection();
+    $db = $this -> f3->get('DB');
 
     $sql =  "select (year(datum)*100)+month(datum) as grouping, sum(betrag*-1) as saldo ";
     $sql .= "from fi_ergebnisrechnungen_base ";
-    $sql .= "where kontenart_id in (3, 4) and gegenkontenart_id <> 5 and mandant_id = $this->mandant_id ";
+    $sql .= "where kontenart_id in (3, 4) and gegenkontenart_id <> 5 and mandant_id = $this->client -> mandant_id ";
 
     # Nur immer die letzten 12 Monate anzeigen
     $sql .= "and (year(datum)*100)+month(datum) >= ((year(now())*100)+month(now()))-100 ";
@@ -301,14 +304,14 @@ function getVerlaufGewinn() {
     $sql .= "group by year(datum), month(datum) ";
     $sql .= "order by grouping";
 
-    $rs = mysqli_query($db, $sql);
+    $result = $db -> exec($sql);
     while($erg = mysqli_fetch_object($rs)) {
         $result[] = $erg;
     }
 
     mysqli_close($db);
     
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Prüft, ob das Zahlenformat des übergebenen Jahres korrekt ist

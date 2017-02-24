@@ -83,7 +83,7 @@ var kontenForm = {
     },
 
     save : function(jsonString) {
-        doPOST("konto", "save", jsonString,
+        doPOST("Account", "saveKonto", jsonString,
             function(data) {
                 alert("Konto erfolgreich gespeichert");
             },
@@ -94,7 +94,7 @@ var kontenForm = {
     },
 
     create : function(jsonString) {
-        doPOST("konto", "create", jsonString,
+        doPOST("Account", "createKonto", jsonString,
             function(data) {
                 alert("Konto erfolgreich angelegt");
             },
@@ -106,7 +106,7 @@ var kontenForm = {
 
 
     showSaldoHandler : function() {
-        doGET("konto", "saldo", {'id':kontenForm.selectedKontonummer}, 
+        doGET("Account", "getSaldo", {'id':kontenForm.selectedKontonummer},
             function(data) {
                 alert("Saldo von Konto "+kontenForm.selectedKontonummer+" = "+data+" Euro");
             }, 
@@ -121,7 +121,7 @@ var kontenForm = {
         $("#account_show_monatssalden").show();
         $("#account_show_monatssalden").html("Monatssalden werden geladen");
 
-        doGETwithCache("verlauf", "monatssalden", {'id':kontenForm.selectedKontonummer},
+        doGETwithCache("Progress", "getMonatsSalden", {'id':kontenForm.selectedKontonummer},
             function(data) {
                 var table = "<table>";
                 var code = "<b>Monatssalden: "+kontenForm.selectedKontonummer+"</b><br/>";
@@ -149,7 +149,7 @@ var kontenForm = {
         $("#account_show_bookings").show();
         $("#account_show_bookings").html("wird geladen...");
         params = {'konto': kontenForm.selectedKontonummer};
-        doGETwithCache("buchung", "listbykonto", params,
+        doGETwithCache("Booking", "getListByKonto", params,
             function(data) {
                 var tabelle = "<p>Saldo: "+data.saldo+"</p>";
                 tabelle += "<table><tr><td>BNr</td><td>BTxt</td><td>GKto</td>";

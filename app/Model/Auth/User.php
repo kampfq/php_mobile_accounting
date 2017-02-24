@@ -11,7 +11,7 @@
  * @deprecated File deprecated in Release
  */
 
-namespace Model\Accounting;
+namespace Model\Auth;
 
 
 use DB\Cortex;

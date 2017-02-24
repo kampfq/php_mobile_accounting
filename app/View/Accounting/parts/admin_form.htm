@@ -38,7 +38,7 @@ var adminForm = {
     saveAdminQuickTemplate : function(quick) {
         var jsonQuick = ko.toJSON(quick);
         //alert(jsonQuick);
-        doPOST("menu", "add", jsonQuick, function(data) {
+        doPOST("Menu", "addQuickMenu", jsonQuick, function(data) {
                 $(".content_form").hide();
                 model.refreshQuick();
                 $("#admin_quick_select_view").show();
@@ -54,7 +54,7 @@ var adminForm = {
     */
     deleteAdminQuickTemplate : function(quick) {
         var id = quick.config_id();
-        doGET("menu", "remove", {'id': id}, 
+        doGET("Menu", "removeQuickMenu", {'id': id},
             function(data) {
                 $(".content_form").hide();
                 model.refreshQuick();

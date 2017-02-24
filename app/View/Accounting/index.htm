@@ -1,24 +1,3 @@
-<?php 
-/*
- * Copyright (c) 2013 by Wolfgang Wiedermann
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA
- */
-?>
-<?php define("MAIN_PAGE", 1); ?>
 <!DOCTYPE html>
 <html lang="de" manifest="manifest.php">
 <head>
@@ -45,11 +24,11 @@
         <a href="#" id="header_new_button" data-icon="new">Neu</a>
     </div>
     <div data-role="content">
-        <?php include("./parts/navigation.php"); ?>
-        <?php include("./parts/account_form.php"); ?>
-        <?php include("./parts/buchung_form.php"); ?>
-        <?php include("./parts/ergebnis_form.php"); ?>
-        <?php include("./parts/admin_form.php"); ?>
+        <include href="Accounting/parts/navigation.htm" />
+        <include href="Accounting/parts/account_form.htm" />
+        <include href="Accounting/parts/buchung_form.htm" />
+        <include href="Accounting/parts/ergebnis_form.htm" />
+        <include href="Accounting/parts/admin_form.htm" />
     </div>
     <div data-role="footer" data-position="fixed" data-theme="b"><center>&copy; 2014 by Wolfgang Wiedermann</center></div>
 </div>

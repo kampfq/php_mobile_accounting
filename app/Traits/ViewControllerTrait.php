@@ -36,16 +36,28 @@ trait ViewControllerTrait
 
     public function render():ResponseInterface
     {
-
         /**
          * get the fat free framework class
          */
         $f3 = \Base::instance();
         $this->execute();
         $f3->set('mainContent', $this->getTemplate());
+        $messages = $this -> prepareFlashMessages($this -> flashMessenger);
+        $f3->set('flashMessages', $messages);
 
+        /**
+         * return the rendered template
+         */
+        $response = $this -> getResponse();
+        $f3 -> set('PSR7_RESPONSE',$response);
+        return $response;
+    }
+
+    abstract public function execute();
+
+    protected function prepareFlashMessages(FlashMessengerBag $flashMessengerBag): array {
         $messages = array();
-        foreach ($this -> flashMessenger -> getFlashMessages() as $message){
+        foreach ($flashMessengerBag -> getFlashMessages() as $message){
             /**
              * @var $message FlashMessage
              */
@@ -56,18 +68,12 @@ trait ViewControllerTrait
             ];
         }
         $this -> flashMessenger -> flush();
-        $f3->set('flashMessages', $messages);
-
-        /**
-         * return the rendered template
-         */
-
-        $response = new Response\HtmlResponse(\Template::instance()->render('base/layout.htm'));
-        $f3 -> set('PSR7_RESPONSE',$response);
-        return $response;
+        return $messages;
     }
 
-    abstract public function execute();
+    protected function getResponse(){
+        return new Response\HtmlResponse(\Template::instance()->render('Accounting/index.htm'));
+    }
 
     abstract public function getTemplate(): string;
 

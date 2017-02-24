@@ -14,13 +14,14 @@
 /**
  * setup Autoloader
  */
-//fat free autoloader
-$f3->set('AUTOLOAD','../app/');
+
 //composer autoloader
 (@include_once ('../app/vendor/autoload.php')) OR die("You need to run php
 composer.phar install for your application to run.");
 
 $f3 = \Base::instance();
+//fat free autoloader
+$f3->set('AUTOLOAD','../app/');
 /**
  * include configuration files
  */

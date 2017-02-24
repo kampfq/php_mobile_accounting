@@ -18,7 +18,7 @@
  * USA
  */
 
-namespace Controller;
+namespace Controller\Accounting;
 
 class Progress {
 

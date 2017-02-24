@@ -6,8 +6,8 @@
 namespace Traits;
 
 
-use Controllers\FlashMessenger\FlashMessage;
-use Controllers\FlashMessenger\FlashMessengerBag;
+use Controller\FlashMessenger\FlashMessage;
+use Controller\FlashMessenger\FlashMessengerBag;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;

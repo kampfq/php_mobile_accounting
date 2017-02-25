@@ -26,50 +26,50 @@ class Office {
 
     use ViewControllerTrait;
 
-# Erstellt eine Liste aller Buchungen
-function getJournal($request) {
+    // Erstellt eine Liste aller Buchungen
+    public function getJournal($request) {
 
-    $format = "csv";    
+        $format = "csv";
 
-    if(isset($request['format'])) {
-       if($request['format'] == "json") {
-           $format = $request['format']; 
-       }
-    } 
-	
-    $result = array();
-    $db = $this -> database;
+        if(isset($request['format'])) {
+            if($request['format'] == "json") {
+                $format = $request['format'];
+            }
+        }
 
-    $query = new QueryHandler("export_journal_to_excel.sql");
-    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
-    $sql = $query->getSql();
+        $result = array();
+        $db = $this -> database;
 
-    $result = $db -> exec($sql);
-	
-    return $this -> wrap_response($result, $format);
-}
+        $query = new QueryHandler("export_journal_to_excel.sql");
+        $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
+        $sql = $query->getSql();
 
-# Erstellt eine Liste aller GuV-Monatssalden
-function getGuvMonate($request) {
+        $result = $db -> exec($sql);
 
-    $format = "csv";    
+        return $this -> wrap_response($result, $format);
+    }
 
-    if(isset($request['format'])) {
-       if($request['format'] == "json") {
-           $format = $request['format']; 
-       }
-    } 
-        
-    $result = array();
-    $db = $this -> database;
+    // Erstellt eine Liste aller GuV-Monatssalden
+    public function getGuvMonate($request) {
 
-    $query = new QueryHandler("guv_monat_csv.sql");
-    $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
-    $sql = $query->getSql();
+        $format = "csv";
 
-    $result = $db -> exec($sql);
-    return $this -> wrap_response($result, $format);
-}
+        if(isset($request['format'])) {
+            if($request['format'] == "json") {
+                $format = $request['format'];
+            }
+        }
+
+        $result = array();
+        $db = $this -> database;
+
+        $query = new QueryHandler("guv_monat_csv.sql");
+        $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
+        $sql = $query->getSql();
+
+        $result = $db -> exec($sql);
+        return $this -> wrap_response($result, $format);
+    }
 
 
 }

@@ -21,102 +21,102 @@
 namespace Controller\Accounting;
 use Model\Accounting\Template;
 use Traits\ViewControllerTrait;
-# Controller für die Schnellbuchungs-Menüeinträge
+    // Controller für die Schnellbuchungs-Menüeinträge
 class Menu {
 
     use ViewControllerTrait;
 
-function getQuickMenu() {
-    $db = $this -> database;
-    $result = $result = $db -> exec("select * from fi_quick_config where mandant_id = ".$this->client->mandant_id." order by config_knz");
-    return $this -> wrap_response($result);
-}
-
-
-function getQuickMenuById() {
-    $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
-    if(!is_numeric($idParsedFromRequest)){
-        throw new \ErrorException("Die fi_quick_config id ist fehlerhaft");
+    public function getQuickMenu() {
+        $db = $this -> database;
+        $result = $result = $db -> exec("select * from fi_quick_config where mandant_id = ".$this->client->mandant_id." order by config_knz");
+        return $this -> wrap_response($result);
     }
-    $template = new Template();
-    $template -> load([
-        'mandant_id = ? AND config_id = ?',$this->client -> mandant_id,$idParsedFromRequest
-    ]);
-    if($template -> loaded() !== 1){
-        return $this -> wrap_response(null);
-    }
-    return $this -> wrap_response($template);
-}
 
-function addQuickMenu($request) {
-    $db = $this -> database;
-    $inputJSON = file_get_contents('php://input');
-    $input = json_decode( $inputJSON, TRUE );
-    if($this->isValidQuickMenu($input)) { 
-        $sql = "insert into fi_quick_config(config_knz, sollkonto, habenkonto, buchungstext,";
-        $sql .= " betrag, mandant_id) values ('".$input['config_knz']."', '".$input['sollkonto']."', ";
-        $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->client -> mandant_id.")";
 
-        mysqli_query($db, $sql);
-        $error = mysqli_error($db);
-        if($error) {
-           error_log($error);
-           error_log($sql);
+    public function getQuickMenuById() {
+        $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
+        if(!is_numeric($idParsedFromRequest)){
+            throw new \ErrorException("Die fi_quick_config id ist fehlerhaft");
         }
-        mysqli_close($db);
-        return $this -> wrap_response("Fehler: $error");
-    } else {
-        mysqli_close($db);
-        throw new ErrorException("Die uebergebene Schnellbuchungsvorlage ist nicht valide: ".$inputJSON);
+        $template = new Template();
+        $template -> load([
+            'mandant_id = ? AND config_id = ?',$this->client -> mandant_id,$idParsedFromRequest
+        ]);
+        if($template -> loaded() !== 1){
+            return $this -> wrap_response(null);
+        }
+        return $this -> wrap_response($template);
     }
-}
 
-function removeQuickMenu($request) {
-    $db = $this -> database;
-    $id = $request['id'];
-    if(is_numeric($id)) {
-        $sql =  "delete from fi_quick_config where mandant_id = $this->client -> mandant_id";
-        $sql .= " and config_id = $id";
+    public function addQuickMenu($request) {
+        $db = $this -> database;
+        $inputJSON = file_get_contents('php://input');
+        $input = json_decode( $inputJSON, TRUE );
+        if($this->isValidQuickMenu($input)) {
+            $sql = "insert into fi_quick_config(config_knz, sollkonto, habenkonto, buchungstext,";
+            $sql .= " betrag, mandant_id) values ('".$input['config_knz']."', '".$input['sollkonto']."', ";
+            $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->client -> mandant_id.")";
 
-        mysqli_query($db, $sql);
-        mysqli_close($db);
-
-        return $this -> wrap_response(null);
-    } else {
-        throw new ErrorException("Die id der Schnellbuchungsvorlage muss numerisch sein!");
+            mysqli_query($db, $sql);
+            $error = mysqli_error($db);
+            if($error) {
+                error_log($error);
+                error_log($sql);
+            }
+            mysqli_close($db);
+            return $this -> wrap_response("Fehler: $error");
+        } else {
+            mysqli_close($db);
+            throw new ErrorException("Die uebergebene Schnellbuchungsvorlage ist nicht valide: ".$inputJSON);
+        }
     }
-}
 
-# Prüft ob $menu ein valides QuickMenu-Objekt ist
-# Typen und Felder prüfen
-function isValidQuickMenu($menu) {
-    if(count($menu) < 4 && count($menu) > 7) {
-        return false;
-    } 
-    foreach($menu as $key => $value) {
-        if(!$this->isValidFieldAndValue($key, $value)) return false;
+    public function removeQuickMenu($request) {
+        $db = $this -> database;
+        $id = $request['id'];
+        if(is_numeric($id)) {
+            $sql =  "delete from fi_quick_config where mandant_id = $this->client -> mandant_id";
+            $sql .= " and config_id = $id";
+
+            mysqli_query($db, $sql);
+            mysqli_close($db);
+
+            return $this -> wrap_response(null);
+        } else {
+            throw new ErrorException("Die id der Schnellbuchungsvorlage muss numerisch sein!");
+        }
     }
-    return true;
-}
 
-# Prüft ein einzelnes Feld uns seinen Inhalt auf Gültigkeit
-function isValidFieldAndValue($key, $value) {
-    switch($key) {
-        case 'config_id': 
-        case 'sollkonto':
-        case 'habenkonto': 
-        case 'betrag':
-        case 'mandant_id':
-            return $value == null || is_numeric($value);
-        case 'buchungstext':
-        case 'config_knz':
-            $pattern = '/[\']/';
-            preg_match($pattern, $value, $results);
-            return count($results) == 0;
-        default: // throw new ErrorException("Key: $key, Value: $value");
+    // Prüft ob $menu ein valides QuickMenu-Objekt ist
+    // Typen und Felder prüfen
+    public function isValidQuickMenu($menu) {
+        if(count($menu) < 4 && count($menu) > 7) {
             return false;
+        }
+        foreach($menu as $key => $value) {
+            if(!$this->isValidFieldAndValue($key, $value)) return false;
+        }
+        return true;
     }
-}
+
+    // Prüft ein einzelnes Feld uns seinen Inhalt auf Gültigkeit
+    public function isValidFieldAndValue($key, $value) {
+        switch($key) {
+            case 'config_id':
+            case 'sollkonto':
+            case 'habenkonto':
+            case 'betrag':
+            case 'mandant_id':
+                return $value == null || is_numeric($value);
+            case 'buchungstext':
+            case 'config_knz':
+                $pattern = '/[\']/';
+                preg_match($pattern, $value, $results);
+                return count($results) == 0;
+            default: // throw new ErrorException("Key: $key, Value: $value");
+                return false;
+        }
+    }
 
 
 

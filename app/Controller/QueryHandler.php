@@ -30,20 +30,20 @@ class QueryHandler {
     private $path;
     private $sql;
 
-    function __construct($path) {
+    public function __construct($path) {
         $this->path = $path;
         $this->loadSql();
     }
 
-    function loadSql() {
+    public function loadSql() {
         $this->sql = file_get_contents(__DIR__."../sql/query/".$this->path);
     }
 
-    function setParameterUnchecked($paramName, $paramValue) {
+    public function setParameterUnchecked($paramName, $paramValue) {
         $this->sql = str_replace("#".$paramName."#", $paramValue, $this->sql);
     }
 
-    function setStringParameter($paramName, $paramValue) {
+    public function setStringParameter($paramName, $paramValue) {
         if($this->isValidString($paramValue)) {
             $this->setParameterUnchecked($paramName, $paramValue);
         } else {
@@ -52,7 +52,7 @@ class QueryHandler {
         }
     }
 
-    function setNumericParameter($paramName, $paramValue) {
+    public function setNumericParameter($paramName, $paramValue) {
         if($this->isValidNumber($paramValue)) {
             $this->setParameterUnchecked($paramName, $paramValue);
         } else {
@@ -61,19 +61,19 @@ class QueryHandler {
         }
     }
 
-    function isValidString($string) {
+    public function isValidString($string) {
         $pattern = "/[']/";
         preg_match($pattern, $string, $results);
         return count($results) == 0;
     }
 
-    function isValidNumber($number) {
+    public function isValidNumber($number) {
         $pattern = "/[^0-9\\.,]/";
         preg_match($pattern, $number, $results);
         return count($results) == 0;
     }
 
-    function getSql() {
+    public function getSql() {
         return $this->sql;
     }
 }

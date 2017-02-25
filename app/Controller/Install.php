@@ -24,7 +24,7 @@ class Install {
 
 private $dispatcher;
 
-# Einsprungpunkt, hier übergibt das Framework
+    // Einsprungpunkt, hier übergibt das Framework
 function invoke($action, $request, $dispatcher) {
     $this->dispatcher = $dispatcher;
     switch($action) {
@@ -43,9 +43,9 @@ function invoke($action, $request, $dispatcher) {
     }
 }
 
-# Liest eines einzelnes Konto aus und liefert
-# sie als Objekt zurück
-# TODO: Die Texte im Fehlerfall stimmen noch nicht: im 2. Fall ist 1. nicht sicher ausgeschlossen!
+    // Liest eines einzelnes Konto aus und liefert
+    // sie als Objekt zurück
+    // TODO: Die Texte im Fehlerfall stimmen noch nicht: im 2. Fall ist 1. nicht sicher ausgeschlossen!
 function checkDatabaseSettings($request) {
     $inputJSON = file_get_contents('php://input');
     $input = json_decode($inputJSON, TRUE); 
@@ -75,8 +75,8 @@ function checkDatabaseSettings($request) {
     return $this -> wrap_response("Verbindung erfolgreich hergestellt, Test erfolgreich");
 }
 
-# Speichert die Datenbankeinstellungen in die Datei lib/Database.php
-# Wenn ein Speichern nicht möglich ist wird eine Fehlermeldung ausgegeben
+    // Speichert die Datenbankeinstellungen in die Datei lib/Database.php
+    // Wenn ein Speichern nicht möglich ist wird eine Fehlermeldung ausgegeben
 function storeDatabaseSettings($request) {
     $inputJSON = file_get_contents('php://input');
     $input = json_decode($inputJSON, TRUE);
@@ -116,8 +116,8 @@ function storeDatabaseSettings($request) {
     } 
 }
 
-# Anlegen des Datenbankschemas
-# unter Verwendung von sql/create-tables-and-views.sql
+    // Anlegen des Datenbankschemas
+    // unter Verwendung von sql/create-tables-and-views.sql
 function createDatabaseSchema() {
     $sql = file_get_contents("../sql/create-tables-and-views.sql");
     require_once("../lib/Database.php");
@@ -149,8 +149,8 @@ function createDatabaseSchema() {
     
 }
 
-# Fügt einen Benutzer für das Haushaltsbuch hinzu
-# (Alle Benutzer werden dem automatisch angelegten Mandanten 1 zugeordnet!)
+    // Fügt einen Benutzer für das Haushaltsbuch hinzu
+    // (Alle Benutzer werden dem automatisch angelegten Mandanten 1 zugeordnet!)
 function addUser($request) {
     $inputJSON = file_get_contents("php://input");
     $input = json_decode($inputJSON, TRUE);
@@ -193,7 +193,7 @@ function addUser($request) {
     }
 }
 
-# .htaccess-Datei erstellen und auf .htpasswd verweisen
+    // .htaccess-Datei erstellen und auf .htpasswd verweisen
 function setHtAccess() {
    $appRootDir = $this->getAppRootDir();
    $htaccess = file_get_contents($appRootDir."htaccess.template");
@@ -224,17 +224,17 @@ function setHtAccess() {
    }
 }
 
-# Installation abschließen
+    // Installation abschließen
 function finishInstallation() {
 
 }
 
-# Ermittelt das Stammverzeichnis der Installation des HTML5-Haushaltsbuchs
+    // Ermittelt das Stammverzeichnis der Installation des HTML5-Haushaltsbuchs
 private function getAppRootDir() {
     return substr(getcwd(), 0, strlen(getcwd())-7);
 }
 
-# Prüft, ob ein übergebenes Benutzerobjekt das korrekte Format hat.
+    // Prüft, ob ein übergebenes Benutzerobjekt das korrekte Format hat.
 private function isValidBenutzerObject($input) {
    if(!(array_key_exists('username', $input) 
         && array_key_exists('password', $input))) {
@@ -251,8 +251,8 @@ private function isValidBenutzerObject($input) {
    return $username_ok && $password_ok;
 }
 
-# Speichern eines Nutzers in der Datenbank
-# Mit automatischer Zuordnung zu Mandant 1
+    // Speichern eines Nutzers in der Datenbank
+    // Mit automatischer Zuordnung zu Mandant 1
 private function addUserToDb($username) {
     require_once("../lib/Database.php");
     $db = $this -> database;
@@ -263,7 +263,7 @@ private function addUserToDb($username) {
     mysqli_close($db);
 }
 
-# Auslesen einer mglw. bestehenden .htpasswd-Datei
+    // Auslesen einer mglw. bestehenden .htpasswd-Datei
 private function getExistingHtpasswd($appRootDir) {
     if(file_exists($appRootDir.".htpasswd")) {
        $htpasswd = file_get_contents($appRootDir.".htpasswd");
@@ -273,15 +273,15 @@ private function getExistingHtpasswd($appRootDir) {
     }
 }
 
-# Baut den String für einen htpasswd-Benutzereintrag zusammen
-# und gibt diesen als Rückgabewert zurück
+    // Baut den String für einen htpasswd-Benutzereintrag zusammen
+    // und gibt diesen als Rückgabewert zurück
 private function createHtpasswdEntry($username, $passwd) {
     return "".$username.":".$this->htpasswd($passwd)."\n";
 }
 
-# Interne Hilfsfunktion
-# Verschlüsselt ein gegebenes Passwort passend für eine
-# .htpasswd-Datei
+    // Interne Hilfsfunktion
+    // Verschlüsselt ein gegebenes Passwort passend für eine
+    // .htpasswd-Datei
 private function htpasswd($passwd) {
   // Alter Ansatz mit Unix-Crypt -> unsafe  
   //return crypt($passwd, base64_encode($passwd));

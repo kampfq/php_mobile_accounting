@@ -25,132 +25,132 @@ class Booking {
 
     use ViewControllerTrait;
 
-# legt das als JSON-Objekt übergebene Konto an
-function createBuchung($request) {
-    $db = $this -> database;
-    $inputJSON = file_get_contents('php://input');
-    $input = json_decode( $inputJSON, TRUE );
-    if($this->isValidBuchung($input)) {
-        $sql = "insert into fi_buchungen (mandant_id, buchungstext, sollkonto, habenkonto, "
-              ."betrag, datum, bearbeiter_user_id)"
-              ." values ($this->client -> mandant_id, '".$input['buchungstext']
-              ."', '".$input['sollkonto']."', '".$input['habenkonto']."', ".$input['betrag'].", '"
-              .$input['datum']."', ".$this->dispatcher->getUserId().")";
-        mysqli_query($db, $sql);
-        mysqli_close($db);
+    // legt das als JSON-Objekt übergebene Konto an
+    public function createBuchung($request) {
+        $db = $this -> database;
+        $inputJSON = file_get_contents('php://input');
+        $input = json_decode( $inputJSON, TRUE );
+        if($this->isValidBuchung($input)) {
+            $sql = "insert into fi_buchungen (mandant_id, buchungstext, sollkonto, habenkonto, "
+                ."betrag, datum, bearbeiter_user_id)"
+                ." values ($this->client -> mandant_id, '".$input['buchungstext']
+                ."', '".$input['sollkonto']."', '".$input['habenkonto']."', ".$input['betrag'].", '"
+                .$input['datum']."', ".$this->dispatcher->getUserId().")";
+            mysqli_query($db, $sql);
+            mysqli_close($db);
 
-        $empty = array();
-       
-        return $this -> wrap_response($empty, "json");
-    } else {
-        throw new ErrorException("Das Buchungsobjekt enthält nicht gültige Elemente");
-    }
-}
+            $empty = array();
 
-# liest die aktuellsten 25 Buchungen aus
-function getTop25($request) {
-    $db = $this -> database;
-    $top = array();
-    $result = $db -> exec("select * from fi_buchungen where mandant_id = $this->client -> mandant_id "
-                           ."order by buchungsnummer desc limit 25");
-    return $this -> wrap_response($result);
-}
-
-function getListByKonto() {
-    $db = $this -> database;
-    $kontonummer =  $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');;
-    # Nur verarbeiten, wenn konto eine Ziffernfolge ist, um SQL-Injections zu vermeiden
-    if(is_numeric($kontonummer)) {
-
-        $result_list = array();
-
-        // Buchungen laden
-        $sql =  "SELECT buchungsnummer, buchungstext, habenkonto as gegenkonto, betrag, datum ";
-        $sql .= "FROM fi_buchungen "; 
-        $sql .= "WHERE mandant_id = ".$this->client -> mandant_id." and sollkonto = '$kontonummer' ";
-        $sql .= "union ";
-        $sql .= "select buchungsnummer, buchungstext, sollkonto as gegenkonto, betrag*-1 as betrag, datum ";
-        $sql .= "from fi_buchungen ";
-        $sql .= "where mandant_id = ".$this->client -> mandant_id." and habenkonto = '$kontonummer' ";
-        $sql .= "order by buchungsnummer desc";
-
-
-        $result_list = $db -> exec($sql);
-        $result['list'] = $result_list;
-
-        // Saldo laden: 
-        $sql =  "select sum(betrag) as saldo from (SELECT sum(betrag) as betrag from fi_buchungen ";
-        $sql .= "where mandant_id = ".$this->client -> mandant_id." and sollkonto = '$kontonummer' ";
-        $sql .= "union SELECT sum(betrag)*-1 as betrag from fi_buchungen ";
-        $sql .= "where mandant_id = ".$this->client -> mandant_id." and habenkonto = '$kontonummer' ) as a ";
-
-        /**
-         * @var $result_list CortexCollection
-         */
-        $result_list = $db -> exec($sql);
-        foreach($result_list as $results){
-            $result['saldo'] = $results -> saldo?:'unbekannt';
+            return $this -> wrap_response($empty, "json");
+        } else {
+            throw new ErrorException("Das Buchungsobjekt enthält nicht gültige Elemente");
         }
+    }
+
+    // liest die aktuellsten 25 Buchungen aus
+    public function getTop25($request) {
+        $db = $this -> database;
+        $top = array();
+        $result = $db -> exec("select * from fi_buchungen where mandant_id = $this->client -> mandant_id "
+            ."order by buchungsnummer desc limit 25");
         return $this -> wrap_response($result);
-    # Wenn konto keine Ziffernfolge ist, leeres Ergebnis zurück liefern
-    } else {
-        throw new \ErrorException("Die Kontonummer ist nicht numerisch");
     }
-}
 
-# -----------------------------------------------------
-# Eingabevalidierung
-# -----------------------------------------------------
+    public function getListByKonto() {
+        $db = $this -> database;
+        $kontonummer =  $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');;
+            // Nur verarbeiten, wenn konto eine Ziffernfolge ist, um SQL-Injections zu vermeiden
+        if(is_numeric($kontonummer)) {
 
-# Validiert ein Buchungsobjekt und prüft die Gültigkeit
-# der einzelnen Felder des Objekts
-function isValidBuchung($buchung) {
-    if(count($buchung) < 6 && count($buchung) > 7) {
-        return false;
+            $result_list = array();
+
+            // Buchungen laden
+            $sql =  "SELECT buchungsnummer, buchungstext, habenkonto as gegenkonto, betrag, datum ";
+            $sql .= "FROM fi_buchungen ";
+            $sql .= "WHERE mandant_id = ".$this->client -> mandant_id." and sollkonto = '$kontonummer' ";
+            $sql .= "union ";
+            $sql .= "select buchungsnummer, buchungstext, sollkonto as gegenkonto, betrag*-1 as betrag, datum ";
+            $sql .= "from fi_buchungen ";
+            $sql .= "where mandant_id = ".$this->client -> mandant_id." and habenkonto = '$kontonummer' ";
+            $sql .= "order by buchungsnummer desc";
+
+
+            $result_list = $db -> exec($sql);
+            $result['list'] = $result_list;
+
+            // Saldo laden:
+            $sql =  "select sum(betrag) as saldo from (SELECT sum(betrag) as betrag from fi_buchungen ";
+            $sql .= "where mandant_id = ".$this->client -> mandant_id." and sollkonto = '$kontonummer' ";
+            $sql .= "union SELECT sum(betrag)*-1 as betrag from fi_buchungen ";
+            $sql .= "where mandant_id = ".$this->client -> mandant_id." and habenkonto = '$kontonummer' ) as a ";
+
+            /**
+             * @var $result_list CortexCollection
+             */
+            $result_list = $db -> exec($sql);
+            foreach($result_list as $results){
+                $result['saldo'] = $results -> saldo?:'unbekannt';
+            }
+            return $this -> wrap_response($result);
+                // Wenn konto keine Ziffernfolge ist, leeres Ergebnis zurück liefern
+        } else {
+            throw new \ErrorException("Die Kontonummer ist nicht numerisch");
+        }
     }
-    foreach($buchung as $key => $value) {
-        if(!$this->isInValidFields($key)) return false;
-        if(!$this->isValidValueForField($key, $value)) return false;       
+
+    // -----------------------------------------------------
+    // Eingabevalidierung
+    // -----------------------------------------------------
+
+    // Validiert ein Buchungsobjekt und prüft die Gültigkeit
+    // der einzelnen Felder des Objekts
+    public function isValidBuchung($buchung) {
+        if(count($buchung) < 6 && count($buchung) > 7) {
+            return false;
+        }
+        foreach($buchung as $key => $value) {
+            if(!$this->isInValidFields($key)) return false;
+            if(!$this->isValidValueForField($key, $value)) return false;
+        }
+        return true;
     }
-    return true;
-}
 
-# Prüft, ob das gegebene Feld in der Menge der
-# gueltigen Felder enthalten ist.
-function isInValidFields($key) {
-   switch($key) {
-       case 'mandant_id':     return true;
-       case 'buchungsnummer': return true;
-       case 'buchungstext':   return true;
-       case 'sollkonto':      return true;
-       case 'habenkonto':     return true;
-       case 'betrag':         return true;
-       case 'datum':          return true;
-       case 'benutzer':       return true;
-       default:               return false;
-   }
-}
+    // Prüft, ob das gegebene Feld in der Menge der
+    // gueltigen Felder enthalten ist.
+    public function isInValidFields($key) {
+        switch($key) {
+            case 'mandant_id':     return true;
+            case 'buchungsnummer': return true;
+            case 'buchungstext':   return true;
+            case 'sollkonto':      return true;
+            case 'habenkonto':     return true;
+            case 'betrag':         return true;
+            case 'datum':          return true;
+            case 'benutzer':       return true;
+            default:               return false;
+        }
+    }
 
-# Prüft, ob jeder Feldinhalt valide sein kann
-function isValidValueForField($key, $value) {
-   switch($key) {
-       case 'buchungsnummer':
-       case 'mandant_id':
-       case 'betrag':
-            return is_numeric($value);
-       case 'sollkonto':
-       case 'habenkonto':
-            $pattern = '/[^0-9]/';
-            preg_match($pattern, $value, $results);
-            return count($results) == 0;
-       case 'buchungstext':
-       case 'datum':
-            $pattern = '/[\']/';
-            preg_match($pattern, $value, $results);
-            return count($results) == 0;
-       default: return true;
-   }
-}
+    // Prüft, ob jeder Feldinhalt valide sein kann
+    public function isValidValueForField($key, $value) {
+        switch($key) {
+            case 'buchungsnummer':
+            case 'mandant_id':
+            case 'betrag':
+                return is_numeric($value);
+            case 'sollkonto':
+            case 'habenkonto':
+                $pattern = '/[^0-9]/';
+                preg_match($pattern, $value, $results);
+                return count($results) == 0;
+            case 'buchungstext':
+            case 'datum':
+                $pattern = '/[\']/';
+                preg_match($pattern, $value, $results);
+                return count($results) == 0;
+            default: return true;
+        }
+    }
 
 
 

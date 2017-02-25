@@ -52,7 +52,7 @@ function getQuickMenu() {
 }
 
 
-function getQuickMenuById($request) {
+function getQuickMenuById() {
     $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
     if(!is_numeric($idParsedFromRequest)){
         throw new \ErrorException("Die fi_quick_config id ist fehlerhaft");

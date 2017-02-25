@@ -57,12 +57,7 @@ function getKontenart($id) {
 # Erstellt eine Liste aller Kontenarten
 function getKontenarten() {
     $db = $this -> f3->get('DB');
-    $result = array();
     $result = $db -> exec("select * from fi_kontenart");
-    while($obj = mysqli_fetch_object($rs)) {
-        $result[] = $obj;
-    }
-    mysqli_close($db);
     return $this -> wrap_response($result);
 }
 

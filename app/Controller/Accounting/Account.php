@@ -73,7 +73,7 @@ function getSaldo($id) {
 function getKonten() {
     $db = $this -> f3->get('DB');
     $result = array();
-    $result = $db -> exec("select * from fi_konto where mandant_id = $this->client -> mandant_id order by kontenart_id, kontonummer");
+    $result = $db -> exec("select * from fi_konto where mandant_id = ".$this->client -> mandant_id." order by kontenart_id, kontonummer");
     return $this -> wrap_response($result);
 }
 

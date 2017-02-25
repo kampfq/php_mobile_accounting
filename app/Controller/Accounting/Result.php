@@ -19,6 +19,7 @@
  */
 
 namespace Controller\Accounting;
+use Model\Accounting\Booking;
 use Traits\ViewControllerTrait;
 
 class Result {
@@ -215,39 +216,33 @@ function getMonthFromRequest($request) {
 
 # Liefert eine Liste der gültigen Monate aus den Buchungen des Mandanten
 function getMonths() {
-    $db = $this -> f3->get('DB');
+    $bookingModel = new Booking();
+    $bookings = $bookingModel -> find([
+        'mandant_id = ?',$this->client -> mandant_id
+    ]);
     $months = array();
-
-    $sql =  "select distinct (year(datum)*100)+month(datum) as yearmonth ";
-    $sql .= " from fi_buchungen where mandant_id = ".$this->client -> mandant_id;
-    $sql .= " order by yearmonth";
-
-    $result = $db -> exec($sql);
-    while($obj = mysqli_fetch_object($rs)) {
-        $months[] = $obj->yearmonth;
+    foreach($bookings as $booking){
+        $date = new \DateTime();
+        $date -> createFromFormat('Y-m-d',$booking->datum);
+        $months[] = $date -> format('m');
     }
-
-    mysqli_free_result($rs);
-    mysqli_close($db);
+    $months = array_unique($months);
     return $this -> wrap_response($months);
 }
 
 # Liefert eine Liste der gültigen Jahre aus den Buchungen des Mandanten
 function getYears() {
-    $db = $this -> f3->get('DB');
+    $bookingModel = new Booking();
+    $bookings = $bookingModel -> find([
+        'mandant_id = ?',$this->client -> mandant_id
+        ]);
     $years = array();
-
-    $sql = "select distinct year(datum) as year ";
-    $sql .= "from fi_buchungen where mandant_id = ".$this->client -> mandant_id;
-    $sql .= " order by year";
-
-    $result = $db -> exec($sql);
-    while($obj = mysqli_fetch_object($rs)) {
-        $years[] = $obj->year;
+    foreach($bookings as $booking){
+        $date = new \DateTime();
+        $date -> createFromFormat('Y-m-d',$booking->datum);
+        $years[] = $date -> format('Y');
     }
-
-    mysqli_free_result($rs);
-    mysqli_close($db);
+    $years = array_unique($years);
     return $this -> wrap_response($years);
 }
 
@@ -261,8 +256,6 @@ function getVerlauf($request) {
 
     $kontenart_id = $request['id'];
     if(is_numeric($kontenart_id)) {
-
-        $db = $this -> f3->get('DB');
 
         if($kontenart_id == 4 || $kontenart_id == 1)
             $sql =  "select (year(datum)*100)+month(datum) as grouping, sum(betrag)*-1 as saldo ";
@@ -278,11 +271,6 @@ function getVerlauf($request) {
         $sql .= "order by grouping";
 
         $result = $db -> exec($sql);
-        while($erg = mysqli_fetch_object($rs)) {
-            $result[] = $erg;
-        }
-
-        mysqli_close($db);
     } 
     return $this -> wrap_response($result);
 }

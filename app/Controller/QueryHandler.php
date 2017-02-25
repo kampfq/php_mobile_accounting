@@ -22,6 +22,9 @@
  * Klasse zur Verwendung von SQL-Abfragen die in eigenständigen Dateien 
  * gespeichert werden.
  */
+
+namespace Controller;
+
 class QueryHandler {
 
     private $path;
@@ -33,7 +36,7 @@ class QueryHandler {
     }
 
     function loadSql() {
-        $this->sql = file_get_contents("./sql/query/".$this->path);
+        $this->sql = file_get_contents(__DIR__."../sql/query/".$this->path);
     }
 
     function setParameterUnchecked($paramName, $paramValue) {
@@ -44,7 +47,7 @@ class QueryHandler {
         if($this->isValidString($paramValue)) {
             $this->setParameterUnchecked($paramName, $paramValue);
         } else {
-            throw new Exception("Der übergebene Wert entspricht nicht den Anforderungen "
+            throw new \Exception("Der übergebene Wert entspricht nicht den Anforderungen "
                 ."an einen String-Parameter");
         }
     }
@@ -53,7 +56,7 @@ class QueryHandler {
         if($this->isValidNumber($paramValue)) {
             $this->setParameterUnchecked($paramName, $paramValue);
         } else {
-            throw new Exception("Der übergebene Wert entspricht nicht den Anforderungen "
+            throw new \Exception("Der übergebene Wert entspricht nicht den Anforderungen "
                 ."an einen numerischen Parameter");
         }
     }

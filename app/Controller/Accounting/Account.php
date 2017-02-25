@@ -36,32 +36,11 @@ class Account {
         AccountModel::ERTRAG => 'Ertrag',
         AccountModel::NEUTRAL => 'Neutale Konten',
     ];
-
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    $this->client -> mandant_id = $dispatcher->getMandantId();
-    switch($action) {
-        case "get":
-            return $this->getKonto($request['id']);
-        case "list":
-            return $this->getKonten();
-        case "save":
-            return $this->saveKonto($request);
-        case "create":
-            return $this->createKonto($request);
-        case "saldo":
-            return $this->getSaldo($request['id']);
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
-
 # Liest eines einzelnes Konto aus und liefert
 # sie als Objekt zurück
 function getKonto($id) {
     if(is_numeric($id)) {
-        $db = $this -> f3->get('DB');
+        $db = $this -> database;
         $result = $db -> exec("select * from fi_konto where kontonummer = $id and mandant_id = $this->client -> mandant_id");
         $erg = mysqli_fetch_object($rs);
         mysqli_close($db); 
@@ -70,19 +49,22 @@ function getKonto($id) {
 }
 
 # Ermittelt den aktuellen Saldo des Kontos
-function getSaldo($id) {
-    if(is_numeric($id)) {
-        $db = $this -> f3->get('DB');
-        $result = $db -> exec("select saldo from fi_ergebnisrechnungen where mandant_id = $this->client -> mandant_id and konto = '$id'");
-        $erg = mysqli_fetch_object($rs);
-        mysqli_close($db);
-        return $this -> wrap_response($erg->saldo);
-    } else throw Exception("Kontonummer nicht numerisch");
+function getSaldo() {
+    $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
+    if(is_numeric($idParsedFromRequest)) {
+        $db = $this -> database;
+        $result = $db -> exec("select saldo from fi_ergebnisrechnungen where mandant_id = ".$this->client -> mandant_id." and konto = '$idParsedFromRequest'");
+        $saldo = 0;
+        foreach($result as $erg){
+            $saldo = $erg->saldo;
+        }
+        return $this -> wrap_response($saldo);
+    } else throw \Exception("Kontonummer nicht numerisch");
 }
 
 # Erstellt eine Liste aller Kontenarten
 function getKonten() {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $result = array();
     $result = $db -> exec("select * from fi_konto where mandant_id = ".$this->client -> mandant_id." order by kontenart_id, kontonummer");
     return $this -> wrap_response($result);
@@ -90,7 +72,7 @@ function getKonten() {
 
 # Speichert das als JSON-Objekt übergebene Konto
 function saveKonto($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $inputJSON = file_get_contents('php://input');
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidKonto($input)) { 
@@ -107,7 +89,7 @@ function saveKonto($request) {
 
 # legt das als JSON-Objekt übergebene Konto an
 function createKonto($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $inputJSON = file_get_contents('php://input');
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidKonto($input)) {

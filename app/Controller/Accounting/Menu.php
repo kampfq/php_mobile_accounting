@@ -26,27 +26,8 @@ class Menu {
 
     use ViewControllerTrait;
 
-private $dispatcher, $mandant_id;
-
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    $this->client -> mandant_id = $dispatcher->getMandantId();
-    switch($action) {
-        case 'quick':
-    	     return $this->getQuickMenu();
-        case 'get':
-             return $this->getQuickMenuById($request);
-        case 'add':
-             return $this->addQuickMenu($request);
-        case 'remove':
-             return $this->removeQuickMenu($request);
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
-
 function getQuickMenu() {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $result = $result = $db -> exec("select * from fi_quick_config where mandant_id = ".$this->client->mandant_id." order by config_knz");
     return $this -> wrap_response($result);
 }
@@ -61,14 +42,14 @@ function getQuickMenuById() {
     $template -> load([
         'mandant_id = ? AND config_id = ?',$this->client -> mandant_id,$idParsedFromRequest
     ]);
-    if($template -> loaded() === 0){
+    if($template -> loaded() !== 1){
         return $this -> wrap_response(null);
     }
     return $this -> wrap_response($template);
 }
 
 function addQuickMenu($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $inputJSON = file_get_contents('php://input');
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidQuickMenu($input)) { 
@@ -91,7 +72,7 @@ function addQuickMenu($request) {
 }
 
 function removeQuickMenu($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $id = $request['id'];
     if(is_numeric($id)) {
         $sql =  "delete from fi_quick_config where mandant_id = $this->client -> mandant_id";

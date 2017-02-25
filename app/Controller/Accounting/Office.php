@@ -19,28 +19,12 @@
  */
 
 namespace Controller\Accounting;
+use Controller\QueryHandler;
 use Traits\ViewControllerTrait;
 
 class Office {
 
     use ViewControllerTrait;
-
-private $dispatcher, $mandant_id;
-
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    $this->client -> mandant_id = $dispatcher->getMandantId();
-	
-    switch($action) {
-        case "journal":
-            return $this->getJournal($request);
-        case "guvmonate":
-            return $this->getGuvMonate($request);
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
 
 # Erstellt eine Liste aller Buchungen
 function getJournal($request) {
@@ -54,7 +38,7 @@ function getJournal($request) {
     } 
 	
     $result = array();
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
 
     $query = new QueryHandler("export_journal_to_excel.sql");
     $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
@@ -77,7 +61,7 @@ function getGuvMonate($request) {
     } 
         
     $result = array();
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
 
     $query = new QueryHandler("guv_monat_csv.sql");
     $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);

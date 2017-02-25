@@ -1,11 +1,9 @@
 <?php
 
-include_once("lib/QueryHandler.php");
-
 class QueryHandlerTest extends PHPUnit_Framework_TestCase {
 
     function testIsValidString() {
-        $handler = new QueryHandler("guv_monat.sql");
+        $handler = new \Controller\QueryHandler("guv_monat.sql");
         $success = $handler->isValidString("abcdeFgHi123+-;");
         $this->assertEquals($success, true, "Korrekter String wurde als fehlerhaft erkannt");
         $error = $handler->isValidString("ab'1234");
@@ -13,7 +11,7 @@ class QueryHandlerTest extends PHPUnit_Framework_TestCase {
     }
 
     function testIsValidNumber() {
-        $handler = new QueryHandler("guv_monat.sql");
+        $handler = new \Controller\QueryHandler("guv_monat.sql");
         $success = $handler->isValidNumber("1234567890,00");
         $this->assertEquals($success, true, "Korrekte Zahl wurde als fehlerhaft erkannt");
         $success = $handler->isValidNumber("1234567890.00");

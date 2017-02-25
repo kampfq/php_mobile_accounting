@@ -24,7 +24,7 @@
 # Antwortzeitverhalten.
 #
 require_once("../lib/Database.php");
-$db = $this -> f3->get('DB');
+$db = $this -> database;
 
 $mandantenzahl = 100;
 

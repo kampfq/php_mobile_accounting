@@ -25,29 +25,11 @@ class Progress {
 
     use ViewControllerTrait;
 
-private $dispatcher, $mandant_id;
-
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    $this->client -> mandant_id = $dispatcher->getMandantId();
-    switch($action) {
-        case "monatssalden":
-            return $this->getMonatsSalden($request['id']);
-        case "cashflow":
-            return $this->getCashFlow($request['id'], $request['side']);
-        case "intramonth":
-            return $this->getIntraMonth($request);
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
-
 # Ermittelt die Monats-Salden des Kontos
 function getMonatsSalden($kontonummer) {
     if(is_numeric($kontonummer) || $this->is_numeric_list($kontonummer)) {
         $kto_prepared = $this->prepareKontoNummern($kontonummer);
-        $db = $this -> f3->get('DB');
+        $db = $this -> database;
         $rechnungsart = $this->getRechnungsart($kto_prepared);
         if($rechnungsart != 0) {
            if($rechnungsart == 2) {
@@ -91,7 +73,7 @@ function getMonatsSalden($kontonummer) {
 function getCashFlow($kontonummer, $side) {
     $values = array();
     if($this->isAktivKonto($kontonummer)) {
-        $db = $this -> f3->get('DB');
+        $db = $this -> database;
         
         if($side == 'S') {
             $sql  = "select (year(datum)*100)+month(datum) as grouping, sum(b.betrag) as saldo ";
@@ -129,7 +111,7 @@ function getCashFlow($kontonummer, $side) {
 
 # Monats-internen Verlauf ermitteln
 function getIntraMonth($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
 
     if(isset($request['month_id'])) { 
       if($this->is_number($request['month_id'])) {
@@ -156,7 +138,7 @@ function getIntraMonth($request) {
 # Prüft, ob das angegebene Konto ein Aktiv-Konto ist.
 function isAktivKonto($kontonummer) {
     if(!is_numeric($kontonummer)) return false;
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $result = $db -> exec("select kontenart_id from fi_konto "
                             ."where mandant_id = ".$this->client -> mandant_id
                             ." and kontonummer = '".$kontonummer."'");
@@ -217,7 +199,7 @@ function is_number($value) {
 # eine GUV-Betrachtung (nur Aufwand und Ertrag) oder
 # eine Bestandsbetrachtung (nur Aktiv und Passiv) handelt.
 function getRechnungsart($kto_prepared) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $kontenarten = array();
     $type = 0;
     $sql = "select distinct kontenart_id from fi_konto where kontonummer in ($kto_prepared)";

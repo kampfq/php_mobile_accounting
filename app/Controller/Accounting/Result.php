@@ -19,6 +19,7 @@
  */
 
 namespace Controller\Accounting;
+use Controller\QueryHandler;
 use Model\Accounting\Booking;
 use Traits\ViewControllerTrait;
 
@@ -26,43 +27,11 @@ class Result {
 
     use ViewControllerTrait;
 
-private $dispatcher, $mandant_id;
-
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-
-    $this->dispatcher = $dispatcher;
-    $this->client -> mandant_id = $dispatcher->getMandantId();
-
-    switch($action) {
-        case "bilanz":
-            return $this->getBilanz();
-        case "guv":
-            return $this->getGuV($request);
-        case "guv_month":
-            return $this->getGuVMonth($request);
-        case "guv_prognose":
-            return $this->getGuVPrognose();
-        case "verlauf":
-            return $this->getVerlauf($request);
-        case "verlauf_gewinn":
-            return $this->getVerlaufGewinn();
-        case "months":
-            return $this->getMonths();
-        case "years":
-            return $this->getYears();
-        default:
-            $message = array();
-            $message['message'] = "Unbekannte Action";
-            return $message;
-    }
-}
-
 # Berechnet eine aktuelle Bilanz und liefert
 # sie als Array zurück
 function getBilanz() {
     $result = array();
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
 
     $sql =  "select konto, kontenname, saldo from fi_ergebnisrechnungen ";
     $sql .= "where mandant_id = $this->client -> mandant_id and kontenart_id in (1, 2) ";
@@ -95,7 +64,7 @@ function getBilanz() {
 # Berechnet eine aktuelle GuV-Rechnung und liefert
 # sie als Array zurück
 function getGuV($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $year = $request['year'];
     if($this->isValidYear($year)) {
 
@@ -135,7 +104,7 @@ function getGuV($request) {
 function getGuVMonth($request) {
     $month_id = $this->getMonthFromRequest($request);
 
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $query = new QueryHandler("guv_monat.sql");
     $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
     $query->setParameterUnchecked("monat_id", $month_id);
@@ -169,7 +138,7 @@ function getGuVMonth($request) {
 # Laden der GuV-Prognose
 # (GuV aktuelles-Monat + Vormonat)
 function getGuVPrognose() {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
 
     $query = new QueryHandler("guv_prognose.sql");
     $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
@@ -248,7 +217,7 @@ function getYears() {
 
 # Verlauf Aufwand, Ertrag, Aktiva und Passiva in Monatsraster
 function getVerlauf($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $result = array();
 
     if(!array_key_exists('id', $request)) 
@@ -277,10 +246,10 @@ function getVerlauf($request) {
 
 # Verlauf des Gewinns in Monatsraster
 function getVerlaufGewinn() {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $result = array();
 
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
 
     $sql =  "select (year(datum)*100)+month(datum) as grouping, sum(betrag*-1) as saldo ";
     $sql .= "from fi_ergebnisrechnungen_base ";

@@ -18,6 +18,8 @@
  * USA
  */
 
+namespace Controller;
+
 class Install {
 
 private $dispatcher;
@@ -122,7 +124,7 @@ function createDatabaseSchema() {
 
     $sql_statements = explode(";", $sql);
 
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     foreach($sql_statements as $sql) {
       #error_log($sql);
       mysqli_query($db, $sql);
@@ -253,7 +255,7 @@ private function isValidBenutzerObject($input) {
 # Mit automatischer Zuordnung zu Mandant 1
 private function addUserToDb($username) {
     require_once("../lib/Database.php");
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
 
     $sql = "insert into fi_user values(0, '$username', 'Benutzer: $username', 1, now())";
     mysqli_query($db, $sql);

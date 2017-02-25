@@ -9,6 +9,7 @@ namespace Traits;
 use Controller\FlashMessenger\FlashMessage;
 use Controller\FlashMessenger\FlashMessengerBag;
 use DB\Cortex;
+use DB\SQL;
 use Model\Accounting\Client;
 use Model\Auth\User;
 use Psr\Http\Message\ResponseInterface;
@@ -24,9 +25,9 @@ trait ViewControllerTrait
      */
     protected $flashMessenger = null;
     /**
-     * @var null|\Base
+     * @var \Base
      */
-    protected $f3 = null;
+    protected $f3;
     /**
      * @var null | User
      */
@@ -35,11 +36,16 @@ trait ViewControllerTrait
      * @var null| Client
      */
     protected $client = null;
+    /**
+     * @var SQL
+     */
+    protected $database = null;
 
     public function __construct()
     {
         $this -> f3 = \Base::instance();
         $this -> flashMessenger = FlashMessengerBag::getInstance();
+        $this -> database = $this -> f3 -> get('DB');
     }
 
     public function getRequest():ServerRequest{

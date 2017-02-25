@@ -19,36 +19,15 @@
  */
 
 namespace Controller\Accounting;
+use DB\CortexCollection;
 use Traits\ViewControllerTrait;
 class Booking {
 
     use ViewControllerTrait;
 
-private $dispatcher, $mandant_id;
-
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-
-    $this->dispatcher = $dispatcher;
-    $this->client -> mandant_id = $dispatcher->getMandantId();
-
-    switch($action) {
-        case "create":
-            return $this->createBuchung($request);
-        case "aktuellste":
-            return $this->getTop25($request);
-        case "listbykonto":
-            return $this->getListByKonto($request);
-        default:
-            $message = array();
-            $message['message'] = "Unbekannte Action";
-            return $message;
-    }
-}
-
 # legt das als JSON-Objekt übergebene Konto an
 function createBuchung($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $inputJSON = file_get_contents('php://input');
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidBuchung($input)) {
@@ -70,56 +49,52 @@ function createBuchung($request) {
 
 # liest die aktuellsten 25 Buchungen aus
 function getTop25($request) {
-    $db = $this -> f3->get('DB');
+    $db = $this -> database;
     $top = array();
     $result = $db -> exec("select * from fi_buchungen where mandant_id = $this->client -> mandant_id "
                            ."order by buchungsnummer desc limit 25");
     return $this -> wrap_response($result);
 }
 
-function getListByKonto($request) {
-    $db = $this -> f3->get('DB');
-    $kontonummer = $request['konto'];
+function getListByKonto() {
+    $db = $this -> database;
+    $kontonummer =  $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');;
     # Nur verarbeiten, wenn konto eine Ziffernfolge ist, um SQL-Injections zu vermeiden
     if(is_numeric($kontonummer)) {
 
-        $result = array();
-        $result_list = array(); 
+        $result_list = array();
 
         // Buchungen laden
         $sql =  "SELECT buchungsnummer, buchungstext, habenkonto as gegenkonto, betrag, datum ";
         $sql .= "FROM fi_buchungen "; 
-        $sql .= "WHERE mandant_id = $this->client -> mandant_id and sollkonto = '$kontonummer' ";
+        $sql .= "WHERE mandant_id = ".$this->client -> mandant_id." and sollkonto = '$kontonummer' ";
         $sql .= "union ";
         $sql .= "select buchungsnummer, buchungstext, sollkonto as gegenkonto, betrag*-1 as betrag, datum ";
         $sql .= "from fi_buchungen ";
-        $sql .= "where mandant_id = $this->client -> mandant_id and habenkonto = '$kontonummer' ";
+        $sql .= "where mandant_id = ".$this->client -> mandant_id." and habenkonto = '$kontonummer' ";
         $sql .= "order by buchungsnummer desc";
 
-        $result = $db -> exec($sql);
-        
-        while($obj = mysqli_fetch_object($rs)) {
-            $result_list[] = $obj;
-        }
+
+        $result_list = $db -> exec($sql);
         $result['list'] = $result_list;
 
         // Saldo laden: 
         $sql =  "select sum(betrag) as saldo from (SELECT sum(betrag) as betrag from fi_buchungen ";
-        $sql .= "where mandant_id = $this->client -> mandant_id and sollkonto = '$kontonummer' ";
+        $sql .= "where mandant_id = ".$this->client -> mandant_id." and sollkonto = '$kontonummer' ";
         $sql .= "union SELECT sum(betrag)*-1 as betrag from fi_buchungen ";
-        $sql .= "where mandant_id = $this->client -> mandant_id and habenkonto = '$kontonummer' ) as a ";
+        $sql .= "where mandant_id = ".$this->client -> mandant_id." and habenkonto = '$kontonummer' ) as a ";
 
-        $result = $db -> exec($sql);
-        if($obj = mysqli_fetch_object($rs)) {
-            $result['saldo'] = $obj->saldo;
-        } else {
-            $result['saldo'] = "unbekannt";
+        /**
+         * @var $result_list CortexCollection
+         */
+        $result_list = $db -> exec($sql);
+        foreach($result_list as $results){
+            $result['saldo'] = $results -> saldo?:'unbekannt';
         }
-        mysqli_close($db);
         return $this -> wrap_response($result);
     # Wenn konto keine Ziffernfolge ist, leeres Ergebnis zurück liefern
     } else {
-        throw new ErrorException("Die Kontonummer ist nicht numerisch");
+        throw new \ErrorException("Die Kontonummer ist nicht numerisch");
     }
 }
 

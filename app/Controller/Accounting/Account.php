@@ -38,13 +38,12 @@ class Account {
     ];
     // Liest eines einzelnes Konto aus und liefert
     // sie als Objekt zurück
-    public function getKonto($id) {
-        if(is_numeric($id)) {
+    public function getKonto() {
+        $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
+        if(is_numeric($idParsedFromRequest)) {
             $db = $this -> database;
-            $result = $db -> exec("select * from fi_konto where kontonummer = $id and mandant_id = $this->client -> mandant_id");
-            $erg = mysqli_fetch_object($rs);
-            mysqli_close($db);
-            return $this -> wrap_response($erg);
+            $result = $db -> exec("select * from fi_konto where kontonummer = ".$idParsedFromRequest." and mandant_id = ".$this -> client -> mandant_id);
+            return $this -> wrap_response($result[0]);
         } else throw Exception("Kontonummer nicht numerisch");
     }
 

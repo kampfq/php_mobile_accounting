@@ -34,13 +34,13 @@ class Menu {
 
 
     public function getQuickMenuById() {
-        $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
-        if(!is_numeric($idParsedFromRequest)){
+        ;
+        if(!is_numeric($this -> idParsedFromRequest)){
             throw new \ErrorException("Die fi_quick_config id ist fehlerhaft");
         }
         $template = new Template();
         $template -> load([
-            'mandant_id = ? AND config_id = ?',$this->client -> mandant_id,$idParsedFromRequest
+            'mandant_id = ? AND config_id = ?',$this->client -> mandant_id,$this -> idParsedFromRequest
         ]);
         if($template -> loaded() !== 1){
             return $this -> wrap_response(null);
@@ -50,7 +50,7 @@ class Menu {
 
     public function addQuickMenu($request) {
         $db = $this -> database;
-        $inputJSON = file_get_contents('php://input');
+        $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidQuickMenu($input)) {
             $sql = "insert into fi_quick_config(config_knz, sollkonto, habenkonto, buchungstext,";

@@ -39,20 +39,18 @@ class Account {
     // Liest eines einzelnes Konto aus und liefert
     // sie als Objekt zurück
     public function getKonto() {
-        $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
-        if(is_numeric($idParsedFromRequest)) {
+        if(is_numeric($this -> idParsedFromRequest)) {
             $db = $this -> database;
-            $result = $db -> exec("select * from fi_konto where kontonummer = ".$idParsedFromRequest." and mandant_id = ".$this -> client -> mandant_id);
+            $result = $db -> exec("select * from fi_konto where kontonummer = ".$this -> idParsedFromRequest." and mandant_id = ".$this -> client -> mandant_id);
             return $this -> wrap_response($result[0]);
         } else throw Exception("Kontonummer nicht numerisch");
     }
 
     // Ermittelt den aktuellen Saldo des Kontos
     public function getSaldo() {
-        $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
-        if(is_numeric($idParsedFromRequest)) {
+        if(is_numeric($this -> idParsedFromRequest)) {
             $db = $this -> database;
-            $result = $db -> exec("select saldo from fi_ergebnisrechnungen where mandant_id = ".$this->client -> mandant_id." and konto = '$idParsedFromRequest'");
+            $result = $db -> exec("select saldo from fi_ergebnisrechnungen where mandant_id = ".$this->client -> mandant_id." and konto = ".$this -> idParsedFromRequest);
             $saldo = 0;
             foreach($result as $erg){
                 $saldo = $erg->saldo;
@@ -72,7 +70,8 @@ class Account {
     // Speichert das als JSON-Objekt übergebene Konto
     public function saveKonto($request) {
         $db = $this -> database;
-        $inputJSON = file_get_contents('php://input');
+
+        $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidKonto($input)) {
             $sql = "update fi_konto set bezeichnung = '".$input['bezeichnung']."', kontenart_id = ".$input['kontenart_id']
@@ -89,7 +88,7 @@ class Account {
     // legt das als JSON-Objekt übergebene Konto an
     public function createKonto($request) {
         $db = $this -> database;
-        $inputJSON = file_get_contents('php://input');
+        $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidKonto($input)) {
             $sql = "insert into fi_konto (kontonummer, bezeichnung, kontenart_id, mandant_id) values ('"

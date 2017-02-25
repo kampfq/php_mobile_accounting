@@ -28,7 +28,7 @@ class Booking {
     // legt das als JSON-Objekt übergebene Konto an
     public function createBuchung($request) {
         $db = $this -> database;
-        $inputJSON = file_get_contents('php://input');
+        $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidBuchung($input)) {
             $sql = "insert into fi_buchungen (mandant_id, buchungstext, sollkonto, habenkonto, "
@@ -58,7 +58,7 @@ class Booking {
 
     public function getListByKonto() {
         $db = $this -> database;
-        $kontonummer =  $idParsedFromRequest = $this -> f3 -> get('PARAMS.id');;
+        $kontonummer =  $this -> idParsedFromRequest;
             // Nur verarbeiten, wenn konto eine Ziffernfolge ist, um SQL-Injections zu vermeiden
         if(is_numeric($kontonummer)) {
 

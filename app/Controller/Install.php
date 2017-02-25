@@ -47,7 +47,7 @@ function invoke($action, $request, $dispatcher) {
     // sie als Objekt zurück
     // TODO: Die Texte im Fehlerfall stimmen noch nicht: im 2. Fall ist 1. nicht sicher ausgeschlossen!
 function checkDatabaseSettings($request) {
-    $inputJSON = file_get_contents('php://input');
+    $inputJSON = $this -> request -> getBody();
     $input = json_decode($inputJSON, TRUE); 
 
     #ggf. Debug-Ausgaben
@@ -78,7 +78,7 @@ function checkDatabaseSettings($request) {
     // Speichert die Datenbankeinstellungen in die Datei lib/Database.php
     // Wenn ein Speichern nicht möglich ist wird eine Fehlermeldung ausgegeben
 function storeDatabaseSettings($request) {
-    $inputJSON = file_get_contents('php://input');
+    $inputJSON = $this -> request -> getBody();
     $input = json_decode($inputJSON, TRUE);
 
     // Prüfen der Datenbankeinstellungen: Führt im Fehlerfall zu einer Exception
@@ -152,7 +152,7 @@ function createDatabaseSchema() {
     // Fügt einen Benutzer für das Haushaltsbuch hinzu
     // (Alle Benutzer werden dem automatisch angelegten Mandanten 1 zugeordnet!)
 function addUser($request) {
-    $inputJSON = file_get_contents("php://input");
+    $inputJSON = $this -> request -> getBody();
     $input = json_decode($inputJSON, TRUE);
 
     if(!$this->isValidBenutzerObject($input)) {

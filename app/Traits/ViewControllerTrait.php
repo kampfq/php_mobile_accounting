@@ -13,11 +13,15 @@ use DB\SQL;
 use Model\Accounting\Client;
 use Model\Auth\User;
 use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Request;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
 
 trait ViewControllerTrait
 {
+    /**
+     * @var Request
+     */
     protected $request;
     protected $errors = [];
     /**
@@ -41,11 +45,14 @@ trait ViewControllerTrait
      */
     protected $database = null;
 
+    protected $idParsedFromRequest = null;
+
     public function __construct()
     {
         $this -> f3 = \Base::instance();
         $this -> flashMessenger = FlashMessengerBag::getInstance();
         $this -> database = $this -> f3 -> get('DB');
+        $this -> idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
     }
 
     public function getRequest():ServerRequest{

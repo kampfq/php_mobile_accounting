@@ -20,11 +20,22 @@
 
 namespace Controller\Accounting;
 use Traits\ViewControllerTrait;
+use Model\Accounting\Account as AccountModel;
+
 class Account {
+
 
     use ViewControllerTrait;
 
-private $dispatcher, $mandant_id;
+    private $dispatcher, $mandant_id;
+
+    protected $types = [
+        AccountModel::AKTIV => 'Aktiv',
+        AccountModel::PASSIV => 'Passiv',
+        AccountModel::AUFWAND => 'Aufwand',
+        AccountModel::ERTRAG => 'Ertrag',
+        AccountModel::NEUTRAL => 'Neutale Konten',
+    ];
 
 # Einsprungpunkt, hier übergibt das Framework
 function invoke($action, $request, $dispatcher) {
@@ -140,6 +151,28 @@ function isValidFieldAndValue($key, $value) {
             return false;
     }
 }
+
+    public function getKontenArten()
+    {
+        $returnValue = [];
+        foreach ($this -> types as $id => $type){
+            $returnValue[] = [
+                'kontenart_id' => $this -> types[$id],
+                'bezeichnung' =>$this -> types[$id]
+            ];
+        }
+        return $this->wrap_response($returnValue);
+    }
+
+    public function getKontenart($id)
+    {
+        $returnValue = [
+            'kontenart_id' => $this -> types[$id],
+            'bezeichnung' =>$this -> types[$id]
+        ];
+
+        return $this->wrap_response($returnValue);
+    }
 
 }
 

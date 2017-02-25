@@ -97,7 +97,7 @@ m.privat.initKontenarten = function(self) {
     // Kontenarten
     self.kontenarten = ko.observableArray([]);
     self.refreshKontenarten = function() {
-        doGETwithCache("TypeOfAccount", "getKontenarten", [],
+        doGETwithCache("Account", "getKontenarten", [],
             function(data) {
                 self.kontenarten($.map(data, function(item) {return new Kontenart(item); }));
             }, 
@@ -110,7 +110,7 @@ m.privat.initKontenarten = function(self) {
     self.refreshKontenarten();
 
     self.loadKontenart = function(kontenart_id) {
-        doGETwithCache("TypeOfAccount", "getKontenart", {'id':kontenart_id},
+        doGETwithCache("Account", "getKontenart", {'id':kontenart_id},
             function(data) {
                 self.kontenart().kontenart_id(data.kontenart_id);
                 self.kontenart().bezeichnung(data.bezeichnung);

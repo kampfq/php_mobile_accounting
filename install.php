@@ -2,23 +2,33 @@
 <html lang="de">
 <head>
 <meta name="viewport" content="width:device-width, initial-scale=1">
-<link rel="stylesheet" href="./html/css/jquery.mobile-1.3.1.css"/>
+<link rel="stylesheet" href="./html/css/lib/haushaltsbuch-theme.min.css" />
+<link rel="stylesheet" href="./html/css/lib/jquery.mobile.icons.min.css" />
+<link rel="stylesheet" href="./html/css/lib/jquery.mobile.structure-1.4.5.min.css" />
 <!-- Standard-Bibliotheken -->
-<script src="./html/js/jquery-2.0.2.min.js"></script>
-<script src="./html/js/jquery.mobile-1.3.1.js"></script>
-<script src="./html/js/knockout-2.2.1.js"></script>
+<script src="./html/js/jquery-2.1.3.min.js"></script>
+<script src="./html/js/jquery.mobile-1.4.5.min.js"></script>
+<script src="./html/js/knockout-3.3.0.js"></script>
 <!-- Installer-spezifische Code-Dateien -->
 <script src="./install/install.js"></script>
 <title>html5-haushaltsbuch Installation</title>
 </head>
 <body>
+
 <!-- Startseite -->
-<div data-role="page" id="startseite">
-<div data-role="header" data-theme="b">
+<div data-role="page" data-theme="b" id="startseite">
+<div data-role="header">
   <h1>Installation</h1>
 </div>
 <div data-role="content">
 Installationsprogramm f&uuml;r das HTML5-Haushaltsbuch.<br>
+<!-- ko if: analysis.hasResults -->
+<br/>
+Die Analyse Ihres Systems ergab die folgenden Hinweise:
+<ul data-bind="foreach: analysis.results">
+  <li data-bind="text: description"></li>
+</ul>
+<!-- /ko -->
 Bitte folgen Sie den Anweisungen auf dem Bildschirm, das Programm wird Sie durch die Installation des HTML5-Haushaltsbuchs leiten.<br>
 <br>
 Bitte beginnen Sie die Installation durch einen Klick auf den Button "Weiter"<br>
@@ -29,8 +39,8 @@ Bitte beginnen Sie die Installation durch einen Klick auf den Button "Weiter"<br
 </div>
 
 <!-- Datenbankkonfiguration -->
-<div data-role="page" id="database_config">
-<div data-role="header" data-theme="b">
+<div data-role="page" data-theme="b" id="database_config">
+<div data-role="header">
   <h1>Datenbankkonfiguration</h1>
 </div>
 <div data-role="content">
@@ -52,8 +62,8 @@ Bitte beginnen Sie die Installation durch einen Klick auf den Button "Weiter"<br
 </div>
 
 <!-- Datenbankschema generieren -->
-<div data-role="page" id="database_create_schema">
-<div data-role="header" data-theme="b">
+<div data-role="page" data-theme="b" id="database_create_schema">
+<div data-role="header">
   <h1>Datenbankschema anlegen</h1>
 </div>
 <div data-role="content">
@@ -75,8 +85,8 @@ mit der Installation fortfahren.<br/>
 </div>
 
 <!-- Benutzer anlegen -->
-<div data-role="page" id="user_config">
-<div data-role="header" data-theme="b">
+<div data-role="page" data-theme="b" id="user_config">
+<div data-role="header">
   <h1>Benutzer anlegen</h1>
 </div>
 <div data-role="content">
@@ -95,8 +105,8 @@ Sie sich sp&auml;ter am Haushaltsbuch anmelden k&ouml;nnen.
 </div>
 
 <!-- Installation abschließen -->
-<div data-role="page" id="installation_abschliessen">
-<div data-role="header" data-theme="b">
+<div data-role="page" data-theme="b" id="installation_abschliessen">
+<div data-role="header">
   <h1>Installation abgeschlossen</h1>
 </div>
 <div data-role="content">
@@ -111,8 +121,8 @@ des HTML5-Haushaltsbuchs.<br/>
 </div>
 
 <!-- Fehler ausgeben -->
-<div data-role="page" data-dialog="true" id="fehler_ausgeben">
-<div data-role="header" data-theme="b">
+<div data-role="page" data-theme="b" data-dialog="true" id="fehler_ausgeben">
+<div data-role="header">
   <h1>Fehler aufgetreten</h1>
 </div>
 <div data-role="content">

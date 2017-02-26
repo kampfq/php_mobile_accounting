@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `fi_buchungen` (
   `betrag` decimal(10,2) NOT NULL,
   `datum` date NOT NULL,
   `bearbeiter_user_id` integer DEFAULT NULL,
+  `is_offener_posten` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`buchungsnummer`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -144,6 +145,24 @@ CREATE TABLE IF NOT EXISTS `fi_quick_config` (
 
 -- --------------------------------------------------------
 
+--
+-- Tabellenstruktur für Tabelle `fi_config_params`
+--
+DROP TABLE IF EXISTS fi_config_params;
+CREATE TABLE IF NOT EXISTS fi_config_params (
+  mandant_id int(11) NOT NULL,
+  param_id int(11) NOT NULL AUTO_INCREMENT,
+  param_knz varchar(50) NOT NULL,
+  param_desc varchar(100) NOT NULL,
+  param_value varchar(256) DEFAULT '',
+  PRIMARY KEY (param_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+ALTER TABLE fi_config_params ADD UNIQUE fi_config_params_unique_knz(mandant_id, param_knz);
+
+INSERT INTO fi_config_params (mandant_id, param_knz, param_desc, param_value) values
+  (1, 'geschj_start_monat', 'Startmonat des Geschaeftsjahres', '1'),
+  (1, 'op_schliessen_txt', 'Buchungsvorl. OP schliessen', 'Aufl. OP #op_nr# - #op_btxt#');
 
 --
 -- Struktur des Views `fi_buchungen_view`
@@ -240,4 +259,17 @@ order by `buchungsnummer`,`buchungsart`;
 insert into fi_mandant values(0, 'Standardmandant', 1, now());
 
 -- Template für Schnellbuchungen anlegen
-insert into fi_quick_config values(1, 1, 'Template', '0000', '0000', 'Template', 0); 
+insert into fi_quick_config values(1, 1, 'Template', '0000', '0000', 'Template', 0);
+
+-- Hilfstabelle für Monatsdarstellungen generieren
+create table fi_hlp_days (xday int not null primary key);
+
+insert into fi_hlp_days
+select xday from
+(select (a.day*10)+b.day as xday 
+ from (select 0 as day union select 1 union select 2 union select 3) as a, 
+ (select 1 as day union select 2 union select 3 union select 4 union select 5 union select 6 union 
+  select 7 union select 8 union select 9 union select 0) as b
+) as days
+where days.xday > 0 and days.xday < 32;
+ 

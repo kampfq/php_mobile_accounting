@@ -124,7 +124,7 @@ hhb.model.types.BuchungenModel = function() {
   // in die Variable self.buchungen
   self.loadAktuellsteBuchungen = function() {
     self.buchungen.removeAll();
-    doGETwithCache("buchung", "aktuellste", [], 
+    doGETwithCache("Booking", "getTop25", [],
       function(data) {
         for(var i = 0; i < data.length; i++) {
           self.buchungen.push(new hhb.model.types.Buchung(data[i]));
@@ -149,7 +149,7 @@ hhb.model.types.BuchungenModel = function() {
   // Offene Posten liste laden
   self.getOffenePosten = function() {
     self.buchungen.removeAll();
-    doGETwithCache("buchung", "listoffeneposten", [],
+    doGETwithCache("Booking", "getOpList", [],
       function(data) {
         for(var i = 0; i < data.length; i++) {
           self.buchungen.push(new hhb.model.types.Buchung(data[i]));

@@ -9,7 +9,7 @@
 function doGET(controller, action, parameters, successHandler, errorHandler) {
     var additionalParams = "";
     for(var key in parameters) {
-        additionalParams += "&"+key+"="+parameters[key];
+        additionalParams += "/"+parameters[key];
     }
     $.ajax({
         type: 'GET',

@@ -41,7 +41,7 @@ hhb.model.types.Kontenart = function(config) {
 * Statische Methode zum laden der Kontenarten
 */
 hhb.model.types.Kontenart.load = function(observableArray) {
-    doGET('kontenart', 'list', [],
+    doGET('Account', 'getKontenArten', [],
         function(data) {
             for(var i = 0; i < data.length; i++) {
                 observableArray.push(new hhb.model.types.Kontenart(data[i]));

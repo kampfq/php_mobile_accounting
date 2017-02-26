@@ -1,24 +1,3 @@
-<?php 
-/*
- * Copyright (c) 2015 by Wolfgang Wiedermann
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA
- */
-?>
-<?php define("MAIN_PAGE", 1 />
 <!DOCTYPE html>
 <html lang="de" manifest="manifest.php">
 <!-- <html lang="de"> -->
@@ -43,34 +22,34 @@
 </head>
 <body>
   <!-- Menüs -->
-  <include href="forms/navigation/navigation.php" />
-  <include href="forms/navigation/navigation.php" />
-  <include href="forms/navigation/buchen_menue.php" />
+  <include href="Accounting/forms/navigation/navigation.php" />
+  <include href="Accounting/forms/navigation/navigation.php" />
+  <include href="Accounting/forms/navigation/buchen_menue.php" />
   <!-- Masken aus dem Menü "Buchungen" -->
-  <include href="forms/buchen/buchen.php" />
-  <include href="forms/buchen/aktuellste_buchungen.php" />
-  <include href="forms/buchen/buchen_warteschlange.php" />
-  <include href="forms/buchen/offene_posten.php" />
-  <include href="forms/buchen/offene_posten_ausbuchen.php" />
+  <include href="Accounting/forms/buchen/buchen.php" />
+  <include href="Accounting/forms/buchen/aktuellste_buchungen.php" />
+  <include href="Accounting/forms/buchen/buchen_warteschlange.php" />
+  <include href="Accounting/forms/buchen/offene_posten.php" />
+  <include href="Accounting/forms/buchen/offene_posten_ausbuchen.php" />
   <!-- Masken aus dem Menü "Konten" -->
-  <include href="forms/konten/konten_liste.php" />
-  <include href="forms/konten/konten_menue.php" />
-  <include href="forms/konten/konten_form.php" />
-  <include href="forms/konten/konten_buchungen.php" />
-  <include href="forms/konten/konten_monatssalden.php" />
+  <include href="Accounting/forms/konten/konten_liste.php" />
+  <include href="Accounting/forms/konten/konten_menue.php" />
+  <include href="Accounting/forms/konten/konten_form.php" />
+  <include href="Accounting/forms/konten/konten_buchungen.php" />
+  <include href="Accounting/forms/konten/konten_monatssalden.php" />
   <!-- Masken aus dem Menü "Administration" -->
-  <include href="forms/schnellbuchungen/schnellbuchungen_liste.php" />
-  <include href="forms/schnellbuchungen/schnellbuchung_form.php" />
-  <include href="forms/configuration/configuration_liste.php" />
-  <include href="forms/configuration/configuration_form.php" />
+  <include href="Accounting/forms/schnellbuchungen/schnellbuchungen_liste.php" />
+  <include href="Accounting/forms/schnellbuchungen/schnellbuchung_form.php" />
+  <include href="Accounting/forms/configuration/configuration_liste.php" />
+  <include href="Accounting/forms/configuration/configuration_form.php" />
   <!-- Ergebnisrechnungen aus dem Menü "Auswertungen" -->
-  <include href="forms/ergebnis/ergebnis_view.php" />
-  <include href="forms/ergebnis/ergebnis_menue.php" />
-  <include href="forms/ergebnis/prognose_view.php" />
-  <include href="forms/verlauf/verlauf_view_einfach.php" />
-  <include href="forms/verlauf/verlauf_view_mehrfach.php" />
-  <include href="forms/verlauf/verlauf_kontenliste.php" />
-  <include href="forms/verlauf/verlauf_kontenauswahl.php" />
+  <include href="Accounting/forms/ergebnis/ergebnis_view.php" />
+  <include href="Accounting/forms/ergebnis/ergebnis_menue.php" />
+  <include href="Accounting/forms/ergebnis/prognose_view.php" />
+  <include href="Accounting/forms/verlauf/verlauf_view_einfach.php" />
+  <include href="Accounting/forms/verlauf/verlauf_view_mehrfach.php" />
+  <include href="Accounting/forms/verlauf/verlauf_kontenliste.php" />
+  <include href="Accounting/forms/verlauf/verlauf_kontenauswahl.php" />
   <!-- Update-Handling -->
   <script type="text/javascript">
       de.ww.updater.handlers.onUpdateReady(function() { alert('Die Buchhaltung wurde auf eine neue Version aktualisiert'); });

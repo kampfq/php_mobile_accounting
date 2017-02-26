@@ -10,6 +10,12 @@
  * @since      File available since Release
  * @deprecated File deprecated in Release
  */
+function ErrorHandler($errLevel, $errMsg, $errFile, $errLine)
+{
+    throw new ErrorException($errMsg, $errLevel, $errLevel, $errFile, $errLine);
+}
+
+set_error_handler("ErrorHandler");
 
 /**
  * setup Autoloader

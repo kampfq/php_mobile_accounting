@@ -24,15 +24,15 @@ header('Content-Type: application/javascript');
 // Sprachdatei einbetten
 include_once("../i18n/lang-de.js");
 // Laden und zusammenfassen aller Javascript-Code-Dateien aus den Formularen
-include_once("../forms/navigation/navigation_model.js");
-include_once("../forms/schnellbuchungen/schnellbuchungen_model.js");
-include_once("../forms/konten/kontenarten_model.js");
-include_once("../forms/konten/konten_model.js");
-include_once("../forms/buchen/buchen_model.js");
-include_once("../forms/ergebnis/ergebnis_model.js");
-include_once("../forms/verlauf/verlauf_model.js");
-include_once("../forms/export/export_model.js");
-include_once("../forms/configuration/configuration_model.js");
+include_once("app/navigation_model.js");
+include_once("app/schnellbuchungen_model.js");
+include_once("app/kontenarten_model.js");
+include_once("app/konten_model.js");
+include_once("app/buchen_model.js");
+include_once("app/ergebnis_model.js");
+include_once("app/verlauf_model.js");
+include_once("app/export_model.js");
+include_once("app/configuration_model.js");
 
 // MainModel importieren
 include_once("./main_model.js");

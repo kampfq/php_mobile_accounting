@@ -18,7 +18,7 @@
  * USA
  */
 ?>
-<?php define("MAIN_PAGE", 1); ?>
+<?php define("MAIN_PAGE", 1 />
 <!DOCTYPE html>
 <html lang="de" manifest="manifest.php">
 <!-- <html lang="de"> -->
@@ -43,33 +43,34 @@
 </head>
 <body>
   <!-- Menüs -->
-  <?php include_once("./forms/navigation/navigation.php"); ?>
-  <?php include_once("./forms/navigation/buchen_menue.php"); ?>
+  <include href="forms/navigation/navigation.php" />
+  <include href="forms/navigation/navigation.php" />
+  <include href="forms/navigation/buchen_menue.php" />
   <!-- Masken aus dem Menü "Buchungen" -->
-  <?php include_once("./forms/buchen/buchen.php"); ?>
-  <?php include_once("./forms/buchen/aktuellste_buchungen.php"); ?>
-  <?php include_once("./forms/buchen/buchen_warteschlange.php"); ?>
-  <?php include_once("./forms/buchen/offene_posten.php"); ?>
-  <?php include_once("./forms/buchen/offene_posten_ausbuchen.php"); ?>
+  <include href="forms/buchen/buchen.php" />
+  <include href="forms/buchen/aktuellste_buchungen.php" />
+  <include href="forms/buchen/buchen_warteschlange.php" />
+  <include href="forms/buchen/offene_posten.php" />
+  <include href="forms/buchen/offene_posten_ausbuchen.php" />
   <!-- Masken aus dem Menü "Konten" -->
-  <?php include_once("./forms/konten/konten_liste.php"); ?>
-  <?php include_once("./forms/konten/konten_menue.php"); ?>
-  <?php include_once("./forms/konten/konten_form.php"); ?>
-  <?php include_once("./forms/konten/konten_buchungen.php"); ?>
-  <?php include_once("./forms/konten/konten_monatssalden.php"); ?>
+  <include href="forms/konten/konten_liste.php" />
+  <include href="forms/konten/konten_menue.php" />
+  <include href="forms/konten/konten_form.php" />
+  <include href="forms/konten/konten_buchungen.php" />
+  <include href="forms/konten/konten_monatssalden.php" />
   <!-- Masken aus dem Menü "Administration" -->
-  <?php include_once("./forms/schnellbuchungen/schnellbuchungen_liste.php"); ?>
-  <?php include_once("./forms/schnellbuchungen/schnellbuchung_form.php"); ?>
-  <?php include_once("./forms/configuration/configuration_liste.php"); ?>
-  <?php include_once("./forms/configuration/configuration_form.php"); ?>
+  <include href="forms/schnellbuchungen/schnellbuchungen_liste.php" />
+  <include href="forms/schnellbuchungen/schnellbuchung_form.php" />
+  <include href="forms/configuration/configuration_liste.php" />
+  <include href="forms/configuration/configuration_form.php" />
   <!-- Ergebnisrechnungen aus dem Menü "Auswertungen" -->
-  <?php include_once("./forms/ergebnis/ergebnis_view.php"); ?>
-  <?php include_once("./forms/ergebnis/ergebnis_menue.php"); ?>
-  <?php include_once("./forms/ergebnis/prognose_view.php"); ?>
-  <?php include_once("./forms/verlauf/verlauf_view_einfach.php"); ?>
-  <?php include_once("./forms/verlauf/verlauf_view_mehrfach.php"); ?>
-  <?php include_once("./forms/verlauf/verlauf_kontenliste.php"); ?>
-  <?php include_once("./forms/verlauf/verlauf_kontenauswahl.php"); ?>
+  <include href="forms/ergebnis/ergebnis_view.php" />
+  <include href="forms/ergebnis/ergebnis_menue.php" />
+  <include href="forms/ergebnis/prognose_view.php" />
+  <include href="forms/verlauf/verlauf_view_einfach.php" />
+  <include href="forms/verlauf/verlauf_view_mehrfach.php" />
+  <include href="forms/verlauf/verlauf_kontenliste.php" />
+  <include href="forms/verlauf/verlauf_kontenauswahl.php" />
   <!-- Update-Handling -->
   <script type="text/javascript">
       de.ww.updater.handlers.onUpdateReady(function() { alert('Die Buchhaltung wurde auf eine neue Version aktualisiert'); });

@@ -1,0 +1,33 @@
+AuthType Basic 
+AuthUserFile %PATH_TO_HTPASSWD% 
+AuthName "html5-haushaltsbuch" 
+
+order deny,allow
+allow from all
+require valid-user
+
+#Gzip fuer HTML-, CSS- und JavaScript-Content aktivieren
+<ifmodule mod_deflate.c>
+AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript text/javascript
+</ifmodule>
+
+# Enable rewrite engine and route requests to framework
+RewriteEngine On
+
+# Some servers require you to specify the `RewriteBase` directive
+# In such cases, it should be the path (relative to the document root)
+# containing this .htaccess file
+#7
+ RewriteBase /
+
+RewriteRule ^(dfg)\/|\.ini$ - [R=404]
+
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* index.php [L,QSA]
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+
+AddType text/css css
+AddType text/javascript js
+

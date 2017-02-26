@@ -1,0 +1,18 @@
+[globals]
+;;DEBUGMODE
+DEBUG=3
+
+;; LOCALE SETTINGS
+TZ=Europe/Berlin
+LANGUAGE=de-DE
+
+;;Foldersettings
+;BASE = /rasputin/www
+UI = ../app/View/
+
+#Database
+DBHOST = 127.0.0.1
+DBPORT = 3306
+DBNAME =
+DBUSER =
+DBPASSWORD =

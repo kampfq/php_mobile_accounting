@@ -47,7 +47,7 @@ function InstallerModel() {
 
   // hier noch die Aktionen Auflisten, die ich auf data-bind:click registriere!
   self.onCreateDbSchema = function() {
-    doPOST("installation", "createdbschema", "",
+    doPOST("installation", "createDatabaseSchema", "",
       function (data) {
         if(data.isError) {
           alert("Fehler aufgetreten: "+data.message);
@@ -64,7 +64,7 @@ function InstallerModel() {
 
   // .htaccess-Datei scharf schalten
   self.onActivateHtaccess = function() {
-    doPOST("installation", "sethtaccess", "",
+    doPOST("Install", "setHtAccess", "",
       function (data) {
         if(data.isError) {
            // Fehler im Dialog anzeigen
@@ -97,7 +97,7 @@ function DatabaseModel() {
   // Methode für onTestConnection
   self.onTestConnection = function(obj) {
       var param = ko.toJSON(self);
-      doPOST("installation", "checkdbsettings", param,
+      doPOST("Install", "checkDatabaseSettings", param,
           // Erfolgsfall: Datenbankverbindung ist brauchbar
           function(data) {
               alert('Die angegebenen Verbindungsdaten sind brauchbar: '+data);
@@ -112,7 +112,7 @@ function DatabaseModel() {
   // Methode für storeConnectionSettings
   self.onStoreConnection = function(obj) {
       var param = ko.toJSON(self);
-      doPOST("installation", "storedbsettings", param,
+      doPOST("Install", "storeDatabaseSettings", param,
           // Erfolgsfall: Datenbankverbindung ist brauchbar
           function(data) {
             if(data.isError) {
@@ -143,7 +143,7 @@ function UserModel() {
   // Methode für createUser
   self.onCreateUser = function() {
     var param = ko.toJSON(self);
-    doPOST("installation", "adduser", param,
+    doPOST("Install", "addUser", param,
       function(data) {
         if(data.isError) {
           $("#fehler_ausgeben_meldung").html("<h2>"+data.message+"</h2>"

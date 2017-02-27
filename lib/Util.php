@@ -18,33 +18,35 @@
  * USA
  */
 class Util
-#
+
+{
+    #
 # Ermittelt einen Konfigurations-Key incl. aller seiner Parameter
 #
-static function get_config_key($param_knz, $mandant_id) {
-    $db = getDbConnection();
-    if(is_legal_string($param_knz)) {
-        $sql = "select * from fi_config_params where mandant_id = $mandant_id and param_knz = '$param_knz'";
-        $rs = $this -> getDatabase() -> exec($sql);
-        if($obj = mysqli_fetch_object($rs)) {
-            mysqli_close($db);
-            return $obj;
+    static function get_config_key($param_knz, $mandant_id) {
+        $db = getDbConnection();
+        if(is_legal_string($param_knz)) {
+            $sql = "select * from fi_config_params where mandant_id = $mandant_id and param_knz = '$param_knz'";
+            $rs = $this -> getDatabase() -> exec($sql);
+            if($obj = mysqli_fetch_object($rs)) {
+                mysqli_close($db);
+                return $obj;
+            } else {
+                mysqli_close($db);
+                throw new ErrorException("Parameter nicht gefunden");
+            }
         } else {
-            mysqli_close($db);
-            throw new ErrorException("Parameter nicht gefunden");
+            throw new ErrorException("Param_knz enthält ungültige Zeichen");
         }
-    } else {
-        throw new ErrorException("Param_knz enthält ungültige Zeichen");
     }
-}
 
 #
 # Prüft, ob ein String Hochkommas enthält
 #
-static function is_legal_string($value) {
-    $pattern = '/[\']/';
-    preg_match($pattern, $value, $results);
-    return count($results) == 0;
-}
+    static function is_legal_string($value) {
+        $pattern = '/[\']/';
+        preg_match($pattern, $value, $results);
+        return count($results) == 0;
+    }
 
-?>
+}

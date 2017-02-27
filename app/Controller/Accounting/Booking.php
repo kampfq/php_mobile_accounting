@@ -56,16 +56,11 @@ class Booking {
 
     //liest die aktuellsten 25 Buchungen aus
     function getTop25() {
-        $db = getDbConnection();
-        $top = array();
         $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
             ."where mandant_id = ".$this-> getClient() -> mandant_id
             ."order by buchungsnummer desc limit 25");
 
-       foreach($rs as $obj) {
-            $top[] = $obj;
-        }
-        return $this -> wrap_response($top);
+        return $this -> wrap_response($rs);
     }
 
     //liest die offenen Posten aus

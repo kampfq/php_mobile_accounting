@@ -30,19 +30,15 @@ class Backup
 # den Buchungen und Konten des aktuell angemeldeten Mandanten
     function getMysqlBackup($request)
     {
-
-        $db = getDbConnection();
-        $backup_sql = $this->getBuchungenBackup($db);
-        $backup_sql .= $this->getKontenBackup($db);
-        mysqli_close($db);
-
+        $backup_sql = $this->getBuchungenBackup();
+        $backup_sql .= $this->getKontenBackup();
         $result = gzencode($backup_sql);
 
         return $this->wrap_response($result, "gz");
     }
 
 # Insert-Statements für alle Buchungen des Mandanten generieren
-    private function getBuchungenBackup($db)
+    private function getBuchungenBackup()
     {
 
         $sql = "select mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
@@ -67,7 +63,7 @@ class Backup
     }
 
 # Insert-Statements für alle Konten des Mandanten generieren
-    private function getKontenBackup($db)
+    private function getKontenBackup()
     {
 
         $sql = "select mandant_id, kontonummer, bezeichnung, kontenart_id ";

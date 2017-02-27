@@ -26,82 +26,37 @@ class Menu {
 
     use ViewControllerTrait;
 
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
-    switch($action) {
-        case 'quick':
-    	     return $this->getQuickMenu();
-        case 'get':
-             return $this->getQuickMenuById($request);
-        case 'add':
-             return $this->addQuickMenu($request);
-        case 'update':
-             return $this->updateQuickMenu($request);
-        case 'remove':
-             return $this->removeQuickMenu($request);
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
-
 function getQuickMenu() {
-    $db = getDbConnection();
-    $lst = array();
-    $rs = $this -> getDatabase() -> exec("select * from fi_quick_config where mandant_id = $this->mandant_id order by config_knz");
-    while($obj = mysqli_fetch_object($rs)) {
-        $lst[] = $obj;
-    }
-    mysqli_free_result($rs);
-    mysqli_close($db);
-    return $this -> wrap_response($lst);
+    $rs = $this -> getDatabase() -> exec("select * from fi_quick_config where mandant_id = ".$this->getClient()->mandant_id." order by config_knz");
+    return $this -> wrap_response($rs);
 }
 
-
-function getQuickMenuById($request) {
-    $db = getDbConnection();
-    $id = $request['id'];
+function getQuickMenuById() {
+    $id = $this -> getIdParsedFromRequest();
     if(is_numeric($id)) {
-        $rs = $this -> getDatabase() -> exec("select * from fi_quick_config where mandant_id = $this->mandant_id and config_id = $id");
-        if($obj = mysqli_fetch_object($rs)) {
-            mysqli_free_result($rs);
-            mysqli_close($db);
-            return $this -> wrap_response($obj);
-        } else {
-            mysqli_free_result($rs);
-            mysqli_close($db);
-            return $this -> wrap_response(null);
-        }
+        $rs = $this -> getDatabase() -> exec("select * from fi_quick_config where mandant_id = ".$this->getClient()->mandant_id." and config_id = $id");
+        return $this -> wrap_response($rs);
     } else {
-        throw new ErrorException("Die fi_quick_config id ist fehlerhaft");
+        throw new \ErrorException("Die fi_quick_config id ist fehlerhaft");
     }
 }
 
-function addQuickMenu($request) {
-    $db = getDbConnection();
+function addQuickMenu() {
     $inputJSON = $this -> request -> getBody();
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidQuickMenu($input)) { 
         $sql = "insert into fi_quick_config(config_knz, sollkonto, habenkonto, buchungstext,";
         $sql .= " betrag, mandant_id) values ('".$input['config_knz']."', '".$input['sollkonto']."', ";
         $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->mandant_id.")";
-
         $this -> getDatabase() -> exec($sql);
-        $error = mysqli_error($db);
-        if($error) {
-           error_log($error);
-           error_log($sql);
-        }
-        mysqli_close($db);
-        return $this -> wrap_response("Fehler: $error");
+        // return $this -> wrap_response("Fehler: $error");
+        return $this -> wrap_response("Fehler: ");
     } else {
-        mysqli_close($db);
         throw new ErrorException("Die uebergebene Schnellbuchungsvorlage ist nicht valide: ".$inputJSON);
     }
 }
 
 function updateQuickMenu($request) {
-    $db = getDbConnection();
     $inputJSON = $this -> request -> getBody();
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidQuickMenu($input)) {
@@ -115,35 +70,22 @@ function updateQuickMenu($request) {
         $sql .= " and config_id = ".$input['config_id'];
 
         $this -> getDatabase() -> exec($sql);
-        $error = mysqli_error($db);
-        if($error) {
-            error_log($error);
-            error_log($sql);
-            mysqli_close($db);
-            return $this -> wrap_response("Fehler: $error");
-        } else {
-            mysqli_close($db);
-            return $this -> wrap_response("Gelöscht");
-        }
+        return $this -> wrap_response("Gelöscht");
     } else {
-        mysqli_close($db);
-        throw new ErrorException("Die uebergebene Schnellbuchungsvorlage ist nicht valide: ".$inputJSON);
+        throw new \ErrorException("Die uebergebene Schnellbuchungsvorlage ist nicht valide: ".$inputJSON);
     }
 }
 
 function removeQuickMenu($request) {
-    $db = getDbConnection();
-    $id = $request['id'];
+    $id = $this -> getIdParsedFromRequest();
     if(is_numeric($id)) {
-        $sql =  "delete from fi_quick_config where mandant_id = $this->mandant_id";
+        $sql =  "delete from fi_quick_config where mandant_id = ".$this->getClient() -> mandant_id;
         $sql .= " and config_id = $id";
 
         $this -> getDatabase() -> exec($sql);
-        mysqli_close($db);
-
         return $this -> wrap_response(null);
     } else {
-        throw new ErrorException("Die id der Schnellbuchungsvorlage muss numerisch sein!");
+        throw new \ErrorException("Die id der Schnellbuchungsvorlage muss numerisch sein!");
     }
 }
 

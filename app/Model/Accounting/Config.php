@@ -31,10 +31,6 @@ class Config extends Cortex
             'type' => Schema::DT_INT,
             'nullable' => true,
         ),
-        'param_id' => array(
-            'type' => Schema::DT_INT,
-            'nullable' => true,
-        ),
         'param_knz' => array(
             'type' => Schema::DT_VARCHAR128,
             'nullable' => true,

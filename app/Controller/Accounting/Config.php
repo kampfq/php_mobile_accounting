@@ -26,58 +26,25 @@ class Config {
 
     use ViewControllerTrait;
 
-    function invoke($action, $request, $dispatcher) {
-        $this->dispatcher = $dispatcher;
-        $this->mandant_id = $dispatcher->getMandantId();
-        switch($action) {
-            case 'list':
-                return $this->listConfigEntries();
-            case 'update':
-                return $this->updateConfigEntry();
-            case 'get':
-                return $this->getConfigEntry($request);
-            default:
-                throw new ErrorException("Unbekannte Action");
-        }
-    }
-
     function listConfigEntries() {
-        $db = getDbConnection();
-        $lst = array();
-        $rs = $this -> getDatabase() -> exec("select * from fi_config_params where mandant_id = $this->mandant_id order by param_desc");
-        while($obj = mysqli_fetch_object($rs)) {
-            $lst[] = $obj;
-        }
-        mysqli_free_result($rs);
-        mysqli_close($db);
-        return $this -> wrap_response($lst);
+        $rs = $this -> getDatabase() -> exec("select * from fi_config_params where mandant_id = ".$this->getClient()->mandant_id." order by param_desc");
+        return $this -> wrap_response($rs);
     }
 
-
-    function getConfigEntry($request) {
-        $db = getDbConnection();
-        if(!isset($request['param_id'])) {
+    function getConfigEntry() {
+        if(!$this -> getIdParsedFromRequest()) {
             throw new ErrorException("Parameter param_id nicht im Request enthalten");
         }
-        $id = $request['param_id'];
+        $id = $this -> getIdParsedFromRequest();
         if(is_numeric($id)) {
-            $rs = $this -> getDatabase() -> exec("select * from fi_config_params where mandant_id = $this->mandant_id and param_id = $id");
-            if($obj = mysqli_fetch_object($rs)) {
-                mysqli_free_result($rs);
-                mysqli_close($db);
-                return $this -> wrap_response($obj);
-            } else {
-                mysqli_free_result($rs);
-                mysqli_close($db);
-                return $this -> wrap_response(null);
-            }
+            $rs = $this -> getDatabase() -> exec("select * from fi_config_params where mandant_id = ".$this-> getClient -> mandant_id." and param_id = $id");
+            return $this -> wrap_response($rs);
         } else {
-            throw new ErrorException("Die fi_config_entries.param_id ist fehlerhaft");
+            throw new \ErrorException("Die fi_config_entries.param_id ist fehlerhaft");
         }
     }
 
     function updateConfigEntry() {
-        $db = getDbConnection();
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidConfigEntry($input)) {
@@ -86,15 +53,9 @@ class Config {
             $sql .= "where mandant_id = $this->mandant_id and param_id = ".$input['param_id'];
 
             $this -> getDatabase() -> exec($sql);
-            $error = mysqli_error($db);
-            if($error) {
-                error_log($error);
-                error_log($sql);
-            }
-            mysqli_close($db);
-            return $this -> wrap_response("Fehler: $error");
+
+            return $this -> wrap_response("Fehler: ");
         } else {
-            mysqli_close($db);
             throw new ErrorException("Der übergebene Konfigurationsparameter ist nicht valide: ".$inputJSON);
         }
     }

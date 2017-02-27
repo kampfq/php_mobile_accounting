@@ -49,7 +49,7 @@ hhb.model.types.ConfigurationModel = function(data) {
 
     // Laden der Liste der Konfigurationsparameter
     self.load = function() {
-        doGETwithCache("config", "list", [],
+        doGETwithCache("Config", "listConfigEntries", [],
             function(data) {
                 var array = [];
                 for(var i = 0; i < data.length; i++) {
@@ -72,7 +72,7 @@ hhb.model.types.ConfigurationModel = function(data) {
     self.updateConfigurationParam = function() {
         var selected = self.selectedConfigurationParam();
         var selectedJSON = ko.toJSON(selected);
-        doPOST("config", "update", selectedJSON,
+        doPOST("Config", "updateConfigEntry", selectedJSON,
             function(data) {
                 alert('Parameter aktualisiert');
                 jQuery.mobile.changePage("#configuration_liste");

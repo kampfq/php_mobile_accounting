@@ -25,24 +25,10 @@ class Progress {
 
     use ViewControllerTrait;
 
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
-    switch($action) {
-        case "monatssalden":
-            return $this->getMonatsSalden($request['id']);
-        case "cashflow":
-            return $this->getCashFlow($request['id'], $request['side']);
-        case "intramonth":
-            return $this->getIntraMonth($request);
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
 
 # Ermittelt die Monats-Salden des Kontos
-function getMonatsSalden($kontonummer) {
+function getMonatsSalden() {
+    $kontonummer = $this -> getIdParsedFromRequest();
     if(is_numeric($kontonummer) || $this->is_numeric_list($kontonummer)) {
         $kto_prepared = $this->prepareKontoNummern($kontonummer);
         $db = getDbConnection();

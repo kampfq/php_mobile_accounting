@@ -73,25 +73,25 @@ hhb.model.types.VerlaufModel = function() {
     self.verlaufaufwand = function() {
         self.titel(hhb.i18n.verlauf.verlaufaufwand_title);
         self.verlauf_einfach.removeAll();
-        self.loadVerlaufEinfach('ergebnis', 'verlauf', {'id': 3});
+        self.loadVerlaufEinfach('Result', 'getVerlauf', {'id': 3});
     };
 
     self.verlaufertrag = function() {
         self.titel(hhb.i18n.verlauf.verlaufertrag_title);
         self.verlauf_einfach.removeAll();
-        self.loadVerlaufEinfach('ergebnis', 'verlauf', {'id': 4});
+        self.loadVerlaufEinfach('Result', 'getVerlauf', {'id': 4});
     };
 
     self.verlaufgewinn = function() {
         self.titel(hhb.i18n.verlauf.verlaufgewinn_title);
         self.verlauf_einfach.removeAll();
-        self.loadVerlaufEinfach('ergebnis', 'verlauf_gewinn', {});
+        self.loadVerlaufEinfach('Result', 'getVerlaufGewinn', {});
     };
 
     self.verlaufintern = function() {
         self.titel(hhb.i18n.verlauf.monatsinternerverlauf_title);
         self.verlauf_mehrfach.removeAll();
-        self.loadVerlaufMehrfach('verlauf', 'intramonth', {'month_id': self.selected_monat()});
+        self.loadVerlaufMehrfach('Progress', 'getIntraMonth', {'month_id': self.selected_monat()});
         self.onchange = self.verlaufintern;
     };
 
@@ -107,7 +107,7 @@ hhb.model.types.VerlaufModel = function() {
         } else {
             self.titel(hhb.i18n.verlauf.abfluss+': '+konto.kontonummer());
         }
-        self.loadVerlaufEinfach('verlauf', 'cashflow', {'id': konto.kontonummer(), 'side': self.sollhaben()});
+        self.loadVerlaufEinfach('Progress', 'getCashFlow', {'id': konto.kontonummer(), 'side': self.sollhaben()});
     };
 
     self.verlauffrei = function() {
@@ -155,7 +155,7 @@ hhb.model.types.VerlaufModel = function() {
                 kontoNumbers += ",";
             }
         }
-        self.loadVerlaufEinfach('verlauf', 'monatssalden', {'id':kontoNumbers});
+        self.loadVerlaufEinfach('Progress', 'getMonatsSalden', {'id':kontoNumbers});
     };
 
     self.loadVerlaufEinfach = function(controller, action, parameters) {

@@ -27,49 +27,17 @@ class Result {
 
     use ViewControllerTrait;
 
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-
-    $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
-
-    switch($action) {
-        case "bilanz":
-            return $this->getBilanz($request);
-        case "guv":
-            return $this->getGuV($request);
-        case "guv_month":
-            return $this->getGuVMonth($request);
-        case "guv_prognose":
-            return $this->getGuVPrognose();
-        case "verlauf":
-            return $this->getVerlauf($request);
-        case "verlauf_gewinn":
-            return $this->getVerlaufGewinn();
-        case "months":
-            return $this->getMonths();
-        case "years":
-            return $this->getYears();
-        default:
-            $message = array();
-            $message['message'] = "Unbekannte Action";
-            return $message;
-    }
-}
-
 # Berechnet eine aktuelle Bilanz und liefert
 # sie als Array zurück
 function getBilanz($request) {
-    $result = array();
-    $db = getDbConnection();
-    $year = $request['year'];
+    $year = $this -> getFirstOptionParsedFromRequest();
 
     if($this->isValidYear($year)) {
         $query = new QueryHandler("bilanz_detail.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+        $query->setParameterUnchecked("mandant_id", $this -> getClient() -> mandant_id);
         $query->setNumericParameter("year", $year+1);
         $query->setNumericParameter("geschj_start_monat",
-            get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
+            get_config_key("geschj_start_monat", $this-> getClient() -> mandant_id)->param_value);
         $sql = $query->getSql();
 
         $rs = $this -> getDatabase() -> exec($sql);

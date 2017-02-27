@@ -17,11 +17,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
-
+class Util
 #
 # Ermittelt einen Konfigurations-Key incl. aller seiner Parameter
 #
-function get_config_key($param_knz, $mandant_id) {
+static function get_config_key($param_knz, $mandant_id) {
     $db = getDbConnection();
     if(is_legal_string($param_knz)) {
         $sql = "select * from fi_config_params where mandant_id = $mandant_id and param_knz = '$param_knz'";
@@ -41,7 +41,7 @@ function get_config_key($param_knz, $mandant_id) {
 #
 # Prüft, ob ein String Hochkommas enthält
 #
-function is_legal_string($value) {
+static function is_legal_string($value) {
     $pattern = '/[\']/';
     preg_match($pattern, $value, $results);
     return count($results) == 0;

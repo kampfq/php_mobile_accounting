@@ -19,6 +19,8 @@
  */
 namespace Accounting\Controller;
 
+use Model\Accounting\Account;
+use Model\Accounting\Booking;
 use Traits\ViewControllerTrait;
 
 class Backup
@@ -40,14 +42,11 @@ class Backup
 # Insert-Statements für alle Buchungen des Mandanten generieren
     private function getBuchungenBackup()
     {
-
-        $sql = "select mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
-        $sql .= "betrag, datum, bearbeiter_user_id, is_offener_posten ";
-        $sql .= "from fi_buchungen ";
-        $sql .= "where mandant_id = ".$this->getClient()->mandant_id;
-
+        $booking = new Booking();
+        $rs = $booking -> load([
+            'mandant_id = ?',$this->getClient()->mandant_id,
+        ]);
         $result = "";
-        $rs = $this->getDatabase()->exec($sql);
         foreach ($rs as $obj) {
             $result .= "insert into fi_buchungen (mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
             $result .= "betrag, datum, bearbeiter_user_id, is_offener_posten) values ";
@@ -66,13 +65,11 @@ class Backup
     private function getKontenBackup()
     {
 
-        $sql = "select mandant_id, kontonummer, bezeichnung, kontenart_id ";
-        $sql .= "from fi_konto ";
-        $sql .= "where mandant_id = ".$this->getClient()->mandant_id;
-
+        $account = new Account();
+        $rs = $account -> load([
+            'mandant_id = ?',$this->getClient()->mandant_id
+        ]);
         $result = "";
-        $rs = $this->getDatabase()->exec($sql);
-
         foreach ($rs as $obj) {
             {
                 $result .= "insert into fi_konto (mandant_id, kontonummer, bezeichnung, kontenart_id) values ";

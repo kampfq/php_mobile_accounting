@@ -167,7 +167,7 @@ hhb.model.types.BuchungenModel = function() {
     var bnr = self.selectedOffenerPosten().buchungsnummer();
     var response = ko.toJSON({'offenerposten':bnr, 'buchung':self.selectedBuchung});
     if(bnr !== 0) {
-      doPOSTwithQueue("buchung", "closeop", response,
+      doPOSTwithQueue("buchung", "closeOpAndGetList", response,
       function(data) {
         for(var i = 0; i < data.length; i++) {
            self.buchungen.push(new hhb.model.types.Buchung(data[i]));

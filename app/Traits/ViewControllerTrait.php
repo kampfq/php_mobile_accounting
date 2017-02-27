@@ -9,6 +9,7 @@ namespace Traits;
 use Controller\FlashMessenger\FlashMessage;
 use Controller\FlashMessenger\FlashMessengerBag;
 use DB\Cortex;
+use DB\CortexCollection;
 use DB\SQL;
 use Model\Accounting\Client;
 use Model\Auth\User;
@@ -46,6 +47,7 @@ trait ViewControllerTrait
     protected $database = null;
 
     protected $idParsedFromRequest = null;
+    protected $firstOptionParsedFromRequest = null;
 
     public function __construct()
     {
@@ -53,6 +55,7 @@ trait ViewControllerTrait
         $this -> flashMessenger = FlashMessengerBag::getInstance();
         $this -> database = $this -> f3 -> get('DB');
         $this -> idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
+        $this -> firstOptionParsedFromRequest = $this -> f3 -> get('PARAMS.option1');
     }
 
     public function getRequest():ServerRequest{
@@ -118,6 +121,17 @@ trait ViewControllerTrait
              */
             $data = $data -> cast();
         }
+        if(is_subclass_of($data,CortexCollection::class)){
+            /**
+             * @var $data Cortex
+             */
+            $normalizedData = [];
+            foreach($data as $obj){
+                $normalizedData[]=$obj-> cast();
+            }
+            $data = $normalizedData;
+        }
+
 
         if($format === 'json'){
             $response = new Response\JsonResponse($data);
@@ -202,6 +216,16 @@ trait ViewControllerTrait
 
         return $this->idParsedFromRequest;
     }
+
+    /**
+     * @return mixed|null
+     */
+    public function getFirstOptionParsedFromRequest()
+    {
+
+        return $this->firstOptionParsedFromRequest;
+    }
+
 
 
 

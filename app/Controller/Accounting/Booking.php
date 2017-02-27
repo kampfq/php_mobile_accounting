@@ -23,103 +23,62 @@ use Traits\ViewControllerTrait;
 class Booking {
 
     use ViewControllerTrait;
-    private $dispatcher, $mandant_id;
 
-# Einsprungpunkt, hier übergibt das Framework
-    function invoke($action, $request, $dispatcher) {
-
-        $this->dispatcher = $dispatcher;
-        $this->mandant_id = $dispatcher->getMandantId();
-
-        switch($action) {
-            case "create":
-                return $this->createBuchung($request);
-            case "aktuellste":
-                return $this->getTop25();
-            case "listbykonto":
-                return $this->getListByKonto($request);
-            case "listoffeneposten":
-                return $this->getOpList();
-            case "closeop":
-                return $this->closeOpAndGetList($request);
-            default:
-                $message = array();
-                $message['message'] = "Unbekannte Action";
-                return $message;
-        }
-    }
-
-# legt das als JSON-Objekt übergebene Konto an
-    function createBuchung($request) {
-        $db = getDbConnection();
+    //legt das als JSON-Objekt übergebene Konto an
+    public function createBuchung($request) {
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
-        $result = $this->createBuchungInternal($input, $db);
-        mysqli_close($db);
+        $result = $this->createBuchungInternal($input, $this -> getDatabase());
         return $result;
     }
 
-# Innerhalb dieses Controllers wiederverwendbare Funktion zum
-# Anlegen von Buchungen
+    //Innerhalb dieses Controllers wiederverwendbare Funktion zum
+    //Anlegen von Buchungen
     private function createBuchungInternal($input, $db) {
         if($this->isValidBuchung($input)) {
-            if($input['is_offener_posten']) {
-                $temp_op = 1;
-            } else {
-                $temp_op = 0;
-            }
+            $booking = new \Model\Accounting\Booking();
+            $booking -> mandant_id = $this -> getClient()->mandant_id;
+            $booking -> buchungstext = $input['buchungstext'];
+            $booking -> sollkonto = $input['sollkonto'];
+            $booking -> habenkonto = $input['habenkonto'];
+            $booking -> betrag = $input['betrag'];
+            $booking -> datum = $input['datum'];
+            $booking -> bearbeiter_user_id = $this -> getUser()->user_id;
+            $booking -> is_offener_posten= $input['is_offener_posten'];
+            $booking -> save();
 
-            $sql = "insert into fi_buchungen (mandant_id, buchungstext, sollkonto, habenkonto, "
-                ."betrag, datum, bearbeiter_user_id, is_offener_posten)"
-                ." values ($this->mandant_id, '".$input['buchungstext']
-                ."', '".$input['sollkonto']."', '".$input['habenkonto']."', ".$input['betrag'].", '"
-                .$input['datum']."', ".$this->dispatcher->getUserId().", ".$temp_op.")";
-            $this -> getDatabase() -> exec($sql);
-
-            $empty = array();
-            return $this -> wrap_response($empty, "json");
+            return $this -> wrap_response([]);
         } else {
             throw new ErrorException("Das Buchungsobjekt enthält nicht gültige Elemente");
         }
 
     }
 
-# liest die aktuellsten 25 Buchungen aus
+    //liest die aktuellsten 25 Buchungen aus
     function getTop25() {
         $db = getDbConnection();
         $top = array();
         $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
-            ."where mandant_id = $this->mandant_id "
+            ."where mandant_id = ".$this-> getClient() -> mandant_id
             ."order by buchungsnummer desc limit 25");
 
-        while($obj = mysqli_fetch_object($rs)) {
+       foreach($rs as $obj) {
             $top[] = $obj;
         }
-
-        mysqli_free_result($rs);
-        mysqli_close($db);
         return $this -> wrap_response($top);
     }
 
-# liest die offenen Posten aus
+    //liest die offenen Posten aus
     function getOpList() {
-        $db = getDbConnection();
-        $top = array();
-        $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
-            ."where mandant_id = $this->mandant_id "
-            ."and is_offener_posten = 1 "
-            ."order by buchungsnummer");
-
-        while($obj = mysqli_fetch_object($rs)) {
-            $top[] = $obj;
-        }
-
-        mysqli_free_result($rs);
-        mysqli_close($db);
-        return $this -> wrap_response($top);
+        $booking = new \Model\Accounting\Booking();
+        $bookings = $booking -> load([
+            'mandant_id = ? AND is_offener_posten = 1',
+            $this->getClient() -> mandant_id,
+        ]);
+        return $this -> wrap_response($bookings);
     }
 
-# liest die offenen Posten aus
+     //liest die offenen Posten aus
     function closeOpAndGetList($request) {
         $db = getDbConnection();
         $inputJSON = $this -> request -> getBody();
@@ -164,9 +123,8 @@ class Booking {
     }
 
     function getListByKonto($request) {
-        $db = getDbConnection();
-        $kontonummer = $request['konto'];
-        $jahr = $request['jahr'];
+        $kontonummer = $this -> getIdParsedFromRequest();
+        $jahr = $this -> getFirstOptionParsedFromRequest();
         # Nur verarbeiten, wenn konto eine Ziffernfolge ist, um SQL-Injections zu vermeiden
         if(is_numeric($kontonummer) && is_numeric($jahr)) {
 
@@ -183,14 +141,7 @@ class Booking {
             $sql .= "where mandant_id = $this->mandant_id and habenkonto = '$kontonummer' and year(datum) = $jahr ";
             $sql .= "order by buchungsnummer desc";
 
-            $rs = $this -> getDatabase() -> exec($sql);
-
-            while($obj = mysqli_fetch_object($rs)) {
-                $result_list[] = $obj;
-            }
-
-            mysqli_free_result($rs);
-            $result['list'] = $result_list;
+            $result['list'] = $this -> getDatabase() -> exec($sql);
 
             // Saldo laden:
             $sql =  "select sum(betrag) as saldo from (SELECT sum(betrag) as betrag from fi_buchungen ";
@@ -199,14 +150,11 @@ class Booking {
             $sql .= "where mandant_id = $this->mandant_id and habenkonto = '$kontonummer' ) as a ";
 
             $rs = $this -> getDatabase() -> exec($sql);
-            if($obj = mysqli_fetch_object($rs)) {
-                $result['saldo'] = $obj->saldo;
+            if(count($rs)===1) {
+                $result['saldo'] = $rs[0];
             } else {
                 $result['saldo'] = "unbekannt";
             }
-
-            mysqli_free_result($rs);
-            mysqli_close($db);
             return $this -> wrap_response($result);
             # Wenn konto keine Ziffernfolge ist, leeres Ergebnis zurück liefern
         } else {

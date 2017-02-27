@@ -17,6 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
+
+namespace Controller;
 class Util
 
 {
@@ -24,19 +26,17 @@ class Util
 # Ermittelt einen Konfigurations-Key incl. aller seiner Parameter
 #
     static function get_config_key($param_knz, $mandant_id) {
-        $db = getDbConnection();
-        if(is_legal_string($param_knz)) {
+        $f3 = \Base::instance();
+        if(self::is_legal_string($param_knz)) {
             $sql = "select * from fi_config_params where mandant_id = $mandant_id and param_knz = '$param_knz'";
-            $rs = $this -> getDatabase() -> exec($sql);
-            if($obj = mysqli_fetch_object($rs)) {
-                mysqli_close($db);
-                return $obj;
+            $rs = $f3 -> get('DB') -> exec($sql);
+            if($rs[0]) {
+                return $rs[0];
             } else {
-                mysqli_close($db);
-                throw new ErrorException("Parameter nicht gefunden");
+                throw new \ErrorException("Parameter nicht gefunden");
             }
         } else {
-            throw new ErrorException("Param_knz enthält ungültige Zeichen");
+            throw new \ErrorException("Param_knz enthält ungültige Zeichen");
         }
     }
 

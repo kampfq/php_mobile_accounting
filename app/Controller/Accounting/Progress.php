@@ -29,11 +29,11 @@ class Progress {
 
 
 # Ermittelt die Monats-Salden des Kontos
-function getMonatsSalden() {
-    $kontonummer = $this -> getIdParsedFromRequest();
-    if(!is_numeric($kontonummer) || !$this->is_numeric_list($kontonummer)) {
-        throw new \Exception("Mindestens eine Kontonummer ist nicht numerisch");
-    }
+    function getMonatsSalden() {
+        $kontonummer = $this -> getIdParsedFromRequest();
+        if(!is_numeric($kontonummer) || !$this->is_numeric_list($kontonummer)) {
+            throw new \Exception("Mindestens eine Kontonummer ist nicht numerisch");
+        }
         $kto_prepared = $this->prepareKontoNummern($kontonummer);
         $rechnungsart = $this->getRechnungsart($kto_prepared);
 
@@ -65,147 +65,147 @@ function getMonatsSalden() {
                     ."group by grouping ";
                 break;
         }
-    $result = $this -> getDatabase() -> exec($sql);
-    return $this -> wrap_response($result);
-}
+        $result = $this -> getDatabase() -> exec($sql);
+        return $this -> wrap_response($result);
+    }
 
 # Ermittelt die monatlichen Werte des Zu- oder Abfluss
 # ($side = S => Sollbuchungen)
 # ($side = H => Habenbuchungen)
 # von Aktivkonten. Bei anderen Kontenarten wird eine
 # Exception zurückgeliefert
-function getCashFlow() {
-    $kontonummer = $this -> getIdParsedFromRequest();
-    $side = $this -> getFirstOptionParsedFromRequest();
-    if(!$this->isAktivKonto($kontonummer)) {
-        throw new \Exception("getCashFlow ist nur für Aktiv-Konten verfügbar");
-    }
+    function getCashFlow() {
+        $kontonummer = $this -> getIdParsedFromRequest();
+        $side = $this -> getFirstOptionParsedFromRequest();
+        if(!$this->isAktivKonto($kontonummer)) {
+            throw new \Exception("getCashFlow ist nur für Aktiv-Konten verfügbar");
+        }
 
-    if($side === 'S'){
-        $accountType = 'sollkonto';
-    } elseif($side === 'H') {
-        $accountType = 'habenkonto';
-    } else {
-        throw new \Exception("Gültige Werte für side sind S und H");
+        if($side === 'S'){
+            $accountType = 'sollkonto';
+        } elseif($side === 'H') {
+            $accountType = 'habenkonto';
+        } else {
+            throw new \Exception("Gültige Werte für side sind S und H");
+        }
+        $sql  = "select (year(b.datum)*100)+month(b.datum) as grouping, sum(b.betrag) as saldo ";
+        $sql .= "from fi_buchungen as b ";
+        $sql .= " inner join fi_konto as k ";
+        $sql .= " on k.mandant_id = b.mandant_id and k.kontonummer = b.habenkonto ";
+        $sql .= " where b.mandant_id = ".$this->getClient()->mandant_id;
+        $sql .= " and b.$accountType = ".$kontonummer;
+        $sql .= " and year(b.datum) >= year(now())-1 ";
+        $sql .= " and year(b.datum) <= year(now()) ";
+        $sql .= " and k.kontenart_id <> 5 ";
+        $sql .= "group by (year(b.datum)*100)+month(b.datum);";
+        $result = $this -> getDatabase() -> exec($sql);
+        return $this -> wrap_response($result);
     }
-    $sql  = "select (year(b.datum)*100)+month(b.datum) as grouping, sum(b.betrag) as saldo ";
-    $sql .= "from fi_buchungen as b ";
-    $sql .= " inner join fi_konto as k ";
-    $sql .= " on k.mandant_id = b.mandant_id and k.kontonummer = b.habenkonto ";
-    $sql .= " where b.mandant_id = ".$this->getClient()->mandant_id;
-    $sql .= " and b.$accountType = ".$kontonummer;
-    $sql .= " and year(b.datum) >= year(now())-1 ";
-    $sql .= " and year(b.datum) <= year(now()) ";
-    $sql .= " and k.kontenart_id <> 5 ";
-    $sql .= "group by (year(b.datum)*100)+month(b.datum);";
-    $result = $this -> getDatabase() -> exec($sql);
-    return $this -> wrap_response($result);
-}
 
 # Monats-internen Verlauf ermitteln
-function getIntraMonth() {
-    $month_id = $this -> getIdParsedFromRequest();
-    if(!$month_id OR !$this->is_number($month_id)) {
-        return $this -> wrap_response("Parameter month_id fehlt oder ist nicht ausschließlich numerisch");
-    }
-    $query = new QueryHandler("guv_intramonth_aufwand.sql");
-    $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
-    $query->setParameterUnchecked("month_id", $month_id);
-    $result = $this -> getDatabase() -> exec($query->getSql());
+    function getIntraMonth() {
+        $month_id = $this -> getIdParsedFromRequest();
+        if(!$month_id OR !$this->is_number($month_id)) {
+            return $this -> wrap_response("Parameter month_id fehlt oder ist nicht ausschließlich numerisch");
+        }
+        $query = new QueryHandler("guv_intramonth_aufwand.sql");
+        $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
+        $query->setParameterUnchecked("month_id", $month_id);
+        $result = $this -> getDatabase() -> exec($query->getSql());
 
-    return $this -> wrap_response($result);
-}
+        return $this -> wrap_response($result);
+    }
 
 # Prüft, ob das angegebene Konto ein Aktiv-Konto ist.
-function isAktivKonto($kontonummer) {
-    $account = new Account();
-    $account -> load([
-        'mandant_id = ? AND kontonummer = ?',
-        $this->getClient()->mandant_id,
-        $kontonummer
-    ]);
-    $isActive = false;
-    if($account -> kontenart_id ==1){
-        $isActive = true;
+    function isAktivKonto($kontonummer) {
+        $account = new Account();
+        $account -> load([
+            'mandant_id = ? AND kontonummer = ?',
+            $this->getClient()->mandant_id,
+            $kontonummer
+        ]);
+        $isActive = false;
+        if($account -> kontenart_id ==1){
+            $isActive = true;
+        }
+        return $isActive;
     }
-    return $isActive;
-}
 
 # Macht aus einer oder mehreren durch Komma getrennten Kontonummern
 # ein Array von Kontonummern-Strings und verwirft dabei
 # nichtnumerische Elemente
-function kontonummernToArray($value) {
-    $list = array();
-    if(is_numeric($value)) {
-        $list[] = $value;
-    } else {
-        $tmp = explode(',', $value);
-        foreach($tmp as $item) {
-            if(is_numeric($item)) {
-                $list[] = $item;
+    function kontonummernToArray($value) {
+        $list = array();
+        if(is_numeric($value)) {
+            $list[] = $value;
+        } else {
+            $tmp = explode(',', $value);
+            foreach($tmp as $item) {
+                if(is_numeric($item)) {
+                    $list[] = $item;
+                }
             }
         }
+        return $list;
     }
-    return $list;
-}
 
 # Macht aus einer oder mehreren durch Komma getrennten Kontonummern
 # eine passende Liste für SQL-IN
-function prepareKontoNummern($value) {
-    $list = $this->kontonummernToArray($value);
+    function prepareKontoNummern($value) {
+        $list = $this->kontonummernToArray($value);
 
-    $result = "";
-    foreach($list as $item) {
-        $result .= "'".$item."',";
+        $result = "";
+        foreach($list as $item) {
+            $result .= "'".$item."',";
+        }
+        $result = substr($result, 0, strlen($result)-1);
+        return $result;
     }
-    $result = substr($result, 0, strlen($result)-1);
-    return $result;
-}
 
 # Prüft mittels RegEx ob $value ausschließlich aus Ziffern und Kommas besteht
-function is_numeric_list($value) {
-    $pattern = '/[^0-9,]/';
-    preg_match($pattern, $value, $results);
-    return count($results) == 0;
-}
+    function is_numeric_list($value) {
+        $pattern = '/[^0-9,]/';
+        preg_match($pattern, $value, $results);
+        return count($results) == 0;
+    }
 
 # Prüft mittels RegEx ob der übergebene Wert ausschließlich aus Ziffern besteht
-function is_number($value) {
-    $pattern = '/[^0-9]/';
-    preg_match($pattern, $value, $results);
-    return count($results) == 0;
-}
+    function is_number($value) {
+        $pattern = '/[^0-9]/';
+        preg_match($pattern, $value, $results);
+        return count($results) == 0;
+    }
 
 # Ermittelt, ob es sich bei den ausgewählten Konten um
 # eine GUV-Betrachtung (nur Aufwand und Ertrag) oder
 # eine Bestandsbetrachtung (nur Aktiv und Passiv) handelt.
-function getRechnungsart($kto_prepared) {
-    $type = 0;
-    $sql = "select distinct kontenart_id from fi_konto where kontonummer in ($kto_prepared)";
-    $rs = $this -> getDatabase() -> exec($sql);
-    foreach($rs as $obj) {
-        $kontenart_id = $obj['kontenart_id'];
-        if($type == 0) {
-            // noch ERGEBNISOFFEN
-            if($kontenart_id == 1 || $kontenart_id == 2){
-                $type = 1;
-            }
-            else if($kontenart_id == 3 || $kontenart_id == 4) {
-                $type = 2;
-            }
-        } else if($type == 1) {
-            // BESTANDSBETRACHTUNG
-            if($kontenart_id == 3 || $kontenart_id == 4) {
-                throw new Exception("Falsche Mischung von Kontenarten");
-            }
-        } else if($type == 2) {
-            // GUV-BETRACHTUNG
-            if($kontenart_id == 1 || $kontenart_id == 2) {
-                throw new Exception("Falsche Mischung von Kontenarten");
+    function getRechnungsart($kto_prepared) {
+        $type = 0;
+        $sql = "select distinct kontenart_id from fi_konto where kontonummer in ($kto_prepared)";
+        $rs = $this -> getDatabase() -> exec($sql);
+        foreach($rs as $obj) {
+            $kontenart_id = $obj['kontenart_id'];
+            if($type == 0) {
+                // noch ERGEBNISOFFEN
+                if($kontenart_id == 1 || $kontenart_id == 2){
+                    $type = 1;
+                }
+                else if($kontenart_id == 3 || $kontenart_id == 4) {
+                    $type = 2;
+                }
+            } else if($type == 1) {
+                // BESTANDSBETRACHTUNG
+                if($kontenart_id == 3 || $kontenart_id == 4) {
+                    throw new Exception("Falsche Mischung von Kontenarten");
+                }
+            } else if($type == 2) {
+                // GUV-BETRACHTUNG
+                if($kontenart_id == 1 || $kontenart_id == 2) {
+                    throw new Exception("Falsche Mischung von Kontenarten");
+                }
             }
         }
+        return $type;
     }
-    return $type;
-}
 
 }

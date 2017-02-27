@@ -29,7 +29,7 @@ class Progress {
 
 
 # Ermittelt die Monats-Salden des Kontos
-    function getMonatsSalden() {
+    public function getMonatsSalden() {
         $kontonummer = $this -> getIdParsedFromRequest();
         if(!is_numeric($kontonummer) || !$this->is_numeric_list($kontonummer)) {
             throw new \Exception("Mindestens eine Kontonummer ist nicht numerisch");
@@ -74,7 +74,7 @@ class Progress {
 # ($side = H => Habenbuchungen)
 # von Aktivkonten. Bei anderen Kontenarten wird eine
 # Exception zurückgeliefert
-    function getCashFlow() {
+    public function getCashFlow() {
         $kontonummer = $this -> getIdParsedFromRequest();
         $side = $this -> getFirstOptionParsedFromRequest();
         if(!$this->isAktivKonto($kontonummer)) {
@@ -103,7 +103,7 @@ class Progress {
     }
 
 # Monats-internen Verlauf ermitteln
-    function getIntraMonth() {
+    public function getIntraMonth() {
         $month_id = $this -> getIdParsedFromRequest();
         if(!$month_id OR !$this->is_number($month_id)) {
             return $this -> wrap_response("Parameter month_id fehlt oder ist nicht ausschließlich numerisch");
@@ -117,7 +117,7 @@ class Progress {
     }
 
 # Prüft, ob das angegebene Konto ein Aktiv-Konto ist.
-    function isAktivKonto($kontonummer) {
+    public function isAktivKonto($kontonummer) {
         $account = new Account();
         $account -> load([
             'mandant_id = ? AND kontonummer = ?',
@@ -134,7 +134,7 @@ class Progress {
 # Macht aus einer oder mehreren durch Komma getrennten Kontonummern
 # ein Array von Kontonummern-Strings und verwirft dabei
 # nichtnumerische Elemente
-    function kontonummernToArray($value) {
+    public function kontonummernToArray($value) {
         $list = array();
         if(is_numeric($value)) {
             $list[] = $value;
@@ -151,7 +151,7 @@ class Progress {
 
 # Macht aus einer oder mehreren durch Komma getrennten Kontonummern
 # eine passende Liste für SQL-IN
-    function prepareKontoNummern($value) {
+    public function prepareKontoNummern($value) {
         $list = $this->kontonummernToArray($value);
 
         $result = "";
@@ -163,14 +163,14 @@ class Progress {
     }
 
 # Prüft mittels RegEx ob $value ausschließlich aus Ziffern und Kommas besteht
-    function is_numeric_list($value) {
+    public function is_numeric_list($value) {
         $pattern = '/[^0-9,]/';
         preg_match($pattern, $value, $results);
         return count($results) == 0;
     }
 
 # Prüft mittels RegEx ob der übergebene Wert ausschließlich aus Ziffern besteht
-    function is_number($value) {
+    public function is_number($value) {
         $pattern = '/[^0-9]/';
         preg_match($pattern, $value, $results);
         return count($results) == 0;
@@ -179,7 +179,7 @@ class Progress {
 # Ermittelt, ob es sich bei den ausgewählten Konten um
 # eine GUV-Betrachtung (nur Aufwand und Ertrag) oder
 # eine Bestandsbetrachtung (nur Aktiv und Passiv) handelt.
-    function getRechnungsart($kto_prepared) {
+    public function getRechnungsart($kto_prepared) {
         $type = 0;
         $sql = "select distinct kontenart_id from fi_konto where kontonummer in ($kto_prepared)";
         $rs = $this -> getDatabase() -> exec($sql);

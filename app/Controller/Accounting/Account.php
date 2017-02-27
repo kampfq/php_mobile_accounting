@@ -26,8 +26,6 @@ class Account {
 
     use ViewControllerTrait;
 
-    private $dispatcher, $mandant_id;
-
     protected $types = [
         AccountModel::AKTIV => 'Aktiv',
         AccountModel::PASSIV => 'Passiv',

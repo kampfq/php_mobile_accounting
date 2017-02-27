@@ -26,12 +26,12 @@ class Config {
 
     use ViewControllerTrait;
 
-    function listConfigEntries() {
+    public function listConfigEntries() {
         $rs = $this -> getDatabase() -> exec("select * from fi_config_params where mandant_id = ".$this->getClient()->mandant_id." order by param_desc");
         return $this -> wrap_response($rs);
     }
 
-    function getConfigEntry() {
+    public function getConfigEntry() {
         if(!$this -> getIdParsedFromRequest()) {
             throw new ErrorException("Parameter param_id nicht im Request enthalten");
         }
@@ -44,13 +44,13 @@ class Config {
         }
     }
 
-    function updateConfigEntry() {
+    public function updateConfigEntry() {
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidConfigEntry($input)) {
             $sql = "update fi_config_params set param_knz='".$input['param_knz']."', ";
             $sql .= "param_desc='".$input['param_desc']."', param_value='".$input['param_value']."' ";
-            $sql .= "where mandant_id = $this->mandant_id and param_id = ".$input['param_id'];
+            $sql .= "where mandant_id = ".$this->getClient()->mandant_id." and param_id = ".$input['param_id'];
 
             $this -> getDatabase() -> exec($sql);
 

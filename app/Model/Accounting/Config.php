@@ -20,7 +20,7 @@ use DB\SQL\Schema;
 class Config extends Cortex
 {
     protected $db = 'DB';
-    protected $table = 'poll';
+    protected $table = 'fi_config_params';
     protected $primary = 'param_id';
     protected $fieldConf = array(
         'mandant_id' => array(

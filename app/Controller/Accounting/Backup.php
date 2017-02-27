@@ -30,7 +30,7 @@ class Backup
 
     //Erstellt ein Datenbankbackup (Insert-Statements) von
     //den Buchungen und Konten des aktuell angemeldeten Mandanten
-    function getMysqlBackup()
+    public function getMysqlBackup()
     {
         $backup_sql = $this->getBuchungenBackup();
         $backup_sql .= $this->getKontenBackup();

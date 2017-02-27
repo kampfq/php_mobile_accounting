@@ -30,7 +30,7 @@ class Result {
 
     //Berechnet eine aktuelle Bilanz und liefert
     //sie als Array zurück
-    function getBilanz() {
+    public function getBilanz() {
         $year = $this -> getFirstOptionParsedFromRequest();
 
         if($this->isValidYear($year)) {
@@ -57,7 +57,7 @@ class Result {
 
     // Berechnet eine aktuelle GuV-Rechnung und liefert
     // sie als Array zurück
-    function getGuV() {
+    public function getGuV() {
         $year = $this -> getIdParsedFromRequest();
         if($this->isValidYear($year)) {
 
@@ -85,7 +85,7 @@ class Result {
 
     //Berechnet eine GuV-Rechnung fuer das angegebene oder aktuelle Monat
     // und liefert sie als Array zurück
-    function getGuVMonth() {
+    public function getGuVMonth() {
         $month_id = $this->getMonthFromRequest(['id'=>$this -> getIdParsedFromRequest()]);
         $query = new QueryHandler("guv_monat.sql");
         $query->setParameterUnchecked("mandant_id", $this->getClient() -> mandant_id);
@@ -104,7 +104,7 @@ class Result {
 
     // Laden der GuV-Prognose
     // (GuV aktuelles-Monat + Vormonat)
-    function getGuVPrognose() {
+    public function getGuVPrognose() {
 
         $query = new QueryHandler("guv_prognose.sql");
         $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
@@ -122,7 +122,7 @@ class Result {
 
     // Ermittelt aus dem Request und dessen Parameter "id" das ausgewählte Monat
     // sofern das möglich ist. Ansonsten wird 'Undef' zurückgegeben
-    function getMonthFromRequest($request) {
+    public function getMonthFromRequest($request) {
         // Monat aus dem Request auslesen und dann ggf. verwenden (ansonsten das jetzt verwenden)
         $month_id = 'Undef';
         if(array_key_exists('id', $request)) {
@@ -135,7 +135,7 @@ class Result {
     }
 
     // Liefert eine Liste der gültigen Monate aus den Buchungen des Mandanten
-    function getMonths() {
+    public function getMonths() {
         $months = array();
         $sql =  "select distinct (year(datum)*100)+month(datum) as yearmonth ";
         $sql .= " from fi_buchungen where mandant_id = ".$this-> getClient() -> mandant_id;
@@ -150,7 +150,7 @@ class Result {
     }
 
     // Liefert eine Liste der gültigen Jahre aus den Buchungen des Mandanten
-    function getYears() {
+    public function getYears() {
 
         $years = array();
         $sql = "select distinct year(date_add(datum, INTERVAL 13-";
@@ -166,7 +166,7 @@ class Result {
     }
 
     // Verlauf Aufwand, Ertrag, Aktiva und Passiva in Monatsraster
-    function getVerlauf()
+    public function getVerlauf()
     {
         $result = [];
         if (!$this -> getIdParsedFromRequest()) {
@@ -196,7 +196,7 @@ class Result {
     }
 
     // Verlauf des Gewinns in Monatsraster
-    function getVerlaufGewinn()
+    public function getVerlaufGewinn()
     {
         $sql = "select (year(datum)*100)+month(datum) as grouping, sum(betrag*-1) as saldo ";
         $sql .= "from fi_ergebnisrechnungen_base ";
@@ -212,7 +212,7 @@ class Result {
     }
 
     // Prüft, ob das Zahlenformat des übergebenen Jahres korrekt ist
-    function isValidYear($year)
+    public function isValidYear($year)
     {
 
         // Jahr-Regex: [0-9]{4}

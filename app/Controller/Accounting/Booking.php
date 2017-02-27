@@ -55,7 +55,7 @@ class Booking {
     }
 
     //liest die aktuellsten 25 Buchungen aus
-    function getTop25() {
+    public function getTop25() {
         $sql = "select * from fi_buchungen "
             ."where mandant_id = ".$this-> getClient() -> mandant_id
             ." order by buchungsnummer desc limit 25";
@@ -65,7 +65,7 @@ class Booking {
     }
 
     //liest die offenen Posten aus
-    function getOpList() {
+    public function getOpList() {
         $booking = new \Model\Accounting\Booking();
         $bookings = $booking -> find([
             'mandant_id = ? AND is_offener_posten = 1',
@@ -75,7 +75,7 @@ class Booking {
     }
 
      //liest die offenen Posten aus
-    function closeOpAndGetList($request) {
+    public function closeOpAndGetList($request) {
         $db = getDbConnection();
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
@@ -89,7 +89,7 @@ class Booking {
                 $buchungsnummer = $input['offenerposten'];
                 if (is_numeric($buchungsnummer)) {
                     $sql = "update fi_buchungen set is_offener_posten = 0"
-                        . " where mandant_id = $this->mandant_id "
+                        . " where mandant_id = ".$this->getClient()->mandant_id
                         . " and buchungsnummer = $buchungsnummer";
                     $this -> getDatabase() -> exec($sql);
                 }
@@ -101,8 +101,8 @@ class Booking {
             // Aktualisierte Offene-Posten-Liste an den Client liefern
             $top = array();
             $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
-                . "where mandant_id = $this->mandant_id "
-                . "and is_offener_posten = 1 "
+                . "where mandant_id = ".$this->getClient()->mandant_id
+                . " and is_offener_posten = 1 "
                 . "order by buchungsnummer");
 
             while ($obj = mysqli_fetch_object($rs)) {
@@ -118,7 +118,7 @@ class Booking {
         }
     }
 
-    function getListByKonto($request) {
+    public function getListByKonto($request) {
         $kontonummer = $this -> getIdParsedFromRequest();
         $jahr = $this -> getFirstOptionParsedFromRequest();
         # Nur verarbeiten, wenn konto eine Ziffernfolge ist, um SQL-Injections zu vermeiden
@@ -130,20 +130,20 @@ class Booking {
             // Buchungen laden
             $sql =  "SELECT buchungsnummer, buchungstext, habenkonto as gegenkonto, betrag, datum, is_offener_posten ";
             $sql .= "FROM fi_buchungen ";
-            $sql .= "WHERE mandant_id = $this->mandant_id and sollkonto = '$kontonummer' and year(datum) = $jahr ";
+            $sql .= "WHERE mandant_id = ".$this->getClient()->mandant_id." and sollkonto = '$kontonummer' and year(datum) = $jahr ";
             $sql .= "union ";
             $sql .= "select buchungsnummer, buchungstext, sollkonto as gegenkonto, betrag*-1 as betrag, datum, is_offener_posten ";
             $sql .= "from fi_buchungen ";
-            $sql .= "where mandant_id = $this->mandant_id and habenkonto = '$kontonummer' and year(datum) = $jahr ";
+            $sql .= "where mandant_id = ".$this->getClient()->mandant_id." and habenkonto = '$kontonummer' and year(datum) = $jahr ";
             $sql .= "order by buchungsnummer desc";
 
             $result['list'] = $this -> getDatabase() -> exec($sql);
 
             // Saldo laden:
             $sql =  "select sum(betrag) as saldo from (SELECT sum(betrag) as betrag from fi_buchungen ";
-            $sql .= "where mandant_id = $this->mandant_id and sollkonto = '$kontonummer' ";
+            $sql .= "where mandant_id = ".$this->getClient()->mandant_id." and sollkonto = '$kontonummer' ";
             $sql .= "union SELECT sum(betrag)*-1 as betrag from fi_buchungen ";
-            $sql .= "where mandant_id = $this->mandant_id and habenkonto = '$kontonummer' ) as a ";
+            $sql .= "where mandant_id = ".$this->getClient()->mandant_id." and habenkonto = '$kontonummer' ) as a ";
 
             $rs = $this -> getDatabase() -> exec($sql);
             if(count($rs)===1) {
@@ -164,7 +164,7 @@ class Booking {
 
 # Validiert ein Buchungsobjekt und prüft die Gültigkeit
 # der einzelnen Felder des Objekts
-    function isValidBuchung($buchung) {
+    public function isValidBuchung($buchung) {
         if(count($buchung) < 6 && count($buchung) > 7) {
             return false;
         }
@@ -178,7 +178,7 @@ class Booking {
 # Validiert ein OPCloseRequest-Objekt und prüft seine
 # Gültigkeit (auch die zu schließende Buchungsnummer
 # muss größer 0 sein!)
-    function isValidOPCloseRequest($request) {
+    public function isValidOPCloseRequest($request) {
         # Hauptgliederung prüfen
         if(!(isset($request['offenerposten'])
             && isset($request['buchung']))) {
@@ -204,7 +204,7 @@ class Booking {
 
 # Prüft, ob das gegebene Feld in der Menge der
 # gueltigen Felder enthalten ist.
-    function isInValidFields($key) {
+    public function isInValidFields($key) {
         switch($key) {
             case 'mandant_id':       return true;
             case 'buchungsnummer':   return true;
@@ -221,7 +221,7 @@ class Booking {
     }
 
 # Prüft, ob jeder Feldinhalt valide sein kann
-    function isValidValueForField($key, $value) {
+    public function isValidValueForField($key, $value) {
         switch($key) {
             case 'buchungsnummer':
             case 'mandant_id':

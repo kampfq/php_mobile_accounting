@@ -47,7 +47,7 @@ function addQuickMenu() {
     if($this->isValidQuickMenu($input)) { 
         $sql = "insert into fi_quick_config(config_knz, sollkonto, habenkonto, buchungstext,";
         $sql .= " betrag, mandant_id) values ('".$input['config_knz']."', '".$input['sollkonto']."', ";
-        $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->mandant_id.")";
+        $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->getClient()->mandant_id.")";
         $this -> getDatabase() -> exec($sql);
         // return $this -> wrap_response("Fehler: $error");
         return $this -> wrap_response("Fehler: ");
@@ -66,7 +66,7 @@ function updateQuickMenu($request) {
         $sql .= "sollkonto = '".$input['sollkonto']."', ";
         $sql .= "habenkonto = '".$input['habenkonto']."', ";
         $sql .= "betrag = '".$input['betrag']."' ";
-        $sql .= "where mandant_id = ".$this->mandant_id;
+        $sql .= "where mandant_id = ".$this->getClient()->mandant_id;
         $sql .= " and config_id = ".$input['config_id'];
 
         $this -> getDatabase() -> exec($sql);

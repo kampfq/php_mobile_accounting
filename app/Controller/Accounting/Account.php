@@ -24,7 +24,6 @@ use Model\Accounting\Account as AccountModel;
 
 class Account {
 
-
     use ViewControllerTrait;
 
     private $dispatcher, $mandant_id;

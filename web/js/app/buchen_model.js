@@ -110,7 +110,7 @@ hhb.model.types.BuchungenModel = function() {
   // Event-Handler für den Klick auf den Verbuchen-Button
   self.verbuchen = function() {
     var jsonString = ko.toJSON(self.selectedBuchung);
-    doPOSTwithQueue("buchung", "create", jsonString,
+    doPOSTwithQueue("Booking", "createBuchung", jsonString,
       function(data) {
         alert(hhb.i18n.buchen.successful_created);
       },
@@ -140,7 +140,7 @@ hhb.model.types.BuchungenModel = function() {
   // und als self.buchungen zur Verfügung stellen
   self.getWarteschlange = function() {
     self.buchungen.removeAll();
-    var queue = broker.queue.list("buchung", "create");
+    var queue = broker.queue.list("Booking", "createBuchung");
     queue.forEach(function(elem) {
         self.buchungen.push(new hhb.model.types.BuchungenModel(elem))
     });

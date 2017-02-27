@@ -25,7 +25,7 @@ class Booking {
     use ViewControllerTrait;
 
     //legt das als JSON-Objekt übergebene Konto an
-    public function createBuchung($request) {
+    public function createBuchung() {
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         $result = $this->createBuchungInternal($input, $this -> getDatabase());

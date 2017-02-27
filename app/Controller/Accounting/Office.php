@@ -20,7 +20,6 @@
 
 namespace Controller\Accounting;
 use Controller\QueryHandler;
-use Model\Accounting\Template;
 use Traits\ViewControllerTrait;
 // Controller für die Schnellbuchungs-Menüeinträge
 class Office {
@@ -31,7 +30,7 @@ class Office {
     public function getJournal($request) {
 
         $format = "json";
-        if($this -> getFirstOptionParsedFromRequest() === "csv"){
+        if($this -> getIdParsedFromRequest() === "csv"){
             $format = "csv";
         }
         $query = new QueryHandler("export_journal_to_excel.sql");
@@ -43,7 +42,6 @@ class Office {
 
     // Erstellt eine Liste aller GuV-Monatssalden
     public function getGuvMonate($request) {
-
         $format = "json";
         if($this -> getFirstOptionParsedFromRequest() === "csv"){
             $format = "csv";
@@ -57,7 +55,6 @@ class Office {
 
     //Erstellt eine Liste aller GuV-Monatssalde
     public function getBilanzMonate($request) {
-
         $format = "json";
         if($this -> getFirstOptionParsedFromRequest() === "csv"){
             $format = "csv";

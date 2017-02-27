@@ -56,6 +56,7 @@ trait ViewControllerTrait
         $this -> database = $this -> f3 -> get('DB');
         $this -> idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
         $this -> firstOptionParsedFromRequest = $this -> f3 -> get('PARAMS.option1');
+        $this -> getRequest();
     }
 
     public function getRequest():ServerRequest{
@@ -132,11 +133,16 @@ trait ViewControllerTrait
             $data = $normalizedData;
         }
 
-
-        if($format === 'json'){
-            $response = new Response\JsonResponse($data);
-        } else {
-            $response = new Response\HtmlResponse($data);
+        switch ($format){
+            case 'json':
+                $response = new Response\JsonResponse($data);
+                break;
+            case 'csv':
+                $response = new Response\TextResponse($data);
+                break;
+            default:
+                $response = new Response\HtmlResponse($data);
+                break;
         }
         $this -> f3 -> set('PSR7_RESPONSE',$response);
         return $response;

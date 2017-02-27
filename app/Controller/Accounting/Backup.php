@@ -28,9 +28,9 @@ class Backup
 
     use ViewControllerTrait;
 
-# Erstellt ein Datenbankbackup (Insert-Statements) von
-# den Buchungen und Konten des aktuell angemeldeten Mandanten
-    function getMysqlBackup($request)
+    //Erstellt ein Datenbankbackup (Insert-Statements) von
+    //den Buchungen und Konten des aktuell angemeldeten Mandanten
+    function getMysqlBackup()
     {
         $backup_sql = $this->getBuchungenBackup();
         $backup_sql .= $this->getKontenBackup();
@@ -39,7 +39,7 @@ class Backup
         return $this->wrap_response($result, "gz");
     }
 
-# Insert-Statements für alle Buchungen des Mandanten generieren
+    //Insert-Statements für alle Buchungen des Mandanten generieren
     private function getBuchungenBackup()
     {
         $booking = new Booking();
@@ -61,7 +61,7 @@ class Backup
         return $result;
     }
 
-# Insert-Statements für alle Konten des Mandanten generieren
+    //Insert-Statements für alle Konten des Mandanten generieren
     private function getKontenBackup()
     {
 

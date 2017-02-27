@@ -36,7 +36,8 @@ class QueryHandler {
     }
 
     public function loadSql() {
-        $this->sql = file_get_contents(__DIR__."../sql/query/".$this->path);
+        $f3 = \Base::instance();
+        $this->sql = file_get_contents(__DIR__."../../sql/query/".$this->path);
     }
 
     public function setParameterUnchecked($paramName, $paramValue) {

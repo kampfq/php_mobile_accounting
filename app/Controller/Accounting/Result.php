@@ -30,7 +30,7 @@ class Result {
 
     //Berechnet eine aktuelle Bilanz und liefert
     //sie als Array zurück
-    function getBilanz($request) {
+    function getBilanz() {
         $year = $this -> getFirstOptionParsedFromRequest();
 
         if($this->isValidYear($year)) {
@@ -38,29 +38,17 @@ class Result {
             $query->setParameterUnchecked("mandant_id", $this -> getClient() -> mandant_id);
             $query->setNumericParameter("year", $year+1);
             $query->setNumericParameter("geschj_start_monat",
-                get_config_key("geschj_start_monat", $this-> getClient() -> mandant_id)->param_value);
-            $rs = $this -> getDatabase() -> exec($query->getSql());
-
-            $zeilen = array();
-            while ($erg = mysqli_fetch_object($rs)) {
-                $zeilen[] = $erg;
-            }
-            $result['zeilen'] = $zeilen;
+                Util::get_config_key("geschj_start_monat", $this-> getClient() -> mandant_id)['param_value']
+            );
+            $result['zeilen'] = $this -> getDatabase() -> exec($query->getSql());
 
             $query = new QueryHandler("bilanz_summen.sql");
-            $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+            $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
             $query->setNumericParameter("year", $year+1);
             $query->setNumericParameter("geschj_start_monat",
-                get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
-            $sql = $query->getSql();
-            $rs = $this -> getDatabase() -> exec($sql);
+                Util::get_config_key("geschj_start_monat", $this->getClient()->mandant_id)['param_value']);
 
-            $ergebnisse = array();
-            while ($erg = mysqli_fetch_object($rs)) {
-                $ergebnisse[] = $erg;
-            }
-            $result['ergebnisse'] = $ergebnisse;
-            mysqli_close($db);
+            $result['ergebnisse'] = $this -> getDatabase() -> exec($query->getSql());
             return $this -> wrap_response($result);
         } else {
             return $this -> wrap_response("Fehler aufgetreten, das angegebene Jahr hat ein ungültiges Format");
@@ -69,40 +57,26 @@ class Result {
 
     // Berechnet eine aktuelle GuV-Rechnung und liefert
     // sie als Array zurück
-    function getGuV($request) {
-        $db = getDbConnection();
-        $year = $request['year'];
+    function getGuV() {
+        $year = $this -> getIdParsedFromRequest();
         if($this->isValidYear($year)) {
 
             $query = new QueryHandler("guv_jahr.sql");
-            $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+            $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
             $query->setParameterUnchecked("jahr_id", $year);
             $query->setParameterUnchecked("geschj_start_monat",
-                Util::get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
-            $sql = $query->getSql();
+                Util::get_config_key("geschj_start_monat", $this->getClient()->mandant_id)['param_value']);
 
-            $rs = $this -> getDatabase() -> exec($sql);
-            $zeilen = array();
             $result = array();
-            while($erg = mysqli_fetch_object($rs)) {
-                $zeilen[] = $erg;
-            }
-            $result['zeilen'] = $zeilen;
-
+            $result['zeilen'] = $this -> getDatabase() -> exec($query->getSql());
             $query = new QueryHandler("guv_jahr_summen.sql");
-            $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+            $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
             $query->setParameterUnchecked("jahr_id", $year);
             $query->setParameterUnchecked("geschj_start_monat",
-                get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
-            $sql2  = $query->getSql();
-
-            $rs = $this -> getDatabase() -> exec($sql2);
-            $ergebnisse = array();
-            while($erg = mysqli_fetch_object($rs)) {
-                $ergebnisse[] = $erg;
-            }
-            $result['ergebnisse'] = $ergebnisse;
-            mysqli_close($db);
+                Util::get_config_key("geschj_start_monat",
+                    $this->getClient()->mandant_id)['param_value'])
+            ;
+            $result['ergebnisse'] = $this -> getDatabase() -> exec($query->getSql());
             return $this -> wrap_response($result);
         } else {
             return $this -> wrap_response("Der übergebene Parameter year erfüllt nicht die Formatvorgaben für gültige Jahre");
@@ -111,70 +85,38 @@ class Result {
 
     //Berechnet eine GuV-Rechnung fuer das angegebene oder aktuelle Monat
     // und liefert sie als Array zurück
-    function getGuVMonth($request) {
-        $month_id = $this->getMonthFromRequest($request);
-
-        $db = getDbConnection();
+    function getGuVMonth() {
+        $month_id = $this->getMonthFromRequest(['id'=>$this -> getIdParsedFromRequest()]);
         $query = new QueryHandler("guv_monat.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+        $query->setParameterUnchecked("mandant_id", $this->getClient() -> mandant_id);
         $query->setParameterUnchecked("monat_id", $month_id);
-        $sql = $query->getSql();
 
-        $rs = $this -> getDatabase() -> exec($sql);
-        $zeilen = array();
-        $result = array();
-        while($erg = mysqli_fetch_object($rs)) {
-            $zeilen[] = $erg;
-        }
-        $result['zeilen'] = $zeilen;
+        $result['zeilen'] = $this -> getDatabase() -> exec($query->getSql());
 
         $query = new QueryHandler("guv_monat_summen.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+        $query->setParameterUnchecked("mandant_id", $this-> getClient() -> mandant_id);
         $query->setParameterUnchecked("monat_id", $month_id);
         $sql = $query->getSql();
 
-        $rs = $this -> getDatabase() -> exec($sql);
-        $ergebnisse = array();
-        while($erg = mysqli_fetch_object($rs)) {
-            $ergebnisse[] = $erg;
-        }
-        $result['ergebnisse'] = $ergebnisse;
-
-        mysqli_close($db);
+        $result['ergebnisse'] = $this -> getDatabase() -> exec($sql);
         return $this -> wrap_response($result);
     }
 
     // Laden der GuV-Prognose
     // (GuV aktuelles-Monat + Vormonat)
     function getGuVPrognose() {
-        $db = getDbConnection();
 
         $query = new QueryHandler("guv_prognose.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+        $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
         $sql = $query->getSql();
 
-        $rs = $this -> getDatabase() -> exec($sql);
-
-        $result = array();
-        $result['detail'] = array();
-        while($erg = mysqli_fetch_object($rs)) {
-            $result['detail'][] = $erg;
-        }
-
-        mysqli_free_result($rs);
+        $result['detail'] = $this -> getDatabase() -> exec($sql);
 
         $query = new QueryHandler("guv_prognose_summen.sql");
-        $query->setParameterUnchecked("mandant_id", $this->mandant_id);
-        $sql = $query->getSql();
+        $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
 
-        $rs = $this -> getDatabase() -> exec($sql);
+        $result['summen'] = $this -> getDatabase() -> exec($query->getSql());
 
-        $result['summen'] = array();
-        while($erg = mysqli_fetch_object($rs)) {
-            $result['summen'][] = $erg;
-        }
-
-        mysqli_close($db);
         return $this -> wrap_response($result);
     }
 
@@ -224,19 +166,15 @@ class Result {
     }
 
     // Verlauf Aufwand, Ertrag, Aktiva und Passiva in Monatsraster
-    function getVerlauf($request)
+    function getVerlauf()
     {
-
-        $result = array();
-
-        if (!array_key_exists('id', $request)) {
-            return $result;
+        $result = [];
+        if (!$this -> getIdParsedFromRequest()) {
+            return $this->wrap_response($result);
         }
 
-        $kontenart_id = $request['id'];
+        $kontenart_id = $this -> getIdParsedFromRequest();
         if (is_numeric($kontenart_id)) {
-
-            $db = getDbConnection();
 
             if ($kontenart_id == 4 || $kontenart_id == 1) {
                 $sql = "select (year(datum)*100)+month(datum) as grouping, sum(betrag)*-1 as saldo ";
@@ -244,50 +182,31 @@ class Result {
                 $sql = "select (year(datum)*100)+month(datum) as grouping, sum(betrag) as saldo ";
             }
             $sql .= "from fi_ergebnisrechnungen_base ";
-            $sql .= "where kontenart_id = $kontenart_id and gegenkontenart_id <> 5 and mandant_id = $this->mandant_id ";
+            $sql .= "where kontenart_id = $kontenart_id and gegenkontenart_id <> 5 and mandant_id = ".$this->getClient()->mandant_id;
 
             # Nur immer die letzten 12 Monate anzeigen
-            $sql .= "and (year(datum)*100)+month(datum) >= ((year(now())*100)+month(now()))-100 ";
+            $sql .= " and (year(datum)*100)+month(datum) >= ((year(now())*100)+month(now()))-100 ";
 
             $sql .= "group by kontenart_id, year(datum), month(datum) ";
             $sql .= "order by grouping";
 
-            $rs = $this->getDatabase()->exec($sql);
-            while ($erg = mysqli_fetch_object($rs)) {
-                $result[] = $erg;
-            }
-
-            mysqli_free_result($rs);
-            mysqli_close($db);
+            $result = $this->getDatabase()->exec($sql);
         }
-
         return $this->wrap_response($result);
     }
 
     // Verlauf des Gewinns in Monatsraster
     function getVerlaufGewinn()
     {
-
-        $result = array();
-        $db = getDbConnection();
-
         $sql = "select (year(datum)*100)+month(datum) as grouping, sum(betrag*-1) as saldo ";
         $sql .= "from fi_ergebnisrechnungen_base ";
-        $sql .= "where kontenart_id in (3, 4) and gegenkontenart_id <> 5 and mandant_id = $this->mandant_id ";
-
+        $sql .= "where kontenart_id in (3, 4) and gegenkontenart_id <> 5 and mandant_id = ".$this->getClient()-> mandant_id ;
         # Nur immer die letzten 12 Monate anzeigen
-        $sql .= "and (year(datum)*100)+month(datum) >= ((year(now())*100)+month(now()))-100 ";
-
+        $sql .= " and (year(datum)*100)+month(datum) >= ((year(now())*100)+month(now()))-100 ";
         $sql .= "group by year(datum), month(datum) ";
         $sql .= "order by grouping";
 
-        $rs = $this->getDatabase()->exec($sql);
-        while ($erg = mysqli_fetch_object($rs)) {
-            $result[] = $erg;
-        }
-
-        mysqli_free_result($rs);
-        mysqli_close($db);
+        $result = $this->getDatabase()->exec($sql);
 
         return $this->wrap_response($result);
     }
@@ -306,4 +225,3 @@ class Result {
         return false;
     }
 }
-

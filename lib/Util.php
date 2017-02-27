@@ -18,26 +18,6 @@
  * USA
  */
 
-# 
-# Verpacken des Response von Controller-Methoden
-#
-function wrap_response($obj="", $format="json") {
-
-    #error_log("Objekt ".json_encode($obj));
-    #error_log("Format ".$format);
-
-    $response = new Response();
-    $response->obj = $obj;
-    $response->format = $format;
-
-    return $response;
-}
-
-class Response {
-    public $obj;
-    public $format;
-}
-
 #
 # Ermittelt einen Konfigurations-Key incl. aller seiner Parameter
 #

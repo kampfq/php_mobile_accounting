@@ -18,10 +18,13 @@
  * USA
  */
 
-# Controller für die globale Konfiguration des Haushaltsbuchs
-class ConfigController {
+namespace Controller\Accounting;
+use Model\Accounting\Template;
+use Traits\ViewControllerTrait;
+// Controller für die Schnellbuchungs-Menüeinträge
+class Config {
 
-    private $dispatcher, $mandant_id;
+    use ViewControllerTrait;
 
     function invoke($action, $request, $dispatcher) {
         $this->dispatcher = $dispatcher;

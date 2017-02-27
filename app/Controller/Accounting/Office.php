@@ -19,58 +19,116 @@
  */
 
 namespace Controller\Accounting;
-use Controller\QueryHandler;
+use Model\Accounting\Template;
 use Traits\ViewControllerTrait;
-
+// Controller für die Schnellbuchungs-Menüeinträge
 class Office {
 
     use ViewControllerTrait;
 
-    // Erstellt eine Liste aller Buchungen
-    public function getJournal($request) {
+# Einsprungpunkt, hier übergibt das Framework
+function invoke($action, $request, $dispatcher) {
+    $this->dispatcher = $dispatcher;
+    $this->mandant_id = $dispatcher->getMandantId();
+	
+    switch($action) {
+        case "journal":
+            return $this->getJournal($request);
+        case "guvmonate":
+            return $this->getGuvMonate($request);
+        case "bilanzmonate":
+            return $this->getBilanzMonate($request);
+        default:
+            throw new ErrorException("Unbekannte Action");
+    }
+}
 
-        $format = "csv";
+# Erstellt eine Liste aller Buchungen
+function getJournal($request) {
 
-        if(isset($request['format'])) {
-            if($request['format'] == "json") {
-                $format = $request['format'];
-            }
-        }
+    $format = "csv";    
 
-        $result = array();
-        $db = $this -> database;
+    if(isset($request['format'])) {
+       if($request['format'] == "json") {
+           $format = $request['format']; 
+       }
+    } 
+	
+    $result = array();
+    $db = getDbConnection();
 
-        $query = new QueryHandler("export_journal_to_excel.sql");
-        $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
-        $sql = $query->getSql();
+    $query = new QueryHandler("export_journal_to_excel.sql");
+    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $sql = $query->getSql();
 
-        $result = $db -> exec($sql);
+    $rs = mysqli_query($db, $sql);
+		
+    while($obj = mysqli_fetch_object($rs)) {
+        $result[] = $obj;
+    }
+    	
+    mysqli_close($db);
+	
+    return wrap_response($result, $format);
+}
 
-        return $this -> wrap_response($result, $format);
+# Erstellt eine Liste aller GuV-Monatssalden
+function getGuvMonate($request) {
+
+    $format = "csv";    
+
+    if(isset($request['format'])) {
+       if($request['format'] == "json") {
+           $format = $request['format']; 
+       }
+    } 
+        
+    $result = array();
+    $db = getDbConnection();
+
+    $query = new QueryHandler("guv_monat_csv.sql");
+    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $sql = $query->getSql();
+
+    $rs = mysqli_query($db, $sql);
+
+    while($obj = mysqli_fetch_object($rs)) {
+        $result[] = $obj;
     }
 
-    // Erstellt eine Liste aller GuV-Monatssalden
-    public function getGuvMonate($request) {
+    mysqli_close($db);
 
-        $format = "csv";
+    return wrap_response($result, $format);
+}
 
-        if(isset($request['format'])) {
-            if($request['format'] == "json") {
-                $format = $request['format'];
-            }
+# Erstellt eine Liste aller GuV-Monatssalde
+function getBilanzMonate($request) {
+
+    $format = "csv";
+
+    if(isset($request['format'])) {
+        if($request['format'] == "json") {
+            $format = $request['format'];
         }
-
-        $result = array();
-        $db = $this -> database;
-
-        $query = new QueryHandler("guv_monat_csv.sql");
-        $query->setParameterUnchecked("mandant_id", $this->client -> mandant_id);
-        $sql = $query->getSql();
-
-        $result = $db -> exec($sql);
-        return $this -> wrap_response($result, $format);
     }
 
+    $result = array();
+    $db = getDbConnection();
+
+    $query = new QueryHandler("bilanz_monat_csv.sql");
+    $query->setParameterUnchecked("mandant_id", $this->mandant_id);
+    $sql = $query->getSql();
+
+    $rs = mysqli_query($db, $sql);
+
+    while($obj = mysqli_fetch_object($rs)) {
+        $result[] = $obj;
+    }
+
+    mysqli_close($db);
+
+    return wrap_response($result, $format);
+}
 
 }
 

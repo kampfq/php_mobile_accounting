@@ -17,24 +17,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
+namespace Accounting\Controller;
 
-class BackupController {
+use Traits\ViewControllerTrait;
 
-private $dispatcher, $mandant_id;
+class Backup {
 
-# Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    $this->mandant_id = $dispatcher->getMandantId();
-	
-    switch($action) {
-        case "sqlbackup":
-            return $this->getMysqlBackup($request);
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
-
+    use ViewControllerTrait;
 # Erstellt ein Datenbankbackup (Insert-Statements) von 
 # den Buchungen und Konten des aktuell angemeldeten Mandanten
 function getMysqlBackup($request) {

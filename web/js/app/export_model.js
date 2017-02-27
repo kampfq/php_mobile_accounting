@@ -31,14 +31,14 @@ hhb.model.types.ExportModel = function() {
     };
 
     self.export_guv = function() {
-        var win = window.open("../index.php?controller=office&action=guvmonate&format=csv", "Download");
+        var win = window.open("../Office/getGuvMonate/csv", "Download");
     };
 
     self.export_bilanz = function() {
-        var win = window.open("../index.php?controller=office&action=bilanzmonate&format=csv", "Download");
+        var win = window.open("Office/getBilanzMonate/csv", "Download");
     };
 
     self.export_sqlbackup = function() {
-        var win = window.open("../index.php?controller=backup&action=sqlbackup", "Download");
+        var win = window.open("../Backup/getMysqlBackup", "Download");
     }
 };

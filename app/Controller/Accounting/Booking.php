@@ -56,9 +56,10 @@ class Booking {
 
     //liest die aktuellsten 25 Buchungen aus
     function getTop25() {
-        $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
+        $sql = "select * from fi_buchungen "
             ."where mandant_id = ".$this-> getClient() -> mandant_id
-            ."order by buchungsnummer desc limit 25");
+            ." order by buchungsnummer desc limit 25";
+        $rs = $this -> getDatabase() -> exec($sql);
 
         return $this -> wrap_response($rs);
     }

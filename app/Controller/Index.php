@@ -20,11 +20,6 @@ class Index
 {
     use ViewControllerTrait;
 
-    public function execute()
-    {
-        // TODO: Implement execute() method.
-    }
-
     public function getTemplate(): string
     {
         return 'Accounting/index.htm';

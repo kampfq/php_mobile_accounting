@@ -52,42 +52,33 @@ trait ViewControllerTrait
     public function __construct()
     {
         $this -> f3 = \Base::instance();
+        $this -> getRequest();
         $this -> flashMessenger = FlashMessengerBag::getInstance();
         $this -> database = $this -> f3 -> get('DB');
         $this -> idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
         $this -> firstOptionParsedFromRequest = $this -> f3 -> get('PARAMS.option1');
-        $this -> getRequest();
+
     }
 
     public function getRequest():ServerRequest{
         if(!$this -> request){
-            $f3 = \Base::instance();
-            $this -> request = $f3 -> get('PSR7_REQUEST');
+            $this -> request = $this -> f3 -> get('PSR7_REQUEST');
         }
         return $this -> request;
     }
 
-    public function render($test):ResponseInterface
+    public function render():ResponseInterface
     {
-        /**
-         * get the fat free framework class
-         */
-        $f3 = \Base::instance();
-        $this->execute();
-        $f3->set('mainContent', $this->getTemplate());
+        $this -> f3-> set('mainContent', $this->getTemplate());
         $messages = $this -> prepareFlashMessages($this -> flashMessenger);
-        $f3->set('flashMessages', $messages);
+        $this -> f3 -> set('flashMessages', $messages);
 
         /**
          * return the rendered template
          */
         $response = $this -> getResponse();
-        $f3 -> set('PSR7_RESPONSE',$response);
+        $this->f3 -> set('PSR7_RESPONSE',$response);
         return $response;
-    }
-
-    public function execute(){
-
     }
 
     protected function prepareFlashMessages(FlashMessengerBag $flashMessengerBag): array {
@@ -111,7 +102,7 @@ trait ViewControllerTrait
     }
 
     public function getTemplate(): string{
-
+        return '';
     }
 
     public function wrap_response($data,$format = 'json'){

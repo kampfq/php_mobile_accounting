@@ -20,30 +20,11 @@
 
 namespace Controller;
 
+use Traits\ViewControllerTrait;
+
 class Install {
 
-private $dispatcher;
-
-    // Einsprungpunkt, hier übergibt das Framework
-function invoke($action, $request, $dispatcher) {
-    $this->dispatcher = $dispatcher;
-    switch($action) {
-	case "checksystem":
-            return $this->checkSystem();
-        case "checkdbsettings":
-            return $this->checkDatabaseSettings($request);
-        case "storedbsettings":
-            return $this->storeDatabaseSettings($request);
-        case "createdbschema":
-            return $this->createDatabaseSchema();
-        case "adduser":
-            return $this->addUser($request);
-        case "sethtaccess":
-            return $this->setHtAccess();
-        default:
-            throw new ErrorException("Unbekannte Action");
-    }
-}
+    use ViewControllerTrait;
 
     // Liest eines einzelnes Konto aus und liefert
     // sie als Objekt zurück
@@ -107,7 +88,7 @@ function checkDatabaseSettings($request) {
     $error = mysqli_error($db);
 
     if($error != null) {
-        throw new ErrorException("Verbindung konnte nicht hergestellt werden. Hostname, Benutzername oder Passwort sind falsch");
+        throw new \ErrorException("Verbindung konnte nicht hergestellt werden. Hostname, Benutzername oder Passwort sind falsch");
     }
 
     mysqli_select_db($db, $input['database']);
@@ -116,7 +97,7 @@ function checkDatabaseSettings($request) {
     $error = mysqli_error($db);
 
     if($error != null) {
-        throw new ErrorException("Die Verbindung konnte hergestellt werden, die gewählte Datenbank existiert aber nicht");
+        throw new \ErrorException("Die Verbindung konnte hergestellt werden, die gewählte Datenbank existiert aber nicht");
     }
 
     mysqli_close($db);
@@ -152,7 +133,7 @@ function storeDatabaseSettings($request) {
         $response['message'] = "Erfolgreich als $path gespeichert.\nAktuelles Verzeichnis:".getcwd();
         return $this -> wrap_response($response);
 
-    } catch(Exception $ex) {
+    } catch(\Exception $ex) {
         if(file_exists($path)) {
           $response['isError'] = FALSE;
           $response['message'] = "Die Datei $path existiert bereits und wurde nicht überschrieben";
@@ -252,7 +233,7 @@ function setHtAccess() {
       || (file_exists($appRootDir.".htaccess") && is_writable($appRootDir.".htaccess"))) {
       try {
          file_put_contents($appRootDir.".htaccess", $htaccess);
-      } catch(ErrorException $ex) {
+      } catch(\ErrorException $ex) {
          $message = array();
          $message['isError'] = TRUE;
          $message['message'] = "Die .htaccess-Datei konnte nicht nach $appRootDir geschrieben werden.";

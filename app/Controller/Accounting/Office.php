@@ -27,48 +27,48 @@ class Office {
 
     use ViewControllerTrait;
 
-# Erstellt eine Liste aller Buchungen
-function getJournal($request) {
+    // Erstellt eine Liste aller Buchungen
+    public function getJournal($request) {
 
-    $format = "json";
-    if($this -> getFirstOptionParsedFromRequest() === "csv"){
-        $format = "csv";
-    }
-    $query = new QueryHandler("export_journal_to_excel.sql");
-    $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
-    $result = $this -> getDatabase() -> exec($query->getSql());
+        $format = "json";
+        if($this -> getFirstOptionParsedFromRequest() === "csv"){
+            $format = "csv";
+        }
+        $query = new QueryHandler("export_journal_to_excel.sql");
+        $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
+        $result = $this -> getDatabase() -> exec($query->getSql());
 
-    return $this -> wrap_response($result, $format);
-}
-
-# Erstellt eine Liste aller GuV-Monatssalden
-function getGuvMonate($request) {
-
-    $format = "json";
-    if($this -> getFirstOptionParsedFromRequest() === "csv"){
-        $format = "csv";
-    }
-    $query = new QueryHandler("guv_monat_csv.sql");
-    $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
-    $result = $this -> getDatabase() -> exec($query->getSql());
-
-    return $this -> wrap_response($result, $format);
-}
-
-# Erstellt eine Liste aller GuV-Monatssalde
-function getBilanzMonate($request) {
-
-    $format = "json";
-    if($this -> getFirstOptionParsedFromRequest() === "csv"){
-        $format = "csv";
+        return $this -> wrap_response($result, $format);
     }
 
-    $query = new QueryHandler("bilanz_monat_csv.sql");
-    $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
-    $result = $this -> getDatabase() -> exec($query->getSql());
+    // Erstellt eine Liste aller GuV-Monatssalden
+    public function getGuvMonate($request) {
 
-    return $this -> wrap_response($result, $format);
-}
+        $format = "json";
+        if($this -> getFirstOptionParsedFromRequest() === "csv"){
+            $format = "csv";
+        }
+        $query = new QueryHandler("guv_monat_csv.sql");
+        $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
+        $result = $this -> getDatabase() -> exec($query->getSql());
+
+        return $this -> wrap_response($result, $format);
+    }
+
+    //Erstellt eine Liste aller GuV-Monatssalde
+    public function getBilanzMonate($request) {
+
+        $format = "json";
+        if($this -> getFirstOptionParsedFromRequest() === "csv"){
+            $format = "csv";
+        }
+
+        $query = new QueryHandler("bilanz_monat_csv.sql");
+        $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
+        $result = $this -> getDatabase() -> exec($query->getSql());
+
+        return $this -> wrap_response($result, $format);
+    }
 
 }
 

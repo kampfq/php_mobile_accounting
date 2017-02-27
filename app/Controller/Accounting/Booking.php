@@ -67,7 +67,7 @@ class Booking {
     //liest die offenen Posten aus
     function getOpList() {
         $booking = new \Model\Accounting\Booking();
-        $bookings = $booking -> load([
+        $bookings = $booking -> find([
             'mandant_id = ? AND is_offener_posten = 1',
             $this->getClient() -> mandant_id,
         ]);

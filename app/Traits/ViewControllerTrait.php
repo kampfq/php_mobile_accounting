@@ -113,7 +113,7 @@ trait ViewControllerTrait
              */
             $data = $data -> cast();
         }
-        if(is_subclass_of($data,CortexCollection::class)){
+        if(is_a($data,CortexCollection::class)){
             /**
              * @var $data Cortex
              */

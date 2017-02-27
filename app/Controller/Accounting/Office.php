@@ -61,7 +61,7 @@ function getJournal($request) {
     $query->setParameterUnchecked("mandant_id", $this->mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
 		
     while($obj = mysqli_fetch_object($rs)) {
         $result[] = $obj;
@@ -90,7 +90,7 @@ function getGuvMonate($request) {
     $query->setParameterUnchecked("mandant_id", $this->mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
 
     while($obj = mysqli_fetch_object($rs)) {
         $result[] = $obj;
@@ -119,7 +119,7 @@ function getBilanzMonate($request) {
     $query->setParameterUnchecked("mandant_id", $this->mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
 
     while($obj = mysqli_fetch_object($rs)) {
         $result[] = $obj;

@@ -25,7 +25,7 @@ function get_config_key($param_knz, $mandant_id) {
     $db = getDbConnection();
     if(is_legal_string($param_knz)) {
         $sql = "select * from fi_config_params where mandant_id = $mandant_id and param_knz = '$param_knz'";
-        $rs = mysqli_query($db, $sql);
+        $rs = $this -> getDatabase() -> exec($sql);
         if($obj = mysqli_fetch_object($rs)) {
             mysqli_close($db);
             return $obj;

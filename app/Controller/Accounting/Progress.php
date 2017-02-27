@@ -62,7 +62,7 @@ function getMonatsSalden($kontonummer) {
                       ."and y.grouping > ((year(now())*100)+month(now()))-100 "
                       ."group by grouping ";
 
-                $rs = mysqli_query($db, $sql);
+                $rs = $this -> getDatabase() -> exec($sql);
             } else if($rechnungsart == 1) {
                 // Laufende Summen, fuer Bestandskonten
                 $sql = "select x1.grouping, sum(x2.betrag) as saldo "
@@ -74,7 +74,7 @@ function getMonatsSalden($kontonummer) {
                       ."where konto in ($kto_prepared) and x1.grouping > ((year(now())*100)+month(now()))-100 "
                       ."group by grouping";
 
-                $rs = mysqli_query($db, $sql);
+                $rs = $this -> getDatabase() -> exec($sql);
             }
             $result = array();
             while($obj = mysqli_fetch_object($rs)) {
@@ -127,7 +127,7 @@ function getCashFlow($kontonummer, $side) {
             throw new Exception("Gültige Werte für side sind S und H");
         }
 
-        $rs = mysqli_query($db, $sql);
+        $rs = $this -> getDatabase() -> exec($sql);
         while($obj = mysqli_fetch_object($rs)) {
             $values[] = $obj;
         }
@@ -154,7 +154,7 @@ function getIntraMonth($request) {
         $sql = $query->getSql();
 
         $result = array();
-        $rs = mysqli_query($db, $sql);
+        $rs = $this -> getDatabase() -> exec($sql);
         while($obj = mysqli_fetch_object($rs)) {
             $result[] = $obj;
         }
@@ -176,7 +176,7 @@ function getIntraMonth($request) {
 function isAktivKonto($kontonummer) {
     if(!is_numeric($kontonummer)) return false;
     $db = getDbConnection();
-    $rs = mysqli_query($db, "select kontenart_id from fi_konto "
+    $rs = $this -> getDatabase() -> exec("select kontenart_id from fi_konto "
                             ."where mandant_id = ".$this->mandant_id
                             ." and kontonummer = '".$kontonummer."'");
     $isActive = false;
@@ -241,7 +241,7 @@ function getRechnungsart($kto_prepared) {
     $kontenarten = array();
     $type = 0;
     $sql = "select distinct kontenart_id from fi_konto where kontonummer in ($kto_prepared)";
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
     while($obj = mysqli_fetch_object($rs)) {
         $kontenart_id = $obj->kontenart_id;
         if($type == 0) {

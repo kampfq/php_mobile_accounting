@@ -111,7 +111,7 @@ function checkDatabaseSettings($request) {
     }
 
     mysqli_select_db($db, $input['database']);
-    mysqli_query($db, "show tables");
+    $this -> getDatabase() -> exec("show tables");
 
     $error = mysqli_error($db);
 
@@ -176,7 +176,7 @@ function createDatabaseSchema() {
     $db = $this -> database;
     foreach($sql_statements as $sql) {
       #error_log($sql);
-      mysqli_query($db, $sql);
+      $this -> getDatabase() -> exec($sql);
 
       $error = mysqli_error($db);
       if($error != null && $error != "Query was empty") {
@@ -307,7 +307,7 @@ private function addUserToDb($username) {
     $db = $this -> database;
 
     $sql = "insert into fi_user values(0, '$username', 'Benutzer: $username', 1, now())";
-    mysqli_query($db, $sql);
+    $this -> getDatabase() -> exec($sql);
 
     mysqli_close($db);
 }

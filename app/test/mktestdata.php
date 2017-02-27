@@ -69,7 +69,7 @@ for($i = 0; $i < 1500; $i++) {
     $sql = "insert into fi_buchungen (mandant_id, buchungstext, sollkonto, habenkonto, betrag, datum, bearbeiter_user_id) ";
     $sql .= "values('$mandant_id', 'Testbuchung', '$sollkonto', '$habenkonto', 12.34, '$datum', -1);\n";
 
-    mysqli_query($db, $sql);
+    $this -> getDatabase() -> exec($sql);
 }
 
 mysqli_close($db);

@@ -44,7 +44,7 @@ class Config {
     function listConfigEntries() {
         $db = getDbConnection();
         $lst = array();
-        $rs = mysqli_query($db, "select * from fi_config_params where mandant_id = $this->mandant_id order by param_desc");
+        $rs = $this -> getDatabase() -> exec("select * from fi_config_params where mandant_id = $this->mandant_id order by param_desc");
         while($obj = mysqli_fetch_object($rs)) {
             $lst[] = $obj;
         }
@@ -61,7 +61,7 @@ class Config {
         }
         $id = $request['param_id'];
         if(is_numeric($id)) {
-            $rs = mysqli_query($db, "select * from fi_config_params where mandant_id = $this->mandant_id and param_id = $id");
+            $rs = $this -> getDatabase() -> exec("select * from fi_config_params where mandant_id = $this->mandant_id and param_id = $id");
             if($obj = mysqli_fetch_object($rs)) {
                 mysqli_free_result($rs);
                 mysqli_close($db);
@@ -78,14 +78,14 @@ class Config {
 
     function updateConfigEntry() {
         $db = getDbConnection();
-        $inputJSON = file_get_contents('php://input');
+        $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidConfigEntry($input)) {
             $sql = "update fi_config_params set param_knz='".$input['param_knz']."', ";
             $sql .= "param_desc='".$input['param_desc']."', param_value='".$input['param_value']."' ";
             $sql .= "where mandant_id = $this->mandant_id and param_id = ".$input['param_id'];
 
-            mysqli_query($db, $sql);
+            $this -> getDatabase() -> exec($sql);
             $error = mysqli_error($db);
             if($error) {
                 error_log($error);

@@ -158,4 +158,51 @@ trait ViewControllerTrait
         }
     }
 
+    /**
+     * @return FlashMessengerBag
+     */
+    public function getFlashMessenger(): FlashMessengerBag
+    {
+
+        return $this->flashMessenger;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUser()
+    {
+
+        return $this->user;
+    }
+
+    /**
+     * @return Client|null
+     */
+    public function getClient()
+    {
+
+        return $this->client;
+    }
+
+    /**
+     * @return SQL
+     */
+    public function getDatabase(): SQL
+    {
+
+        return $this->database;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getIdParsedFromRequest()
+    {
+
+        return $this->idParsedFromRequest;
+    }
+
+
+
 }

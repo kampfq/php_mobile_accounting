@@ -40,8 +40,7 @@ class Account {
     // sie als Objekt zurück
     public function getKonto() {
         if(is_numeric($this -> idParsedFromRequest)) {
-            $db = $this -> database;
-            $result = $db -> exec("select * from fi_konto where kontonummer = ".$this -> idParsedFromRequest." and mandant_id = ".$this -> client -> mandant_id);
+            $result = $this -> getDatabase() -> exec("select * from fi_konto where kontonummer = ".$this -> idParsedFromRequest." and mandant_id = ".$this -> client -> mandant_id);
             return $this -> wrap_response($result[0]);
         } else throw Exception("Kontonummer nicht numerisch");
     }
@@ -49,8 +48,7 @@ class Account {
     // Ermittelt den aktuellen Saldo des Kontos
     public function getSaldo() {
         if(is_numeric($this -> idParsedFromRequest)) {
-            $db = $this -> database;
-            $result = $db -> exec("select saldo from fi_ergebnisrechnungen where mandant_id = ".$this->client -> mandant_id." and konto = ".$this -> idParsedFromRequest);
+            $result = $this -> getDatabase() -> exec("select saldo from fi_ergebnisrechnungen where mandant_id = ".$this->client -> mandant_id." and konto = ".$this -> idParsedFromRequest);
             $saldo = 0;
             foreach($result as $erg){
                 $saldo = $erg->saldo;
@@ -61,25 +59,19 @@ class Account {
 
     // Erstellt eine Liste aller Kontenarten
     public function getKonten() {
-        $db = $this -> database;
-        $result = array();
-        $result = $db -> exec("select * from fi_konto where mandant_id = ".$this->client -> mandant_id." order by kontenart_id, kontonummer");
+        $result = $this -> getDatabase() -> exec("select * from fi_konto where mandant_id = ".$this->client -> mandant_id." order by kontenart_id, kontonummer");
         return $this -> wrap_response($result);
     }
 
     // Speichert das als JSON-Objekt übergebene Konto
     public function saveKonto($request) {
-        $db = $this -> database;
-
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidKonto($input)) {
             $sql = "update fi_konto set bezeichnung = '".$input['bezeichnung']."', kontenart_id = ".$input['kontenart_id']
                 ." where kontonummer = ".$input['kontonummer']." and mandant_id = ".$this->client -> mandant_id;
-            mysqli_query($db, $sql);
-            mysqli_close($db);
-            $void = array();
-            return $this -> wrap_response($void);
+            $this -> getDatabase() -> exec($sql);
+            return $this -> wrap_response([]);
         } else {
             throw new Exception("Kontenobjekt enthaelt ungueltige Zeichen");
         }
@@ -87,17 +79,14 @@ class Account {
 
     // legt das als JSON-Objekt übergebene Konto an
     public function createKonto($request) {
-        $db = $this -> database;
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidKonto($input)) {
             $sql = "insert into fi_konto (kontonummer, bezeichnung, kontenart_id, mandant_id) values ('"
                 .$input['kontonummer']."', '".$input['bezeichnung']
                 ."', ".$input['kontenart_id'].", ".$this->client -> mandant_id.")";
-            mysqli_query($db, $sql);
-            mysqli_close($db);
-            $void = array();
-            return $this -> wrap_response($void);
+            $this -> getDatabase() -> exec($sql);
+            return $this -> wrap_response([]);
         } else {
             throw new Exception("Kontenobjekt enthaelt ungueltige Zeichen");
         }

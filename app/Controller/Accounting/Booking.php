@@ -52,7 +52,7 @@ class Booking {
 # legt das als JSON-Objekt übergebene Konto an
     function createBuchung($request) {
         $db = getDbConnection();
-        $inputJSON = file_get_contents('php://input');
+        $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         $result = $this->createBuchungInternal($input, $db);
         mysqli_close($db);
@@ -74,7 +74,7 @@ class Booking {
                 ." values ($this->mandant_id, '".$input['buchungstext']
                 ."', '".$input['sollkonto']."', '".$input['habenkonto']."', ".$input['betrag'].", '"
                 .$input['datum']."', ".$this->dispatcher->getUserId().", ".$temp_op.")";
-            mysqli_query($db, $sql);
+            $this -> getDatabase() -> exec($sql);
 
             $empty = array();
             return wrap_response($empty, "json");
@@ -88,7 +88,7 @@ class Booking {
     function getTop25() {
         $db = getDbConnection();
         $top = array();
-        $rs = mysqli_query($db, "select * from fi_buchungen "
+        $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
             ."where mandant_id = $this->mandant_id "
             ."order by buchungsnummer desc limit 25");
 
@@ -105,7 +105,7 @@ class Booking {
     function getOpList() {
         $db = getDbConnection();
         $top = array();
-        $rs = mysqli_query($db, "select * from fi_buchungen "
+        $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
             ."where mandant_id = $this->mandant_id "
             ."and is_offener_posten = 1 "
             ."order by buchungsnummer");
@@ -122,7 +122,7 @@ class Booking {
 # liest die offenen Posten aus
     function closeOpAndGetList($request) {
         $db = getDbConnection();
-        $inputJSON = file_get_contents('php://input');
+        $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidOPCloseRequest($input)) {
             $db->begin_transaction();
@@ -136,7 +136,7 @@ class Booking {
                     $sql = "update fi_buchungen set is_offener_posten = 0"
                         . " where mandant_id = $this->mandant_id "
                         . " and buchungsnummer = $buchungsnummer";
-                    mysqli_query($db, $sql);
+                    $this -> getDatabase() -> exec($sql);
                 }
                 $db->commit();
             } catch (Exception $e) {
@@ -145,7 +145,7 @@ class Booking {
             }
             // Aktualisierte Offene-Posten-Liste an den Client liefern
             $top = array();
-            $rs = mysqli_query($db, "select * from fi_buchungen "
+            $rs = $this -> getDatabase() -> exec("select * from fi_buchungen "
                 . "where mandant_id = $this->mandant_id "
                 . "and is_offener_posten = 1 "
                 . "order by buchungsnummer");
@@ -183,7 +183,7 @@ class Booking {
             $sql .= "where mandant_id = $this->mandant_id and habenkonto = '$kontonummer' and year(datum) = $jahr ";
             $sql .= "order by buchungsnummer desc";
 
-            $rs = mysqli_query($db, $sql);
+            $rs = $this -> getDatabase() -> exec($sql);
 
             while($obj = mysqli_fetch_object($rs)) {
                 $result_list[] = $obj;
@@ -198,7 +198,7 @@ class Booking {
             $sql .= "union SELECT sum(betrag)*-1 as betrag from fi_buchungen ";
             $sql .= "where mandant_id = $this->mandant_id and habenkonto = '$kontonummer' ) as a ";
 
-            $rs = mysqli_query($db, $sql);
+            $rs = $this -> getDatabase() -> exec($sql);
             if($obj = mysqli_fetch_object($rs)) {
                 $result['saldo'] = $obj->saldo;
             } else {

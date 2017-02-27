@@ -44,7 +44,7 @@ private function getBuchungenBackup($db) {
     $sql .= "where mandant_id = $this->mandant_id";
 
     $result = "";
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
 
     while($obj = mysqli_fetch_object($rs)) {
         $result .= "insert into fi_buchungen (mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
@@ -67,7 +67,7 @@ private function getKontenBackup($db) {
     $sql .= "where mandant_id = $this->mandant_id";
 
     $result = "";
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
 
     while($obj = mysqli_fetch_object($rs)) {
         $result .= "insert into fi_konto (mandant_id, kontonummer, bezeichnung, kontenart_id) values ";

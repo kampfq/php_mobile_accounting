@@ -72,7 +72,7 @@ function getBilanz($request) {
             get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
         $sql = $query->getSql();
 
-        $rs = mysqli_query($db, $sql);
+        $rs = $this -> getDatabase() -> exec($sql);
 
         $zeilen = array();
         while ($erg = mysqli_fetch_object($rs)) {
@@ -86,7 +86,7 @@ function getBilanz($request) {
         $query->setNumericParameter("geschj_start_monat",
             get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
         $sql = $query->getSql();
-        $rs = mysqli_query($db, $sql);
+        $rs = $this -> getDatabase() -> exec($sql);
 
         $ergebnisse = array();
         while ($erg = mysqli_fetch_object($rs)) {
@@ -114,7 +114,7 @@ function getGuV($request) {
             get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
         $sql = $query->getSql();
    
-        $rs = mysqli_query($db, $sql);
+        $rs = $this -> getDatabase() -> exec($sql);
         $zeilen = array();
         $result = array();
         while($erg = mysqli_fetch_object($rs)) {
@@ -129,7 +129,7 @@ function getGuV($request) {
             get_config_key("geschj_start_monat", $this->mandant_id)->param_value);
         $sql2  = $query->getSql();
 
-        $rs = mysqli_query($db, $sql2);
+        $rs = $this -> getDatabase() -> exec($sql2);
         $ergebnisse = array();
         while($erg = mysqli_fetch_object($rs)) {
             $ergebnisse[] = $erg;
@@ -153,7 +153,7 @@ function getGuVMonth($request) {
     $query->setParameterUnchecked("monat_id", $month_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
     $zeilen = array();
     $result = array();
     while($erg = mysqli_fetch_object($rs)) {
@@ -166,7 +166,7 @@ function getGuVMonth($request) {
     $query->setParameterUnchecked("monat_id", $month_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
     $ergebnisse = array();
     while($erg = mysqli_fetch_object($rs)) {
         $ergebnisse[] = $erg;
@@ -187,7 +187,7 @@ function getGuVPrognose() {
     $query->setParameterUnchecked("mandant_id", $this->mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
 
     $result = array();
     $result['detail'] = array();
@@ -201,7 +201,7 @@ function getGuVPrognose() {
     $query->setParameterUnchecked("mandant_id", $this->mandant_id);
     $sql = $query->getSql();
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
     
     $result['summen'] = array();
     while($erg = mysqli_fetch_object($rs)) {
@@ -235,7 +235,7 @@ function getMonths() {
     $sql .= " from fi_buchungen where mandant_id = ".$this->mandant_id;
     $sql .= " order by yearmonth desc";
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
     while($obj = mysqli_fetch_object($rs)) {
         $months[] = $obj->yearmonth;
     }
@@ -255,7 +255,7 @@ function getYears() {
     $sql .= "from fi_buchungen where mandant_id = ".$this->mandant_id;
     $sql .= " order by year desc";
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
     while($obj = mysqli_fetch_object($rs)) {
         $years[] = $obj->year;
     }
@@ -290,7 +290,7 @@ function getVerlauf($request) {
         $sql .= "group by kontenart_id, year(datum), month(datum) ";
         $sql .= "order by grouping";
 
-        $rs = mysqli_query($db, $sql);
+        $rs = $this -> getDatabase() -> exec($sql);
         while($erg = mysqli_fetch_object($rs)) {
             $result[] = $erg;
         }
@@ -316,7 +316,7 @@ function getVerlaufGewinn() {
     $sql .= "group by year(datum), month(datum) ";
     $sql .= "order by grouping";
 
-    $rs = mysqli_query($db, $sql);
+    $rs = $this -> getDatabase() -> exec($sql);
     while($erg = mysqli_fetch_object($rs)) {
         $result[] = $erg;
     }

@@ -48,7 +48,7 @@ function invoke($action, $request, $dispatcher) {
 function getQuickMenu() {
     $db = getDbConnection();
     $lst = array();
-    $rs = mysqli_query($db, "select * from fi_quick_config where mandant_id = $this->mandant_id order by config_knz");
+    $rs = $this -> getDatabase() -> exec("select * from fi_quick_config where mandant_id = $this->mandant_id order by config_knz");
     while($obj = mysqli_fetch_object($rs)) {
         $lst[] = $obj;
     }
@@ -62,7 +62,7 @@ function getQuickMenuById($request) {
     $db = getDbConnection();
     $id = $request['id'];
     if(is_numeric($id)) {
-        $rs = mysqli_query($db, "select * from fi_quick_config where mandant_id = $this->mandant_id and config_id = $id");
+        $rs = $this -> getDatabase() -> exec("select * from fi_quick_config where mandant_id = $this->mandant_id and config_id = $id");
         if($obj = mysqli_fetch_object($rs)) {
             mysqli_free_result($rs);
             mysqli_close($db);
@@ -79,14 +79,14 @@ function getQuickMenuById($request) {
 
 function addQuickMenu($request) {
     $db = getDbConnection();
-    $inputJSON = file_get_contents('php://input');
+    $inputJSON = $this -> request -> getBody();
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidQuickMenu($input)) { 
         $sql = "insert into fi_quick_config(config_knz, sollkonto, habenkonto, buchungstext,";
         $sql .= " betrag, mandant_id) values ('".$input['config_knz']."', '".$input['sollkonto']."', ";
         $sql .= "'".$input['habenkonto']."', '".$input['buchungstext']."', ".$input['betrag'].", ".$this->mandant_id.")";
 
-        mysqli_query($db, $sql);
+        $this -> getDatabase() -> exec($sql);
         $error = mysqli_error($db);
         if($error) {
            error_log($error);
@@ -102,7 +102,7 @@ function addQuickMenu($request) {
 
 function updateQuickMenu($request) {
     $db = getDbConnection();
-    $inputJSON = file_get_contents('php://input');
+    $inputJSON = $this -> request -> getBody();
     $input = json_decode( $inputJSON, TRUE );
     if($this->isValidQuickMenu($input)) {
         $sql = "update fi_quick_config set ";
@@ -114,7 +114,7 @@ function updateQuickMenu($request) {
         $sql .= "where mandant_id = ".$this->mandant_id;
         $sql .= " and config_id = ".$input['config_id'];
 
-        mysqli_query($db, $sql);
+        $this -> getDatabase() -> exec($sql);
         $error = mysqli_error($db);
         if($error) {
             error_log($error);
@@ -138,7 +138,7 @@ function removeQuickMenu($request) {
         $sql =  "delete from fi_quick_config where mandant_id = $this->mandant_id";
         $sql .= " and config_id = $id";
 
-        mysqli_query($db, $sql);
+        $this -> getDatabase() -> exec($sql);
         mysqli_close($db);
 
         return wrap_response(null);

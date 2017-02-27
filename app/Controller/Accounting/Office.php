@@ -69,7 +69,7 @@ function getJournal($request) {
     	
     mysqli_close($db);
 	
-    return wrap_response($result, $format);
+    return $this -> wrap_response($result, $format);
 }
 
 # Erstellt eine Liste aller GuV-Monatssalden
@@ -98,7 +98,7 @@ function getGuvMonate($request) {
 
     mysqli_close($db);
 
-    return wrap_response($result, $format);
+    return $this -> wrap_response($result, $format);
 }
 
 # Erstellt eine Liste aller GuV-Monatssalde
@@ -127,7 +127,7 @@ function getBilanzMonate($request) {
 
     mysqli_close($db);
 
-    return wrap_response($result, $format);
+    return $this -> wrap_response($result, $format);
 }
 
 }

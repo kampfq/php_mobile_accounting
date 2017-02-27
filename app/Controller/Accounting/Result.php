@@ -94,9 +94,9 @@ function getBilanz($request) {
         }
         $result['ergebnisse'] = $ergebnisse;
         mysqli_close($db);
-        return wrap_response($result);
+        return $this -> wrap_response($result);
     } else {
-        return wrap_response("Fehler aufgetreten, das angegebene Jahr hat ein ungültiges Format");
+        return $this -> wrap_response("Fehler aufgetreten, das angegebene Jahr hat ein ungültiges Format");
     }
 }
 
@@ -136,9 +136,9 @@ function getGuV($request) {
         }
         $result['ergebnisse'] = $ergebnisse;
         mysqli_close($db);
-        return wrap_response($result);
+        return $this -> wrap_response($result);
     } else {
-        return wrap_response("Der übergebene Parameter year erfüllt nicht die Formatvorgaben für gültige Jahre");
+        return $this -> wrap_response("Der übergebene Parameter year erfüllt nicht die Formatvorgaben für gültige Jahre");
     }
 }
 
@@ -174,7 +174,7 @@ function getGuVMonth($request) {
     $result['ergebnisse'] = $ergebnisse;
 
     mysqli_close($db);
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 #
@@ -209,7 +209,7 @@ function getGuVPrognose() {
     }
 
     mysqli_close($db);
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Ermittelt aus dem Request und dessen Parameter "id" das ausgewählte Monat
@@ -242,7 +242,7 @@ function getMonths() {
 
     mysqli_free_result($rs);
     mysqli_close($db);
-    return wrap_response($months);
+    return $this -> wrap_response($months);
 }
 
 # Liefert eine Liste der gültigen Jahre aus den Buchungen des Mandanten
@@ -262,7 +262,7 @@ function getYears() {
 
     mysqli_free_result($rs);
     mysqli_close($db);
-    return wrap_response($years);
+    return $this -> wrap_response($years);
 }
 
 # Verlauf Aufwand, Ertrag, Aktiva und Passiva in Monatsraster
@@ -298,7 +298,7 @@ function getVerlauf($request) {
         mysqli_free_result($rs);
         mysqli_close($db);
     } 
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Verlauf des Gewinns in Monatsraster
@@ -324,7 +324,7 @@ function getVerlaufGewinn() {
     mysqli_free_result($rs);
     mysqli_close($db);
     
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Prüft, ob das Zahlenformat des übergebenen Jahres korrekt ist

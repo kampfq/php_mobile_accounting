@@ -177,7 +177,7 @@ trait ViewControllerTrait
     }
 
     /**
-     * @return Client|null
+     * @return Client
      */
     public function getClient()
     {

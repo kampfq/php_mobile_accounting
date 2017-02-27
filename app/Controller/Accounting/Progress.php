@@ -82,7 +82,7 @@ function getMonatsSalden($kontonummer) {
             }
             mysqli_free_result($rs);
             mysqli_close($db);
-            return wrap_response($result);
+            return $this -> wrap_response($result);
         } else {
             mysqli_close($db);
             throw new Exception("Mindestens eine Kontonummer ist unbekannt");
@@ -136,7 +136,7 @@ function getCashFlow($kontonummer, $side) {
     } else {
         throw new Exception("getCashFlow ist nur für Aktiv-Konten verfügbar");
     }
-    return wrap_response($values);
+    return $this -> wrap_response($values);
 }
 
 # Monats-internen Verlauf ermitteln
@@ -162,13 +162,13 @@ function getIntraMonth($request) {
         mysqli_free_result($rs);
         mysqli_close($db);
 
-        return wrap_response($result);
+        return $this -> wrap_response($result);
 
       } else {
-        return wrap_response("Parameter month_id ist nicht ausschließlich numerisch");
+        return $this -> wrap_response("Parameter month_id ist nicht ausschließlich numerisch");
       }
     } else {
-        return wrap_response("Parameter month_id fehlt");
+        return $this -> wrap_response("Parameter month_id fehlt");
     }
 }
 

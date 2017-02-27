@@ -54,7 +54,7 @@ function getQuickMenu() {
     }
     mysqli_free_result($rs);
     mysqli_close($db);
-    return wrap_response($lst);
+    return $this -> wrap_response($lst);
 }
 
 
@@ -66,11 +66,11 @@ function getQuickMenuById($request) {
         if($obj = mysqli_fetch_object($rs)) {
             mysqli_free_result($rs);
             mysqli_close($db);
-            return wrap_response($obj);
+            return $this -> wrap_response($obj);
         } else {
             mysqli_free_result($rs);
             mysqli_close($db);
-            return wrap_response(null);
+            return $this -> wrap_response(null);
         }
     } else {
         throw new ErrorException("Die fi_quick_config id ist fehlerhaft");
@@ -93,7 +93,7 @@ function addQuickMenu($request) {
            error_log($sql);
         }
         mysqli_close($db);
-        return wrap_response("Fehler: $error");
+        return $this -> wrap_response("Fehler: $error");
     } else {
         mysqli_close($db);
         throw new ErrorException("Die uebergebene Schnellbuchungsvorlage ist nicht valide: ".$inputJSON);
@@ -120,10 +120,10 @@ function updateQuickMenu($request) {
             error_log($error);
             error_log($sql);
             mysqli_close($db);
-            return wrap_response("Fehler: $error");
+            return $this -> wrap_response("Fehler: $error");
         } else {
             mysqli_close($db);
-            return wrap_response("Gelöscht");
+            return $this -> wrap_response("Gelöscht");
         }
     } else {
         mysqli_close($db);
@@ -141,7 +141,7 @@ function removeQuickMenu($request) {
         $this -> getDatabase() -> exec($sql);
         mysqli_close($db);
 
-        return wrap_response(null);
+        return $this -> wrap_response(null);
     } else {
         throw new ErrorException("Die id der Schnellbuchungsvorlage muss numerisch sein!");
     }

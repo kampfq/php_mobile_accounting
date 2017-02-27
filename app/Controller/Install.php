@@ -89,7 +89,7 @@ function checkSystem() {
 	$result[] = "Stellen Sie sicher, dass Ihre Apache-Installation .htaccess-Dateien auswertet";
     }
 
-    return wrap_response($result);
+    return $this -> wrap_response($result);
 }
 
 # Liest eines einzelnes Konto aus und liefert

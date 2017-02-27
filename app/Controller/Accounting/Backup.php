@@ -24,59 +24,56 @@ use Traits\ViewControllerTrait;
 class Backup {
 
     use ViewControllerTrait;
-# Erstellt ein Datenbankbackup (Insert-Statements) von 
+# Erstellt ein Datenbankbackup (Insert-Statements) von
 # den Buchungen und Konten des aktuell angemeldeten Mandanten
-function getMysqlBackup($request) {
-    $db = getDbConnection();
-    $backup_sql = $this->getBuchungenBackup($db);
-    $backup_sql .= $this->getKontenBackup($db);
-    mysqli_close($db);
+    function getMysqlBackup($request) {
+        $db = getDbConnection();
+        $backup_sql = $this->getBuchungenBackup($db);
+        $backup_sql .= $this->getKontenBackup($db);
+        mysqli_close($db);
 
-    $result = gzencode($backup_sql);
-    return wrap_response($result, "gz");
-}
+        $result = gzencode($backup_sql);
+        return $this -> wrap_response($result, "gz");
+    }
 
 # Insert-Statements für alle Buchungen des Mandanten generieren
-private function getBuchungenBackup($db) {
-    $sql = "select mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
-    $sql .= "betrag, datum, bearbeiter_user_id, is_offener_posten ";
-    $sql .= "from fi_buchungen ";
-    $sql .= "where mandant_id = $this->mandant_id";
+    private function getBuchungenBackup($db) {
+        $sql = "select mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
+        $sql .= "betrag, datum, bearbeiter_user_id, is_offener_posten ";
+        $sql .= "from fi_buchungen ";
+        $sql .= "where mandant_id = ".$this->getClient()->mandant_id;
 
-    $result = "";
-    $rs = $this -> getDatabase() -> exec($sql);
-
-    while($obj = mysqli_fetch_object($rs)) {
-        $result .= "insert into fi_buchungen (mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
-        $result .= "betrag, datum, bearbeiter_user_id, is_offener_posten) values ";
-        $result .= "(".$obj->mandant_id.", ".$obj->buchungsnummer.", ";
-        $result .= "'".mysqli_escape_string($db, $obj->buchungstext)."', ";
-        $result .= "'".mysqli_escape_string($db, $obj->sollkonto)."', ";
-        $result .= "'".mysqli_escape_string($db, $obj->habenkonto)."', ";
-        $result .= "".$obj->betrag.", '".$obj->datum."', ";
-        $result .= "".$obj->bearbeiter_user_id.", ".$obj->is_offener_posten."); \n";
+        $result = "";
+        $rs = $this -> getDatabase() -> exec($sql);
+        foreach($rs as $obj) {
+            $result .= "insert into fi_buchungen (mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
+            $result .= "betrag, datum, bearbeiter_user_id, is_offener_posten) values ";
+            $result .= "(".$obj->mandant_id.", ".$obj->buchungsnummer.", ";
+            $result .= "'".mysqli_escape_string($db, $obj->buchungstext)."', ";
+            $result .= "'".mysqli_escape_string($db, $obj->sollkonto)."', ";
+            $result .= "'".mysqli_escape_string($db, $obj->habenkonto)."', ";
+            $result .= "".$obj->betrag.", '".$obj->datum."', ";
+            $result .= "".$obj->bearbeiter_user_id.", ".$obj->is_offener_posten."); \n";
+        }
+        return $result;
     }
-    mysqli_free_result($rs);
-    return $result;
-}
 
 # Insert-Statements für alle Konten des Mandanten generieren
-private function getKontenBackup($db) {
-    $sql = "select mandant_id, kontonummer, bezeichnung, kontenart_id ";
-    $sql .= "from fi_konto ";
-    $sql .= "where mandant_id = $this->mandant_id";
+    private function getKontenBackup($db) {
+        $sql = "select mandant_id, kontonummer, bezeichnung, kontenart_id ";
+        $sql .= "from fi_konto ";
+        $sql .= "where mandant_id = ".$this->getClient()->mandant_id;
 
-    $result = "";
-    $rs = $this -> getDatabase() -> exec($sql);
+        $result = "";
+        $rs = $this -> getDatabase() -> exec($sql);
 
-    while($obj = mysqli_fetch_object($rs)) {
-        $result .= "insert into fi_konto (mandant_id, kontonummer, bezeichnung, kontenart_id) values ";
-        $result .= "(".$obj->mandant_id.", ";
-        $result .= "'".mysqli_escape_string($db, $obj->kontonummer)."', ";
-        $result .= "'".mysqli_escape_string($db, $obj->bezeichnung)."', ";
-        $result .= "".$obj->kontenart_id."); \n";
+        foreach($rs as $obj) { {
+            $result .= "insert into fi_konto (mandant_id, kontonummer, bezeichnung, kontenart_id) values ";
+            $result .= "(".$obj->mandant_id.", ";
+            $result .= "'".mysqli_escape_string($db, $obj->kontonummer)."', ";
+            $result .= "'".mysqli_escape_string($db, $obj->bezeichnung)."', ";
+            $result .= "".$obj->kontenart_id."); \n";
+        }
+            return $result;
+        }
     }
-    mysqli_free_result($rs);
-    return $result;
-}
-}

@@ -77,7 +77,7 @@ class Booking {
             $this -> getDatabase() -> exec($sql);
 
             $empty = array();
-            return wrap_response($empty, "json");
+            return $this -> wrap_response($empty, "json");
         } else {
             throw new ErrorException("Das Buchungsobjekt enthält nicht gültige Elemente");
         }
@@ -98,7 +98,7 @@ class Booking {
 
         mysqli_free_result($rs);
         mysqli_close($db);
-        return wrap_response($top);
+        return $this -> wrap_response($top);
     }
 
 # liest die offenen Posten aus
@@ -116,7 +116,7 @@ class Booking {
 
         mysqli_free_result($rs);
         mysqli_close($db);
-        return wrap_response($top);
+        return $this -> wrap_response($top);
     }
 
 # liest die offenen Posten aus
@@ -156,7 +156,7 @@ class Booking {
 
             mysqli_free_result($rs);
             mysqli_close($db);
-            return wrap_response($top);
+            return $this -> wrap_response($top);
         } else {
             mysqli_close($db);
             throw new ErrorException("Der OP-Close-Request ist ungültig!");
@@ -207,7 +207,7 @@ class Booking {
 
             mysqli_free_result($rs);
             mysqli_close($db);
-            return wrap_response($result);
+            return $this -> wrap_response($result);
             # Wenn konto keine Ziffernfolge ist, leeres Ergebnis zurück liefern
         } else {
             throw new ErrorException("Die Kontonummer ist nicht numerisch");

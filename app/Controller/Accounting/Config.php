@@ -50,7 +50,7 @@ class Config {
         }
         mysqli_free_result($rs);
         mysqli_close($db);
-        return wrap_response($lst);
+        return $this -> wrap_response($lst);
     }
 
 
@@ -65,11 +65,11 @@ class Config {
             if($obj = mysqli_fetch_object($rs)) {
                 mysqli_free_result($rs);
                 mysqli_close($db);
-                return wrap_response($obj);
+                return $this -> wrap_response($obj);
             } else {
                 mysqli_free_result($rs);
                 mysqli_close($db);
-                return wrap_response(null);
+                return $this -> wrap_response(null);
             }
         } else {
             throw new ErrorException("Die fi_config_entries.param_id ist fehlerhaft");
@@ -92,7 +92,7 @@ class Config {
                 error_log($sql);
             }
             mysqli_close($db);
-            return wrap_response("Fehler: $error");
+            return $this -> wrap_response("Fehler: $error");
         } else {
             mysqli_close($db);
             throw new ErrorException("Der übergebene Konfigurationsparameter ist nicht valide: ".$inputJSON);

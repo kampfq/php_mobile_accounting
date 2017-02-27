@@ -27,7 +27,7 @@ hhb.model.types.ExportModel = function() {
     var self = this;
 
     self.export_journal = function() {
-        var win = window.open("../index.php?controller=office&action=journal&format=csv", "Download");
+        var win = window.open("../Office/getJournal/csv", "Download");
     };
 
     self.export_guv = function() {

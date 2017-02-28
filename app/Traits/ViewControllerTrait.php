@@ -105,7 +105,7 @@ trait ViewControllerTrait
         return '';
     }
 
-    public function wrap_response($data,$format = 'json'){
+    public function wrap_response($data,string $format = 'json'):ResponseInterface{
 
         if(is_subclass_of($data,Cortex::class)){
             /**
@@ -181,7 +181,7 @@ trait ViewControllerTrait
     /**
      * @return User|null
      */
-    public function getUser()
+    public function getUser():User
     {
 
         return $this->user;
@@ -190,7 +190,7 @@ trait ViewControllerTrait
     /**
      * @return Client
      */
-    public function getClient()
+    public function getClient():Client
     {
 
         return $this->client;
@@ -206,21 +206,21 @@ trait ViewControllerTrait
     }
 
     /**
-     * @return mixed|null
+     * @return int
      */
-    public function getIdParsedFromRequest()
+    public function getIdParsedFromRequest():int
     {
 
-        return $this->idParsedFromRequest;
+        return (int)$this->idParsedFromRequest;
     }
 
     /**
-     * @return mixed|null
+     * @return string
      */
-    public function getFirstOptionParsedFromRequest()
+    public function getFirstOptionParsedFromRequest():string
     {
 
-        return $this->firstOptionParsedFromRequest;
+        return (string)$this->firstOptionParsedFromRequest;
     }
 
 

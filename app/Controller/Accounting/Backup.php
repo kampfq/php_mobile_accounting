@@ -21,6 +21,7 @@ namespace Accounting\Controller;
 
 use Model\Accounting\Account;
 use Model\Accounting\Booking;
+use Psr\Http\Message\ResponseInterface;
 use Traits\ViewControllerTrait;
 
 class Backup
@@ -30,7 +31,7 @@ class Backup
 
     //Erstellt ein Datenbankbackup (Insert-Statements) von
     //den Buchungen und Konten des aktuell angemeldeten Mandanten
-    public function getMysqlBackup()
+    public function getMysqlBackup():ResponseInterface
     {
         $backup_sql = $this->getBuchungenBackup();
         $backup_sql .= $this->getKontenBackup();
@@ -40,7 +41,7 @@ class Backup
     }
 
     //Insert-Statements für alle Buchungen des Mandanten generieren
-    private function getBuchungenBackup()
+    private function getBuchungenBackup():string
     {
         $booking = new Booking();
         $rs = $booking -> load([
@@ -62,7 +63,7 @@ class Backup
     }
 
     //Insert-Statements für alle Konten des Mandanten generieren
-    private function getKontenBackup()
+    private function getKontenBackup():string
     {
 
         $account = new Account();

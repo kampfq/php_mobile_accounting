@@ -28,7 +28,7 @@
 function doPOST(controller, action, parameterObject, successHandler, errorHandler) {
     $.ajax({
         type: 'POST',
-        url: "./install/rpc.php?controller="+controller+"&action="+action,
+        url: "/install/"+action,
         dataType:"json",
         contentType:"application/json",
         data: parameterObject,

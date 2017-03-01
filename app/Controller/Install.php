@@ -30,12 +30,12 @@ class Install {
     // sie als Objekt zurück
     // TODO: Die Texte im Fehlerfall stimmen noch nicht: im 2. Fall ist 1. nicht sicher ausgeschlossen!
 # Überprüft das System auf bekannte Installationsprobleme
-function checkSystem() {
+function checksystem() {
     $result = array();
 
     # Prüfen ob die Datenbankverbindung bereits konfiguriert ist, bzw.
     # nach der Konfiguration gespeichert werden kann.
-    $db_config_path = $this->getAppRootDir()."lib/Database.php";
+    $db_config_path = $this->getAppRootDir()."/app/config/config.ini";
     if(file_exists($db_config_path)) {
         $result[] = "Die Datenbank-Konfigurationsdatei $db_config_path existiert bereits";
         if(is_writeable($db_config_path)) {
@@ -44,7 +44,7 @@ function checkSystem() {
             $result[] = "Die Datenbank-Konfigurationsdatei ist schreibgeschützt";
         }
     } else {
-        $db_config_folder = $this->getAppRootDir()."lib/";
+        $db_config_folder = $this->getAppRootDir()."/app/config/";
         if(is_writeable($db_config_folder)) {
             $result[] = "Die Datenbank-Konfiguration kann durch dieses Installationsprogramm im Ordner $db_config_folder angelegt werden";
         } else {
@@ -76,8 +76,8 @@ function checkSystem() {
 # Liest eines einzelnes Konto aus und liefert
 # sie als Objekt zurück
 # TODO: Die Texte im Fehlerfall stimmen noch nicht: im 2. Fall ist 1. nicht sicher ausgeschlossen!
-function checkDatabaseSettings($request) {
-    $inputJSON = $this -> request -> getBody();
+function checkDatabaseSettings() {
+    $inputJSON = $this -> getRequest() -> getBody();
     $input = json_decode($inputJSON, TRUE); 
 
     #ggf. Debug-Ausgaben
@@ -149,9 +149,7 @@ function storeDatabaseSettings($request) {
     // Anlegen des Datenbankschemas
     // unter Verwendung von sql/create-tables-and-views.sql
 function createDatabaseSchema() {
-    $sql = file_get_contents("../sql/create-tables-and-views.sql");
-    require_once("../lib/Database.php");
-
+    $sql = file_get_contents($this -> getAppRootDir()."/app/sql/create-tables-and-views.sql");
     $sql_statements = explode(";", $sql);
 
     $db = $this -> database;
@@ -261,7 +259,7 @@ function finishInstallation() {
 
     // Ermittelt das Stammverzeichnis der Installation des HTML5-Haushaltsbuchs
 private function getAppRootDir() {
-    return substr(getcwd(), 0, strlen(getcwd())-7);
+    return __DIR__ .'/../..';
 }
 
     // Prüft, ob ein übergebenes Benutzerobjekt das korrekte Format hat.
@@ -295,7 +293,7 @@ private function addUserToDb($username) {
 
     // Auslesen einer mglw. bestehenden .htpasswd-Datei
 private function getExistingHtpasswd($appRootDir) {
-    if(file_exists($appRootDir.".htpasswd")) {
+    if(file_exists($appRootDir."/web/.htpasswd")) {
        $htpasswd = file_get_contents($appRootDir.".htpasswd");
        return $htpasswd;
     } else {
@@ -317,6 +315,12 @@ private function htpasswd($passwd) {
   //return crypt($passwd, base64_encode($passwd));
   return "{SHA}".base64_encode(sha1($passwd, true));
 }
+
+    public function getTemplate(): string
+    {
+        return 'Install/install.htm';
+    }
+
 
 }
 

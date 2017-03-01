@@ -7,6 +7,11 @@
 * @param errorHandler = Funktions-Handle für Fehlerfall
 */
 function doGET(controller, action, parameters, successHandler, errorHandler) {
+    $.mobile.loading( 'show', {
+        textVisible: false,
+        theme: 'z',
+        html: ""
+    });
     var additionalParams = "";
     for(var key in parameters) {
         additionalParams += "/"+parameters[key];
@@ -16,9 +21,11 @@ function doGET(controller, action, parameters, successHandler, errorHandler) {
         url: "/"+controller+"/"+action+additionalParams,
         dataType:"json",
     }).done(function(data) {
+        $.mobile.loading('hide');
         broker.setConnected();
         successHandler(data);
     }).fail(function(error) {
+        $.mobile.loading('hide');
         if(error.status === 404) {
             broker.setDisconnected();
         } else {
@@ -39,6 +46,11 @@ function doGET(controller, action, parameters, successHandler, errorHandler) {
 * @param errorHandler = Funktions-Handle für Fehlerfall
 */
 function doPOST(controller, action, parameterObject, successHandler, errorHandler) {
+    $.mobile.loading( 'show', {
+        textVisible: false,
+        theme: 'z',
+        html: ""
+    });
     $.ajax({
         type: 'POST',
         url: "/"+controller+"/"+action,
@@ -46,9 +58,11 @@ function doPOST(controller, action, parameterObject, successHandler, errorHandle
         contentType:"application/json",
         data: parameterObject,
     }).done(function(data) {
+        $.mobile.loading('hide');
         broker.setConnected();
         successHandler(data);
     }).fail(function(error) {
+        $.mobile.loading('hide');
         if(error.status === 404) {
             broker.setDisconnected();
         } else {

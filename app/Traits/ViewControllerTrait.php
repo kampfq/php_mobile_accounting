@@ -98,7 +98,7 @@ trait ViewControllerTrait
     }
 
     protected function getResponse(){
-        return new Response\HtmlResponse(\Template::instance()->render('Accounting/index.htm'));
+        return new Response\HtmlResponse(\Template::instance()->render($this -> getTemplate()));
     }
 
     public function getTemplate(): string{

@@ -61,7 +61,7 @@ class Account {
     }
 
     // Speichert das als JSON-Objekt übergebene Konto
-    public function saveKonto($request) {
+    public function saveKonto() {
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidKonto($input)) {
@@ -123,7 +123,7 @@ class Account {
         $returnValue = [];
         foreach ($this -> types as $id => $type){
             $returnValue[] = [
-                'kontenart_id' => $this -> types[$id],
+                'kontenart_id' => $id,
                 'bezeichnung' =>$this -> types[$id]
             ];
         }

@@ -44,7 +44,7 @@ class Progress {
             case 1:
                 $sql = "select x1.grouping, sum(x2.betrag) as saldo "
                     ."from (select distinct (year(datum)*100)+month(datum) as grouping from fi_buchungen_view "
-                    ."where mandant_id = '$this->getClient()->mandant_id') x1 "
+                    ."where mandant_id = ".$this->getClient()->mandant_id.") x1 "
                     ."inner join (select (year(datum)*100+month(datum)) as grouping, konto, betrag "
                     ."from fi_buchungen_view where mandant_id = ".$this->getClient()->mandant_id.") x2 "
                     ."on x2.grouping <= x1.grouping "

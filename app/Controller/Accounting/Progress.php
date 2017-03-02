@@ -156,6 +156,10 @@ class Progress {
 
         $result = "";
         foreach($list as $item) {
+            //add leading zero when its missing
+            if(strlen($item) === 3){
+                $item = '0'.$item;
+            }
             $result .= "'".$item."',";
         }
         $result = substr($result, 0, strlen($result)-1);

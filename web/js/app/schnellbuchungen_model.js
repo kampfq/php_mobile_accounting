@@ -99,7 +99,7 @@ hhb.model.types.SchnellbuchungModel = function() {
     self.speichern = function() {
         var selected = self.selectedSchnellbuchung();
         var selectedJSON = ko.toJSON(selected);
-        doPOST("menu", "update", selectedJSON,
+        doPOST("Menu", "updateQuickMenu", selectedJSON,
             function(data) {
                 jQuery.mobile.changePage("#schnellbuchungen_liste");
                 self.load();
@@ -114,7 +114,7 @@ hhb.model.types.SchnellbuchungModel = function() {
     self.anlegen = function() {
         var selected = self.selectedSchnellbuchung();
         var selectedJSON = ko.toJSON(selected);
-        doPOST("menu", "add", selectedJSON,
+        doPOST("Menu", "addQuickMenu", selectedJSON,
             function(data) {
                 jQuery.mobile.changePage("#schnellbuchungen_liste");
                 self.load();
@@ -128,7 +128,7 @@ hhb.model.types.SchnellbuchungModel = function() {
     // Eintrag aus dem Schnellbuchungsmenü löschen
     self.loeschen = function() {
         var id = self.selectedSchnellbuchung().config_id();
-        doGET("menu", "remove", {'id': id},
+        doGET("Menu", "removeQuickMenu", {'id': id},
             function(data){
                 jQuery.mobile.changePage("#schnellbuchungen_liste");
                 self.load();

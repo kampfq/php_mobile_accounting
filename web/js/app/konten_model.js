@@ -170,7 +170,7 @@ hhb.model.types.KontenModel = function() {
   // Neues Konto anlegen
   self.anlegen = function() {
     var kontoJSON = ko.toJSON(self.selectedKonto());
-    doPOST("konto", "create", kontoJSON,
+    doPOST("Account", "createKonto", kontoJSON,
         function(data) {
           alert('Das Konto wurde angelegt');
         },
@@ -183,7 +183,7 @@ hhb.model.types.KontenModel = function() {
   // Bestehendes Konto aktualisieren
   self.speichern = function() {
     var kontoJSON = ko.toJSON(self.selectedKonto());
-    doPOST("konto", "save", kontoJSON,
+    doPOST("Account", "saveKonto", kontoJSON,
         function(data) {
           alert('Die Änderungen wurden gespeichert');
         },

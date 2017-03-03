@@ -75,7 +75,7 @@ class Account {
     }
 
     // legt das als JSON-Objekt übergebene Konto an
-    public function createKonto($request) {
+    public function createKonto() {
         $inputJSON = $this -> request -> getBody();
         $input = json_decode( $inputJSON, TRUE );
         if($this->isValidKonto($input)) {

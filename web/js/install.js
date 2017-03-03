@@ -48,7 +48,7 @@ function InstallerModel() {
 
   // Systemanalyse starten
   self.onCheckSystem = function() {
-    doPOST("installation", "checksystem", "",
+    doPOST("Install", "checksystem", "",
       function (data) {
         if(!data.isError) {
            var messages = [];
@@ -66,7 +66,7 @@ function InstallerModel() {
 
   // hier noch die Aktionen Auflisten, die ich auf data-bind:click registriere!
   self.onCreateDbSchema = function() {
-    doPOST("installation", "createDatabaseSchema", "",
+    doPOST("Install", "createDatabaseSchema", "",
       function (data) {
         if(data.isError) {
           alert("Fehler aufgetreten: "+data.message);

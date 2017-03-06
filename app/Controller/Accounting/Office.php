@@ -68,7 +68,12 @@ class Office {
     protected function createCSV($result){
         $meh = new \SplFileObject(tempnam(sys_get_temp_dir(), rand()),'w+');
         $writer = Writer::createFromFileObject($meh);
+        $headlineInserted= false;
         foreach ($result as $row){
+            if($headlineInserted === false){
+                $writer -> insertOne(array_keys($row));
+                $headlineInserted = true;
+            }
             $writer -> insertOne($row);
         }
 

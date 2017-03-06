@@ -6,6 +6,7 @@
 namespace Traits;
 
 
+use Controller\AttachmentResponse;
 use Controller\FlashMessenger\FlashMessage;
 use Controller\FlashMessenger\FlashMessengerBag;
 use DB\Cortex;
@@ -17,6 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Request;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequest;
+use Zend\Diactoros\Stream;
 
 trait ViewControllerTrait
 {
@@ -129,7 +131,21 @@ trait ViewControllerTrait
                 $response = new Response\JsonResponse($data);
                 break;
             case 'csv':
-                $response = new Response\TextResponse($data);
+                /**
+                 * @var $data \SplTempFileObject
+                 */
+                $tempfile = $data->getPath(). DIRECTORY_SEPARATOR . $data->getFilename();
+                $response = new AttachmentResponse($tempfile,200,[],'export.csv');
+                $body = new Stream($tempfile);
+                $response
+                ->withHeader('content-disposition', 'attachment; filename=export.csv')
+                ->withHeader('Content-Transfer-Encoding', 'Binary')
+                ->withHeader('Content-Description', 'File Transfer')
+                ->withHeader('Pragma', 'public')
+                ->withHeader('Expires', '0')
+                ->withHeader('Cache-Control', 'must-revalidate')
+                ->withBody($body)
+                ->withHeader('Content-Length', "{$body->getSize()}");
                 break;
             default:
                 $response = new Response\HtmlResponse($data);
@@ -208,10 +224,10 @@ trait ViewControllerTrait
     /**
      * @return int
      */
-    public function getIdParsedFromRequest():int
+    public function getIdParsedFromRequest()
     {
 
-        return (int)$this->idParsedFromRequest;
+        return $this->idParsedFromRequest;
     }
 
     /**

@@ -20,6 +20,7 @@
 
 namespace Controller\Accounting;
 use Controller\QueryHandler;
+use League\Csv\Writer;
 use Traits\ViewControllerTrait;
 // Controller für die Schnellbuchungs-Menüeinträge
 class Office {
@@ -36,35 +37,43 @@ class Office {
         $query = new QueryHandler("export_journal_to_excel.sql");
         $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
         $result = $this -> getDatabase() -> exec($query->getSql());
-
-        return $this -> wrap_response($result, $format);
+        return $this -> wrap_response($this -> createCSV($result), $format);
     }
 
     // Erstellt eine Liste aller GuV-Monatssalden
     public function getGuvMonate($request) {
         $format = "json";
-        if($this -> getFirstOptionParsedFromRequest() === "csv"){
+        if($this -> getIdParsedFromRequest() === "csv"){
             $format = "csv";
         }
         $query = new QueryHandler("guv_monat_csv.sql");
         $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
         $result = $this -> getDatabase() -> exec($query->getSql());
-
+        $this -> createCSV($result);
         return $this -> wrap_response($result, $format);
     }
 
     //Erstellt eine Liste aller GuV-Monatssalde
     public function getBilanzMonate($request) {
         $format = "json";
-        if($this -> getFirstOptionParsedFromRequest() === "csv"){
+        if($this -> getIdParsedFromRequest() === "csv"){
             $format = "csv";
         }
 
         $query = new QueryHandler("bilanz_monat_csv.sql");
         $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
         $result = $this -> getDatabase() -> exec($query->getSql());
+        return $this -> wrap_response($this -> createCSV($result), $format);
+    }
 
-        return $this -> wrap_response($result, $format);
+    protected function createCSV($result){
+        $meh = new \SplFileObject(tempnam(sys_get_temp_dir(), rand()),'w+');
+        $writer = Writer::createFromFileObject($meh);
+        foreach ($result as $row){
+            $writer -> insertOne($row);
+        }
+
+        return $meh;
     }
 
 }

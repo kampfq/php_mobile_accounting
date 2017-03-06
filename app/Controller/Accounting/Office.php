@@ -49,8 +49,7 @@ class Office {
         $query = new QueryHandler("guv_monat_csv.sql");
         $query->setParameterUnchecked("mandant_id", $this->getClient()->mandant_id);
         $result = $this -> getDatabase() -> exec($query->getSql());
-        $this -> createCSV($result);
-        return $this -> wrap_response($result, $format);
+        return $this -> wrap_response( $this -> createCSV($result), $format);
     }
 
     //Erstellt eine Liste aller GuV-Monatssalde

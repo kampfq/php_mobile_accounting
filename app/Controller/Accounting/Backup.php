@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
-namespace Accounting\Controller;
+namespace Controller\Accounting;
 
 use Model\Accounting\Account;
 use Model\Accounting\Booking;
@@ -37,6 +37,7 @@ class Backup
         $backup_sql .= $this->getKontenBackup();
         $result = gzencode($backup_sql);
 
+        $tempFile = new \SplFileObject(tempnam(sys_get_temp_dir(), rand()),'w+');
         return $this->wrap_response($result, "gz");
     }
 
@@ -44,7 +45,7 @@ class Backup
     private function getBuchungenBackup():string
     {
         $booking = new Booking();
-        $rs = $booking -> load([
+        $rs = $booking -> find([
             'mandant_id = ?',$this->getClient()->mandant_id,
         ]);
         $result = "";
@@ -52,9 +53,9 @@ class Backup
             $result .= "insert into fi_buchungen (mandant_id, buchungsnummer, buchungstext, sollkonto, habenkonto, ";
             $result .= "betrag, datum, bearbeiter_user_id, is_offener_posten) values ";
             $result .= "(".$obj->mandant_id.", ".$obj->buchungsnummer.", ";
-            $result .= "'".mysqli_escape_string($db, $obj->buchungstext)."', ";
-            $result .= "'".mysqli_escape_string($db, $obj->sollkonto)."', ";
-            $result .= "'".mysqli_escape_string($db, $obj->habenkonto)."', ";
+            $result .= "'".$obj->buchungstext."', ";
+            $result .= "'".$obj->sollkonto."', ";
+            $result .= "'".$obj->habenkonto."', ";
             $result .= "".$obj->betrag.", '".$obj->datum."', ";
             $result .= "".$obj->bearbeiter_user_id.", ".$obj->is_offener_posten."); \n";
         }
@@ -67,7 +68,7 @@ class Backup
     {
 
         $account = new Account();
-        $rs = $account -> load([
+        $rs = $account -> find([
             'mandant_id = ?',$this->getClient()->mandant_id
         ]);
         $result = "";
@@ -75,8 +76,8 @@ class Backup
             {
                 $result .= "insert into fi_konto (mandant_id, kontonummer, bezeichnung, kontenart_id) values ";
                 $result .= "(".$obj->mandant_id.", ";
-                $result .= "'".mysqli_escape_string($db, $obj->kontonummer)."', ";
-                $result .= "'".mysqli_escape_string($db, $obj->bezeichnung)."', ";
+                $result .= "'".$obj->kontonummer."', ";
+                $result .= "'".$obj->bezeichnung."', ";
                 $result .= "".$obj->kontenart_id."); \n";
             }
             return $result;

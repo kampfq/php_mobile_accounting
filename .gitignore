@@ -1,2 +1,7 @@
 lib/Database.php
 .htusers
+web/tmp
+app/vendor
+.idea
+.htpasswd
+config.ini

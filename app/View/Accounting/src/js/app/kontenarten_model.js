@@ -1,4 +1,3 @@
-// -- <?php
 /*
  * Copyright (c) 2015 by Wolfgang Wiedermann
  *
@@ -17,28 +16,37 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
-//?>
 
 var hhb = hhb || {};
 hhb.model = hhb.model || {};
 hhb.model.types = hhb.model.types || {};
 
-hhb.model.types.ExportModel = function() {
+/*
+ * Datenmodell einer Kontenart
+ */
+hhb.model.types.Kontenart = function(config) {
     var self = this;
+    self.kontenart_id = ko.observable(0);
+    self.bezeichnung = ko.observable("");
 
-    self.export_journal = function() {
-        var win = window.open("../Office/getJournal/csv", "Download");
-    };
-
-    self.export_guv = function() {
-        var win = window.open("../Office/getGuvMonate/csv", "Download");
-    };
-
-    self.export_bilanz = function() {
-        var win = window.open("Office/getBilanzMonate/csv", "Download");
-    };
-
-    self.export_sqlbackup = function() {
-        var win = window.open("../Backup/getMysqlBackup", "Download");
+    if(!!config) {
+        self.kontenart_id(config.kontenart_id);
+        self.bezeichnung(config.bezeichnung);
     }
+};
+
+/*
+* Statische Methode zum laden der Kontenarten
+*/
+hhb.model.types.Kontenart.load = function(observableArray) {
+    doGET('Account', 'getKontenArten', [],
+        function(data) {
+            for(var i = 0; i < data.length; i++) {
+                observableArray.push(new hhb.model.types.Kontenart(data[i]));
+            }
+        },
+        function(error) {
+            util.showErrorMessage(error, "Fehler beim Laden der Kontenarten aufgetreten");
+        }
+    )
 };

@@ -1,4 +1,3 @@
-// -- <?php
 /*
  * Copyright (c) 2015 by Wolfgang Wiedermann
  *
@@ -17,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
-//?>
 
 var hhb = hhb || {};
 hhb.model = hhb.model || {};

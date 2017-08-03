@@ -1,4 +1,3 @@
-<?php 
 /*
  * Copyright (c) 2015 by Wolfgang Wiedermann
  *
@@ -17,23 +16,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  */
-?>
-<?php
-// Content-Type auf application/javascript setzen
-header('Content-Type: application/javascript');
-// Sprachdatei einbetten
-include_once("../i18n/lang-de.js");
-// Laden und zusammenfassen aller Javascript-Code-Dateien aus den Formularen
-include_once("app/navigation_model.js");
-include_once("app/schnellbuchungen_model.js");
-include_once("app/kontenarten_model.js");
-include_once("app/konten_model.js");
-include_once("app/buchen_model.js");
-include_once("app/ergebnis_model.js");
-include_once("app/verlauf_model.js");
-include_once("app/export_model.js");
-include_once("app/configuration_model.js");
 
-// MainModel importieren
-include_once("./main_model.js");
-?>
+var hhb = hhb || {};
+hhb.model = hhb.model || {};
+hhb.model.types = hhb.model.types || {};
+
+hhb.model.types.ExportModel = function() {
+    var self = this;
+
+    self.export_journal = function() {
+        var win = window.open("../Office/getJournal/csv", "Download");
+    };
+
+    self.export_guv = function() {
+        var win = window.open("../Office/getGuvMonate/csv", "Download");
+    };
+
+    self.export_bilanz = function() {
+        var win = window.open("Office/getBilanzMonate/csv", "Download");
+    };
+
+    self.export_sqlbackup = function() {
+        var win = window.open("../Backup/getMysqlBackup", "Download");
+    }
+};

@@ -170,7 +170,7 @@ hhb.model.types.KontenModel = function() {
         var kontoJSON = ko.toJSON(self.selectedKonto());
         doPOST("Account", "createKonto", kontoJSON,
             function(data) {
-                alert('Das Konto wurde angelegt');
+                util.showErrorMessage('Das Konto wurde angelegt');
             },
             function(error) {
                 util.showErrorMessage(error, hhb.i18n.konten.error_on_create);
@@ -183,7 +183,7 @@ hhb.model.types.KontenModel = function() {
         var kontoJSON = ko.toJSON(self.selectedKonto());
         doPOST("Account", "saveKonto", kontoJSON,
             function(data) {
-                alert('Die Änderungen wurden gespeichert');
+                util.showErrorMessage('Die Änderungen wurden gespeichert');
             },
             function(error) {
                 util.showErrorMessage(error, hhb.i18n.konten.error_on_update);

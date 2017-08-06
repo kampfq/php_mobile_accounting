@@ -141,7 +141,7 @@ hhb.model.types.ErgebnisModel = function() {
                 }
             },
             function(error) {
-                alert("Fehler aufgetreten: "+JSON.stringify(error));
+                ("Fehler aufgetreten: "+JSON.stringify(error));
             }
         );
     };
@@ -169,7 +169,7 @@ hhb.model.types.ErgebnisModel = function() {
                 }
             },
             function(error) {
-                alert("Fehler aufgetreten: "+JSON.stringify(error));
+                util.showErrorMessage("Fehler aufgetreten: "+JSON.stringify(error));
             });
     };
 

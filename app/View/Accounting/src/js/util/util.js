@@ -19,12 +19,28 @@ util.formatDateAtG = function(dateStringIn) {
 // Fehlermeldung ausgeben
 util.showErrorMessage = function(error, message) {
     if(!!message) {
-        alert(message+": "+error.status+" "+error.statusText);
+        util.showMessage(message+": "+error.status+" "+error.statusText);
     } else {
-        alert('Fehler aufgetreten: '+error.status+" "+error.statusText);
+        util.showMessage('Fehler aufgetreten: '+error.status+" "+error.statusText);
     }
     //console.log(error);
     //console.log(JSON.stringify(error));
+};
+
+util.showMessage = function(msg){
+        $("<div class='ui-loader ui-overlay-shadow ui-body-e ui-corner-all'><h3>"+msg+"</h3></div>")
+            .css({ display: "block",
+                opacity: 0.90,
+                position: "fixed",
+                padding: "7px",
+                "text-align": "center",
+                width: "270px",
+                left: ($(window).width() - 284)/2,
+                top: $(window).height()/2 })
+            .appendTo( $.mobile.pageContainer ).delay( 1500 )
+            .fadeOut( 400, function(){
+                $(this).remove();
+            });
 };
 
 // Ersetzt < mit &lt; und > mit &gt;

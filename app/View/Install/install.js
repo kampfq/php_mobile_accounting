@@ -59,7 +59,7 @@ function InstallerModel() {
         }
       },
       function (error) {
-        alert("Fehler aufgetreten: "+error.statusText);
+          util.showErrorMessage("Fehler aufgetreten: "+error.statusText);
       }
     );
   };
@@ -69,14 +69,14 @@ function InstallerModel() {
     doPOST("Install", "createDatabaseSchema", "",
       function (data) {
         if(data.isError) {
-          alert("Fehler aufgetreten: "+data.message);
+            util.showErrorMessage("Fehler aufgetreten: "+data.message);
         } else {
-          alert("Erfolg: "+data.message);
+          util.showMessage("Erfolg: "+data.message);
           $.mobile.navigate("#user_config");
         }
       },
       function (error) {
-        alert("Fehler aufgetreten: "+error.statusText);
+          util.showErrorMessage("Fehler aufgetreten: "+error.statusText);
       }
     );
   };
@@ -93,12 +93,12 @@ function InstallerModel() {
               $('textarea').textinput();
               $.mobile.navigate("#fehler_ausgeben");
         } else {
-           alert(data.message);
+           util.showMessage(data.message);
            $.mobile.navigate("#installation_abschliessen");
         }
       },
       function (error) {
-        alert("Fehler aufgetreten: "+error.statusText);
+          util.showErrorMessage("Fehler aufgetreten: "+error.statusText);
       }
     );
   };
@@ -136,11 +136,11 @@ function DatabaseModel() {
       doPOST("Install", "checkDatabaseSettings", param,
           // Erfolgsfall: Datenbankverbindung ist brauchbar
           function(data) {
-              alert('Die angegebenen Verbindungsdaten sind brauchbar: '+data);
+              util.showErrorMessage('Die angegebenen Verbindungsdaten sind brauchbar: '+data);
           }, 
           // Fehlerfall: Verbindungsdaten sind unbrauchbar
           function(error) {
-              alert('Mit den angegebenen Daten kann keine Verbindung aufgebaut werden: '+error.statusText);
+              util.showErrorMessage('Mit den angegebenen Daten kann keine Verbindung aufgebaut werden: '+error.statusText);
           }
       );
   };
@@ -157,13 +157,13 @@ function DatabaseModel() {
               $('textarea').textinput();
               $.mobile.navigate("#fehler_ausgeben");
             } else {
-              alert('Die angegebenen Verbindungsdaten wurden gespeichert: '+data.message);
+                util.showErrorMessage('Die angegebenen Verbindungsdaten wurden gespeichert: '+data.message);
               $.mobile.navigate("#database_create_schema");
             }
           },
           // Fehlerfall: Verbindungsdaten sind unbrauchbar
           function(error) {
-              alert('Die Datei konnte nicht gespeichert werden: '+error.statusText);
+              util.showErrorMessage('Die Datei konnte nicht gespeichert werden: '+error.statusText);
           }
       );
  
@@ -188,11 +188,11 @@ function UserModel() {
           $("textarea").textinput();
           $.mobile.navigate("#fehler_ausgeben");
         } else {
-          alert("Der angegebene Benutzer wurde gespeichert");
+            util.showMessage("Der angegebene Benutzer wurde gespeichert");
         }
       }, 
       function(error) {
-         alert('Fehler aufgetreten: '+error.statusText);
+          util.showErrorMessage('Fehler aufgetreten: '+error.statusText);
       }
     );
   };

@@ -109,7 +109,7 @@ hhb.model.types.BuchungenModel = function() {
         var jsonString = ko.toJSON(self.selectedBuchung);
         doPOSTwithQueue("Booking", "createBuchung", jsonString,
             function(data) {
-                alert(hhb.i18n.buchen.successful_created);
+                util.showMessage(hhb.i18n.buchen.successful_created);
             },
             function(error) {
                 util.showErrorMessage(error, hhb.i18n.buchen.error_on_create);

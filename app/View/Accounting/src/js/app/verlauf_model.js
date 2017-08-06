@@ -131,7 +131,7 @@ hhb.model.types.VerlaufModel = function() {
             $(".konten_liste2").listview();
             $(".konten_liste2").listview("refresh");
         } else {
-            alert(hhb.i18n.verlauf.selektionsfehler);
+            util.showErrorMessage(hhb.i18n.verlauf.selektionsfehler);
         }
     };
 

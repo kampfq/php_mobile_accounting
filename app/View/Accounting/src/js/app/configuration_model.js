@@ -72,7 +72,7 @@ hhb.model.types.ConfigurationModel = function(data) {
         var selectedJSON = ko.toJSON(selected);
         doPOST("Config", "updateConfigEntry", selectedJSON,
             function(data) {
-                alert('Parameter aktualisiert');
+                util.showMessage('Parameter aktualisiert');
                 jQuery.mobile.changePage("#configuration_liste");
             },
             function(error) {

@@ -186,7 +186,7 @@ var d = {
             d.context.lineWidth = 0.5;
             d.context.fillRect(x1, y1, x2 - x1, y2 - y1);
         } else {
-            alert('Fehler: d ist nicht initialisiert');
+            util.showErrorMessage('Fehler: d ist nicht initialisiert');
         }
     },
 
@@ -206,7 +206,7 @@ var d = {
             ctx.closePath();
             ctx.stroke();
         } else {
-            alert('Fehler: d ist nicht initialisiert');
+            util.showErrorMessage('Fehler: d ist nicht initialisiert');
         }
     },
 

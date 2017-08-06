@@ -45,7 +45,11 @@ function doGET(controller, action, parameters, successHandler, errorHandler) {
 * @param successHandler = Funktions-Handle für Erfolgsfall
 * @param errorHandler = Funktions-Handle für Fehlerfall
 */
-function doPOST(controller, action, parameterObject, successHandler, errorHandler) {
+function doPOST(controller, action, parameterObject, successHandler, errorHandler, contentType) {
+    if(contentType === "undefined"){
+        contentType = "application/json"
+    }
+
     $.mobile.loading( 'show', {
         textVisible: false,
         theme: 'z',
@@ -55,7 +59,7 @@ function doPOST(controller, action, parameterObject, successHandler, errorHandle
         type: 'POST',
         url: "/"+controller+"/"+action,
         dataType:"json",
-        contentType:"application/json",
+        contentType:contentType,
         data: parameterObject,
     }).done(function(data) {
         $.mobile.loading('hide');

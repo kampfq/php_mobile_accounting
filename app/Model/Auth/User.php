@@ -33,6 +33,10 @@ class User extends Cortex
             'nullable' => false,
         ),
         'user_name' => array(
+            'type' => Schema::DT_VARCHAR128,
+            'nullable' => false,
+        ),
+        'user_password' => array(
             'type' => Schema::DT_VARCHAR256,
             'nullable' => false,
         ),
@@ -49,6 +53,12 @@ class User extends Cortex
             'nullable' => false,
         ),
     );
+
+    public function passwordIsEqualTo($password)
+    {
+        return password_verify($password,$this -> user_password);
+    }
+
 
 
 }

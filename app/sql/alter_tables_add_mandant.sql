@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS `fi_user`;
 CREATE TABLE IF NOT EXISTS `fi_user` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(50) NOT NULL,
+  `user_password` varchar(255) NOT NULL,
   `user_description` varchar(256) DEFAULT NULL,
   `mandant_id` int(11) NOT NULL,
   `create_date` date NOT NULL,

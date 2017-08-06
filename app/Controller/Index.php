@@ -22,6 +22,9 @@ class Index
 
     public function getTemplate(): string
     {
+        if( $this -> f3 -> get('loginRequired')){
+            return 'Security/login.htm';
+        }
         return 'Accounting/index.htm';
     }
 

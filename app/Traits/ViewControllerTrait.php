@@ -59,6 +59,7 @@ trait ViewControllerTrait
         $this -> database = $this -> f3 -> get('DB');
         $this -> idParsedFromRequest = $this -> f3 -> get('PARAMS.id');
         $this -> firstOptionParsedFromRequest = $this -> f3 -> get('PARAMS.option1');
+        new SQL\Session($this -> database);
 
     }
 
@@ -157,31 +158,24 @@ trait ViewControllerTrait
     }
 
     public function beforeRoute(){
-        $username = null;
-        if(isset($_SERVER['REMOTE_USER'])) {
-            $username = $_SERVER['REMOTE_USER'];
-        }
-        // für PHP5-FPM mit nginx
-        else if(isset($_SERVER["PHP_AUTH_USER"])) {
-            $username = $_SERVER["PHP_AUTH_USER"];
+        $username = $this -> f3 -> get('SESSION.username');
+        if(!$username){
+            $this -> f3 -> set('loginRequired',true);
         } else {
-            throw new \Exception("Fehler: Benutzer nicht über \$_SERVER['REMOTE_USER'] oder \$_SERVER['PHP_AUTH_USER'] ermittelbar");
-        }
-
-        $user = new User();
-        $user -> load([
-            'user_name = ?',$username
-        ]);
-
-        $client = new Client();
-        $client -> load([
-            'mandant_id = ?', $user -> mandant_id
-        ]);
-        if(null === $user -> user_id || null === $client -> mandant_id){
-            throw new \Exception("Kein Mandant für den Benutzer $username konfiguriert");
-        }else {
-            $this -> user = $user;
-            $this -> client = $client;
+            $user = new User();
+            $user -> load([
+                'user_name = ?',$username
+            ]);
+            $client = new Client();
+            $client -> load([
+                'mandant_id = ?', $user -> mandant_id
+            ]);
+            if(null === $user -> user_id || null === $client -> mandant_id){
+                throw new \Exception("Kein Mandant für den Benutzer $username konfiguriert");
+            }else {
+                $this -> user = $user;
+                $this -> client = $client;
+            }
         }
     }
 

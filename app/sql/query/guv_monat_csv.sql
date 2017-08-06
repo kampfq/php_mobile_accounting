@@ -7,9 +7,9 @@ select substr(cast(base_view.monat_id as char(6)), 1, 4) as jahr,
   base_view.kontonummer as konto,
   base_view.bezeichnung as kontenname,
   case when base_view.kontenart_id = 4
-       then format(sum(base_view.betrag)*-1, 2, 'de_DE')
-       else format(sum(base_view.betrag), 2, 'de_DE') end as saldo,
-  format(sum(base_view.betrag)*-1, 2, 'de_DE') as saldo_summierbar
+       then format(sum(base_view.betrag)*-1, 2)
+       else format(sum(base_view.betrag), 2) end as saldo,
+  format(sum(base_view.betrag)*-1, 2) as saldo_summierbar
 from (
 
 select (year(b.datum)*100)+month(b.datum) as monat_id, 

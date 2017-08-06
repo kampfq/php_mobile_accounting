@@ -5,3 +5,4 @@ app/vendor
 .idea
 .htpasswd
 config.ini
+node_modules

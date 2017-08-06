@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de" manifest="manifest.php">
+<!-- <html lang="de"> -->
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./css/lib/haushaltsbuch-theme.min.css" />
+    <link rel="stylesheet" href="./css/lib/jquery.mobile.icons.min.css" />
+    <link rel="stylesheet" href="./css/lib/jquery.mobile.structure-1.4.5.min.css" />
+    <link rel="stylesheet" href="./css/hhb.css" />
+
+    <!-- Standard-Bibliotheken -->
+    <script src="./js/vendor.min.js"></script>
+    <!-- App-spezifische Code-Dateien -->
+    <script src="./js/app.min.js"></script>
+</head>
+<body>
+
+<div data-role="page" data-theme="b" id="login_user">
+
+    <div data-role="content">
+        <label for="username" data-bind="text:i18n.login.username"></label>
+        <input type="text" id="username" data-bind="value: login().username">
+        <label for="password" data-bind="text:i18n.login.password"></label>
+        <input type="text" id="password" data-bind="value: login().password">
+
+        <button data-bind="click: login().authenticate, text:i18n.login.submit"></button>
+    </div><!-- /content -->
+    <div data-role="footer" data-position="fixed">
+        <h4 data-bind="text:i18n.general.copy"></h4>
+    </div><!-- /footer -->
+</div><!-- /page -->
+
+
+
+
+</body>
+</html>

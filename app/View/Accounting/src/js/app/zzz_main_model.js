@@ -27,21 +27,28 @@ hhb.model.MainModel = null;
 */
 hhb.model.types.MainModel = function() {
   var self = this;
-  // Modelbestandteile laden
-  self.kontenarten = ko.observableArray([]);
-  hhb.model.types.Kontenart.load(self.kontenarten);
-
   self.i18n = hhb.i18n;
-  self.navigation = ko.observable(new hhb.model.types.NavigationModel());
-  self.buchen = ko.observable(new hhb.model.types.BuchungenModel());
-  self.konten = ko.observable(new hhb.model.types.KontenModel());
-  self.schnellbuchungen = ko.observable(new hhb.model.types.SchnellbuchungModel());
-  self.ergebnis = ko.observable(new hhb.model.types.ErgebnisModel());
-  self.verlauf = ko.observable(new hhb.model.types.VerlaufModel());
-  self.exporte = ko.observable(new hhb.model.types.ExportModel());
-  self.configuration = ko.observable(new hhb.model.types.ConfigurationModel());
 
-  self.ergebnis().initialize();
+  if($("#login_user").length != 0){
+      self.login = ko.observable(new hhb.model.types.LoginModel());
+  } else {
+      // Modelbestandteile laden
+      self.kontenarten = ko.observableArray([]);
+      hhb.model.types.Kontenart.load(self.kontenarten);
+      self.navigation = ko.observable(new hhb.model.types.NavigationModel());
+      self.buchen = ko.observable(new hhb.model.types.BuchungenModel());
+      self.konten = ko.observable(new hhb.model.types.KontenModel());
+      self.schnellbuchungen = ko.observable(new hhb.model.types.SchnellbuchungModel());
+      self.ergebnis = ko.observable(new hhb.model.types.ErgebnisModel());
+      self.verlauf = ko.observable(new hhb.model.types.VerlaufModel());
+      self.exporte = ko.observable(new hhb.model.types.ExportModel());
+      self.configuration = ko.observable(new hhb.model.types.ConfigurationModel());
+      self.ergebnis().initialize();
+  }
+
+
+
+
 };
 
 /*

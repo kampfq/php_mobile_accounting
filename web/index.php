@@ -21,6 +21,8 @@ set_error_handler("ErrorHandler");
  * setup Autoloader
  */
 
+
+
 //composer autoloader
 (@include_once ('../app/vendor/autoload.php')) OR die("You need to run php
 composer.phar install for your application to run.");
@@ -51,8 +53,8 @@ $f3->set('DB',
         $databasePassword
     )
 );
-
-
+new \DB\SQL\Session($f3 -> get('DB'));
+//new Session();
 /**
  * init PSR7
  */

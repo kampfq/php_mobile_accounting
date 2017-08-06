@@ -10,7 +10,7 @@ select
          when k.kontonummer = b.sollkonto then b.betrag 
 	       when k.kontonummer = b.habenkonto then b.betrag * -1
     end
-  ), 2, 'de_DE') as saldo
+  ), 2) as saldo
 from fi_buchungen as b
   inner join fi_konto as k
   on b.mandant_id = #mandant_id#

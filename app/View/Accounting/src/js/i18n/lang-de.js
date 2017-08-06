@@ -112,5 +112,10 @@ hhb.i18n = {
         guvmonate:'GuV Monate exportieren',
         bilanzmonate:"Bilanz n. Monaten exportieren",
         sqlbackup:"Backup exportieren"
+    },
+    login:{
+        submit:'Login',
+        username:'Username',
+        password:'Passwort',
     }
 };

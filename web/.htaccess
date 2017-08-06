@@ -1,10 +1,5 @@
-AuthType Basic 
-AuthUserFile /Users/kampfq/Developer/Websites/php_mobile_accounting/.htpasswd 
-AuthName "html5-haushaltsbuch" 
-
 order deny,allow
 allow from all
-require valid-user
 
 #Gzip fuer HTML-, CSS- und JavaScript-Content aktivieren
 <ifmodule mod_deflate.c>

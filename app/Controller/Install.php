@@ -20,6 +20,7 @@
 
 namespace Controller;
 
+use function Sodium\crypto_pwhash_scryptsalsa208sha256_str;
 use Traits\ViewControllerTrait;
 
 class Install {
@@ -196,7 +197,7 @@ function addUser($request) {
     error_log("HTPASSWD: ".$htpasswd);
 
     // Benutzer in fi_users eintragen
-    $this->addUserToDb($input['username']);
+    $this->addUserToDb($input['username'],$input['password']);
 
     // Prüfen, ob schreibrechte im ROOT-Verzeichnis des Haushaltsbuchs vorliegen
     if(is_writeable($appRootDir) || is_writeable($appRootDir.".htpasswd")) {
@@ -281,11 +282,11 @@ private function isValidBenutzerObject($input) {
 
     // Speichern eines Nutzers in der Datenbank
     // Mit automatischer Zuordnung zu Mandant 1
-private function addUserToDb($username) {
+private function addUserToDb($username,$password) {
     require_once("../lib/Database.php");
     $db = $this -> database;
-
-    $sql = "insert into fi_user values(0, '$username', 'Benutzer: $username', 1, now())";
+    $password = password_hash($password);
+    $sql = "insert into fi_user values(0, '$username','$password', 'Benutzer: $username', 1, now())";
     $this -> getDatabase() -> exec($sql);
 
     mysqli_close($db);

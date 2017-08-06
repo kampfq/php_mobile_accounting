@@ -36,7 +36,7 @@ hhb.model.types.ErgebnisRechnungEintrag = function(data) {
     }
 };
 
-// Eintrag f�r die GuV-Prognose-Rechnung
+// Eintrag fuer die GuV-Prognose-Rechnung
 hhb.model.types.PrognoseRechnungEintrag = function(data) {
     var self = this;
 
@@ -115,7 +115,7 @@ hhb.model.types.ErgebnisModel = function() {
         self.updateMonate(function() {
            self.guvmonat();
         });
-    }
+    };
 
     // Liste der auswählbaren Monate aktualisieren
     self.updateMonate = function(successHandler) {
@@ -220,7 +220,9 @@ hhb.model.types.ErgebnisModel = function() {
 
     // Allgemeine Funktion zum Laden von Bilanz und GuV-Rechnungen
     priv.loadErgebnisrechnung = function(action, titel, untertitel, parameters) {
-        var parameters = parameters || [];
+        if(parameters === 'undefined'){
+            parameters = [];
+        }
 
         self.rechnung.removeAll();
         self.summen.removeAll();

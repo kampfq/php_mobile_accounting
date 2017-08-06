@@ -25,172 +25,172 @@ hhb.model.types = hhb.model.types || {};
 * Datenmodell eines Kontos
 */
 hhb.model.types.Konto = function(config) {
-  var self = this;
+    var self = this;
 
-  self.kontonummer = ko.observable("0000");
-  self.bezeichnung = ko.observable("");
-  self.kontenart_id = ko.observable(0);
-  self.mandant_id = ko.observable(0);
+    self.kontonummer = ko.observable("0000");
+    self.bezeichnung = ko.observable("");
+    self.kontenart_id = ko.observable(0);
+    self.mandant_id = ko.observable(0);
 
-  self.tostring = ko.computed(function() {
-    return self.kontonummer()+" : "+self.bezeichnung();
-  });
+    self.tostring = ko.computed(function() {
+        return self.kontonummer()+" : "+self.bezeichnung();
+    });
 
-  if(!!config) {
-    self.kontonummer(config.kontonummer);
-    self.bezeichnung(config.bezeichnung);
-    self.kontenart_id(config.kontenart_id);
-    self.mandant_id(config.mandant_id);
-  }
+    if(!!config) {
+        self.kontonummer(config.kontonummer);
+        self.bezeichnung(config.bezeichnung);
+        self.kontenart_id(config.kontenart_id);
+        self.mandant_id(config.mandant_id);
+    }
 };
 
 /*
 * Eintrag in der Salden-Liste
 */
 hhb.model.types.SaldenEintrag = function(obj) {
-  var self = this;
+    var self = this;
 
-  self.grouping = ko.observable("000000");
-  self.saldo = ko.observable(0.00);
+    self.grouping = ko.observable("000000");
+    self.saldo = ko.observable(0.00);
 
-  if(!!obj) {
-    self.grouping(obj.grouping);
-    self.saldo(obj.saldo);
-  }
+    if(!!obj) {
+        self.grouping(obj.grouping);
+        self.saldo(obj.saldo);
+    }
 };
 
 /*
 * Zusammenfassenden Model-Typen für den Themenbereich Konten
 */
 hhb.model.types.KontenModel = function() {
-  var self = this;
-  
-  self.selectedKonto = ko.observable(new hhb.model.types.Konto());
-  self.selectedJahr = ko.observable('2016');
-  self.konten = ko.observableArray([]);
-  self.konten.push(self.selectedKonto);
-  self.aktivkonten = ko.observableArray([]);
-  self.aktivkonten.push(self.selectedKonto);
-  self.buchungen = ko.observableArray([]);
-  self.buchungen.push(new hhb.model.types.KontoBuchung());
-  self.saldo = ko.observable("");
-  self.salden = ko.observableArray([]);
-  self.salden.push(new hhb.model.types.SaldenEintrag());
+    var self = this;
 
-  // Platzhalter für Eventhandler bei "Jahr-Auswahl wurde verändert"
-  self.selectedJahrChanged = function() {};
+    self.selectedKonto = ko.observable(new hhb.model.types.Konto());
+    self.selectedJahr = ko.observable('2016');
+    self.konten = ko.observableArray([]);
+    self.konten.push(self.selectedKonto);
+    self.aktivkonten = ko.observableArray([]);
+    self.aktivkonten.push(self.selectedKonto);
+    self.buchungen = ko.observableArray([]);
+    self.buchungen.push(new hhb.model.types.KontoBuchung());
+    self.saldo = ko.observable("");
+    self.salden = ko.observableArray([]);
+    self.salden.push(new hhb.model.types.SaldenEintrag());
 
-  // self.konten mit den auf dem Server vorgehaltenen Konten befüllen
-  self.refreshKonten = function(successHandler) {
-    self.konten.removeAll();
-    self.aktivkonten.removeAll();
+    // Platzhalter für Eventhandler bei "Jahr-Auswahl wurde verändert"
+    self.selectedJahrChanged = function() {};
 
-    doGETwithCache("Account", "getKonten", [],
-      function(data) {
-        for(var i = 0; i < data.length; i++) {
-          var konto = new hhb.model.types.Konto(data[i]);
+    // self.konten mit den auf dem Server vorgehaltenen Konten befüllen
+    self.refreshKonten = function(successHandler) {
+        self.konten.removeAll();
+        self.aktivkonten.removeAll();
 
-          self.konten.push(konto);
-          if(data[i].kontenart_id == 1) {
-              self.aktivkonten.push(konto);
-          }
-        }
-        $(".konten_liste").listview();
-        $(".konten_liste").listview("refresh");
+        doGETwithCache("Account", "getKonten", [],
+            function(data) {
+                for(var i = 0; i < data.length; i++) {
+                    var konto = new hhb.model.types.Konto(data[i]);
 
-        if(!!successHandler) {
-            successHandler(self);
-        }
-      },
-        function(error) {
-          util.showErrorMessage(error, hhb.i18n.konten.error_on_load);
-        }
-    ); 
-  };
+                    self.konten.push(konto);
+                    if(data[i].kontenart_id == 1) {
+                        self.aktivkonten.push(konto);
+                    }
+                }
+                $(".konten_liste").listview();
+                $(".konten_liste").listview("refresh");
 
-  // Menü nach der Auswahl eines Kontos öffnen
-  self.openKontenMenu = function(item) {
-    self.selectedKonto(item);
-    jQuery.mobile.changePage("#konten_menue");
-  };
+                if(!!successHandler) {
+                    successHandler(self);
+                }
+            },
+            function(error) {
+                util.showErrorMessage(error, hhb.i18n.konten.error_on_load);
+            }
+        );
+    };
 
-  // Formular Konto bearbeiten öffnen
-  self.openKontenBearbeiten = function() {
-    jQuery.mobile.changePage("#konto_bearbeiten");
-    $('#konto_bearbeiten').trigger('create');
-  };
+    // Menü nach der Auswahl eines Kontos öffnen
+    self.openKontenMenu = function(item) {
+        self.selectedKonto(item);
+        jQuery.mobile.changePage("#konten_menue");
+    };
 
-  // Buchungen des aktuell selektierten Kontos in #konto_buchungen anzeigen
-  self.openBuchungen = function() {
-    self.buchungen.removeAll();
-    var kontonummer = self.selectedKonto().kontonummer();
-    var jahr = self.selectedJahr();
+    // Formular Konto bearbeiten öffnen
+    self.openKontenBearbeiten = function() {
+        jQuery.mobile.changePage("#konto_bearbeiten");
+        $('#konto_bearbeiten').trigger('create');
+    };
 
-    doGETwithCache("Booking", "getListByKonto", {'konto':kontonummer, 'jahr':jahr},
-        function(data) {
-          var list = data.list;
-          self.saldo(data.saldo);
-          for(var i = 0; i < list.length; i++) {
-            self.buchungen.push(new hhb.model.types.KontoBuchung(list[i]));
-          }
-          // Event-Handler für die Auswahl eines anderen Jahres registrieren
-          self.selectedJahrChanged = self.openBuchungen;
-          // Anzeige laden
-          jQuery.mobile.changePage("#konto_buchungen");
-        },
-        function(error) {
-          util.showErrorMessage(error, hhb.i18n.konten.error_on_load_entries);
-        }
-    );
-  };
+    // Buchungen des aktuell selektierten Kontos in #konto_buchungen anzeigen
+    self.openBuchungen = function() {
+        self.buchungen.removeAll();
+        var kontonummer = self.selectedKonto().kontonummer();
+        var jahr = self.selectedJahr();
 
-  // Grafik und Tabelle der Monatssalden anzeigen
-  self.openMonatssalden = function() {
-    self.salden.removeAll();
-    doGETwithCache("Progress", "getMonatsSalden", {'id':self.selectedKonto().kontonummer()},
-        function(data) {
-          var diagramData = [];
-          for(var i = 0; i < data.length; i++) {
-            self.salden.push(new hhb.model.types.SaldenEintrag(data[i]));
-            diagramData.push(data[i].saldo);
-          }
-          d.init("konto_monatssalden_grafik");
-          d.setToWindowWidth();
-          d.drawLineDiagramFor(diagramData);
-          jQuery.mobile.changePage("#konto_monatssalden");
-        },
-        function(error) {
-          util.showErrorMessage(error, hhb.i18n.konten.error_on_load_saldo);
-        }
-    );
-  };
+        doGETwithCache("Booking", "getListByKonto", {'konto':kontonummer, 'jahr':jahr},
+            function(data) {
+                var list = data.list;
+                self.saldo(data.saldo);
+                for(var i = 0; i < list.length; i++) {
+                    self.buchungen.push(new hhb.model.types.KontoBuchung(list[i]));
+                }
+                // Event-Handler für die Auswahl eines anderen Jahres registrieren
+                self.selectedJahrChanged = self.openBuchungen;
+                // Anzeige laden
+                jQuery.mobile.changePage("#konto_buchungen");
+            },
+            function(error) {
+                util.showErrorMessage(error, hhb.i18n.konten.error_on_load_entries);
+            }
+        );
+    };
 
-  // Neues Konto anlegen
-  self.anlegen = function() {
-    var kontoJSON = ko.toJSON(self.selectedKonto());
-    doPOST("Account", "createKonto", kontoJSON,
-        function(data) {
-          alert('Das Konto wurde angelegt');
-        },
-        function(error) {
-          util.showErrorMessage(error, hhb.i18n.konten.error_on_create);
-        }
-    );
-  };
+    // Grafik und Tabelle der Monatssalden anzeigen
+    self.openMonatssalden = function() {
+        self.salden.removeAll();
+        doGETwithCache("Progress", "getMonatsSalden", {'id':self.selectedKonto().kontonummer()},
+            function(data) {
+                var diagramData = [];
+                for(var i = 0; i < data.length; i++) {
+                    self.salden.push(new hhb.model.types.SaldenEintrag(data[i]));
+                    diagramData.push(data[i].saldo);
+                }
+                d.init("konto_monatssalden_grafik");
+                d.setToWindowWidth();
+                d.drawLineDiagramFor(diagramData);
+                jQuery.mobile.changePage("#konto_monatssalden");
+            },
+            function(error) {
+                util.showErrorMessage(error, hhb.i18n.konten.error_on_load_saldo);
+            }
+        );
+    };
 
-  // Bestehendes Konto aktualisieren
-  self.speichern = function() {
-    var kontoJSON = ko.toJSON(self.selectedKonto());
-    doPOST("Account", "saveKonto", kontoJSON,
-        function(data) {
-          alert('Die Änderungen wurden gespeichert');
-        },
-        function(error) {
-          util.showErrorMessage(error, hhb.i18n.konten.error_on_update);
-        }
-    );
-  };
+    // Neues Konto anlegen
+    self.anlegen = function() {
+        var kontoJSON = ko.toJSON(self.selectedKonto());
+        doPOST("Account", "createKonto", kontoJSON,
+            function(data) {
+                alert('Das Konto wurde angelegt');
+            },
+            function(error) {
+                util.showErrorMessage(error, hhb.i18n.konten.error_on_create);
+            }
+        );
+    };
 
-  // Konten intial laden
-  self.refreshKonten();
-}
+    // Bestehendes Konto aktualisieren
+    self.speichern = function() {
+        var kontoJSON = ko.toJSON(self.selectedKonto());
+        doPOST("Account", "saveKonto", kontoJSON,
+            function(data) {
+                alert('Die Änderungen wurden gespeichert');
+            },
+            function(error) {
+                util.showErrorMessage(error, hhb.i18n.konten.error_on_update);
+            }
+        );
+    };
+
+    // Konten intial laden
+    self.refreshKonten();
+};

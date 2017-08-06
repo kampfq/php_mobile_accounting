@@ -63,7 +63,7 @@ hhb.model.types.ConfigurationModel = function(data) {
                 util.showErrorMessage(error, "Fehler beim Laden der Konfiguration aufgetreten");
             }
         );
-    }
+    };
 
     // Übertragen von selectedConfigurationParam an den Server zur aktualisierung
     // der gespeicherten Version
@@ -79,12 +79,12 @@ hhb.model.types.ConfigurationModel = function(data) {
                 util.showErrorMessage(error, "Fehler beim Speichern der Schnellbuchung aufgetreten");
             }
         );
-    }
+    };
 
     // Öffnen eines einzelnen Konfigurationsparameters in der
     // Bearbeiten-Ansicht.
     self.open = function(selected) {
         self.selectedConfigurationParam(selected);
         jQuery.mobile.changePage("#configuration_form");
-    }
+    };
 };

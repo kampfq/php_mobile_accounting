@@ -48,5 +48,5 @@ hhb.model.types.Kontenart.load = function(observableArray) {
         function(error) {
             util.showErrorMessage(error, "Fehler beim Laden der Kontenarten aufgetreten");
         }
-    )
+    );
 };

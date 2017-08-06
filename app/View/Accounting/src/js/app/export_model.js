@@ -38,5 +38,5 @@ hhb.model.types.ExportModel = function() {
 
     self.export_sqlbackup = function() {
         var win = window.open("../Backup/getMysqlBackup", "Download");
-    }
+    };
 };

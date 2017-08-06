@@ -4,7 +4,7 @@ var d = {
 
     // 2D-Grafikkontext
     context : null,
-    
+
     // Konstruktor
     init: function(elementId) {
         d.canvas = document.getElementById(elementId);
@@ -17,7 +17,7 @@ var d = {
     setToWindowWidth: function() {
         if(!!d.canvas) {
             d.canvas.width = window.innerWidth - 35;
-            d.canvas.height = (d.canvas.width * 10) / 14
+            d.canvas.height = (d.canvas.width * 10) / 14;
         } else throw Exception("Init noch nicht aufgerufen!");
     },
 
@@ -106,75 +106,75 @@ var d = {
     },
 
     // Begin-Utilities
-    util : {    
-    // Maximum ermitteln (Vektor)
-    getMax: function(values) {
-        var max = 'null';
-        for(var idx in values) {
-            var val = values[idx];
-            if(max === 'null') {
-                max = val;
+    util : {
+        // Maximum ermitteln (Vektor)
+        getMax: function(values) {
+            var max = 'null';
+            for(var idx in values) {
+                var val = values[idx];
+                if(max === 'null') {
+                    max = val;
+                }
+                if((max*1) < (val*1)) {
+                    max = val;
+                }
             }
-            if((max*1) < (val*1)) {
-                max = val;
-            }
-        }
-        return max;
-    },
+            return max;
+        },
 
-    // Maximum aus einem zweidimensionalen Array ermitteln
-    getMax2: function(values) {
-        var max = 'null';
-        for(var idx in values) {
-            if(max === 'null') {
-                max = d.util.getMax(values[idx]);
+        // Maximum aus einem zweidimensionalen Array ermitteln
+        getMax2: function(values) {
+            var max = 'null';
+            for(var idx in values) {
+                if(max === 'null') {
+                    max = d.util.getMax(values[idx]);
+                }
+                var val = d.util.getMax(values[idx]);
+                if((max*1) < (val*1)) {
+                    max = val;
+                }
             }
-            var val = d.util.getMax(values[idx]);
-            if((max*1) < (val*1)) {
-                max = val;
-            }
-        }
-        return max;
-    },
+            return max;
+        },
 
-    // Minimum ermitteln (Vektor)
-    getMin: function(values) {
-        var min = 'null';
-        for(var idx in values) {
-            var val = values[idx];
-            if(min === 'null') {
-                min = val;
+        // Minimum ermitteln (Vektor)
+        getMin: function(values) {
+            var min = 'null';
+            for(var idx in values) {
+                var val = values[idx];
+                if(min === 'null') {
+                    min = val;
+                }
+                if((min*1) > (val*1)) {
+                    min = val;
+                }
             }
-            if((min*1) > (val*1)) {
-                min = val;
-            }
-        }
-        return min;
-    },
+            return min;
+        },
 
-    // Minimum aus einem zweidimensionalen Array ermitteln
-    getMin2: function(values) {
-        var min = 'null';
-        for(var idx in values) {
-            if(min === 'null') {
-                min = d.util.getMin(values[idx]);
+        // Minimum aus einem zweidimensionalen Array ermitteln
+        getMin2: function(values) {
+            var min = 'null';
+            for(var idx in values) {
+                if(min === 'null') {
+                    min = d.util.getMin(values[idx]);
+                }
+                var val = d.util.getMin(values[idx]);
+                if(min > val) {
+                    min = val;
+                }
             }
-            var val = d.util.getMin(values[idx]);
-            if(min > val) {
-                min = val;
+            return min;
+        },
+
+        // Berechnet den Absolut-Betrag der angeg. Zahl
+        getAbs: function(value) {
+            if(value >= 0) {
+                return value;
+            } else {
+                return value *-1;
             }
         }
-        return min;
-    },
-    
-    // Berechnet den Absolut-Betrag der angeg. Zahl
-    getAbs: function(value) {
-        if(value >= 0) {
-            return value;
-        } else {
-            return value *-1;
-        }
-    }
     },
     // End-Utilities
 

@@ -79,8 +79,7 @@ hhb.i18n = {
         anlegen:'Schnellbuchung anlegen',
         kurzbezeichnung:'Kurzbezeichnung',
         buchungstext:'Buchungstext',
-        loeschen:'Löschen',
-        anlegen:'Anlegen'
+        loeschen:'Löschen'
     },
     verlauf:{
         kontenauswahl:'Kontenauswahl',

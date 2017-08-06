@@ -8,31 +8,22 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 
-function errorHandler (error) {
-    console.log(error.toString());
-    this.emit('end');
-}
+var applicationJsFiles = [
+    'app/View/Accounting/src/js/util/*.js',
+    'app/View/Accounting/src/js/i18n/lang-de.js',
+    'app/View/Accounting/src/js/app/*.js'
+];
 
 // Lint Task
 gulp.task('lint', function() {
-    return gulp.src('js/*.js')
+    return gulp.src(applicationJsFiles)
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });
 
-// Compile Our Sass
-gulp.task('sass', function() {
-    return gulp.src('scss/*.scss')
-        .pipe(sass())
-        .pipe(gulp.dest('dist/css'));
-});
-
 // Concatenate & Minify JS
 gulp.task('buildJs', function() {
-    return gulp.src([
-        'app/View/Accounting/src/js/util/*.js',
-        'app/View/Accounting/src/js/i18n/lang-de.js',
-        'app/View/Accounting/src/js/app/*.js'])
+    return gulp.src(applicationJsFiles)
         .pipe(concat('app.js'))
         .pipe(gulp.dest('web/js/'))
         .pipe(rename('app.min.js'))
@@ -64,11 +55,9 @@ gulp.task('concatAllJs', function() {
 
 // Watch Files For Changes
 gulp.task('watch', function() {
-    gulp.watch('js/*.js', ['lint', 'scripts']);
+    gulp.watch(applicationJsFiles, ['lint', 'scripts']);
     gulp.watch('scss/*.scss', ['sass']);
 });
 
-
-gulp.task('buildFullJs', ['buildJs', 'concatVendor']);
 // Default Task
-gulp.task('default', ['lint', 'sass', 'buildJs', 'watch']);
+gulp.task('default', ['lint', 'buildJs', 'concatVendor', 'watch']);

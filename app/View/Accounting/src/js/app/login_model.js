@@ -42,7 +42,7 @@ hhb.model.types.LoginModel = function() {
                 util.showErrorMessage(error, "Fehler");
             },
             'application/x-www-form-urlencoded'
-        )
-    }
+        );
+    };
 
 };

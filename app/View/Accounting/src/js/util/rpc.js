@@ -1,11 +1,11 @@
 /**
-* Funktion zum Absetzen eines GET-Requests
-* @param controller = Bezeichnung des Controllers als String (wie in URL)
-* @param action = Bezeichnung der Action als String
-* @param parameters = Parameter als assoziatives Array Key=>Value
-* @param successHandler = Funktions-Handle für Erfolgsfall
-* @param errorHandler = Funktions-Handle für Fehlerfall
-*/
+ * Funktion zum Absetzen eines GET-Requests
+ * @param controller = Bezeichnung des Controllers als String (wie in URL)
+ * @param action = Bezeichnung der Action als String
+ * @param parameters = Parameter als assoziatives Array Key=>Value
+ * @param successHandler = Funktions-Handle für Erfolgsfall
+ * @param errorHandler = Funktions-Handle für Fehlerfall
+ */
 function doGET(controller, action, parameters, successHandler, errorHandler) {
     $.mobile.loading( 'show', {
         textVisible: false,
@@ -38,16 +38,16 @@ function doGET(controller, action, parameters, successHandler, errorHandler) {
 }
 
 /**
-* Funktion zum Absetzen eines POST-Requests
-* @param controller = Bezeichnung des Controllers als String (wie in URL)
-* @param action = Bezeichnung der Action als String
-* @param parameterObject = Parameter als JSON-Objekt (String)
-* @param successHandler = Funktions-Handle für Erfolgsfall
-* @param errorHandler = Funktions-Handle für Fehlerfall
-*/
+ * Funktion zum Absetzen eines POST-Requests
+ * @param controller = Bezeichnung des Controllers als String (wie in URL)
+ * @param action = Bezeichnung der Action als String
+ * @param parameterObject = Parameter als JSON-Objekt (String)
+ * @param successHandler = Funktions-Handle für Erfolgsfall
+ * @param errorHandler = Funktions-Handle für Fehlerfall
+ */
 function doPOST(controller, action, parameterObject, successHandler, errorHandler, contentType) {
     if(contentType === "undefined"){
-        contentType = "application/json"
+        contentType = "application/json";
     }
 
     $.mobile.loading( 'show', {
@@ -79,21 +79,21 @@ function doPOST(controller, action, parameterObject, successHandler, errorHandle
 }
 
 /**
-* Funktion zum Absetzen eines GET-Requests die falls gerade keine Online-Verbindung
-* besteht, ein ggf. verfügbares passendes Cache-Element verwendet 
-* @param controller = Bezeichnung des Controllers als String (wie in URL)
-* @param action = Bezeichnung der Action als String
-* @param parameters = Parameter als assoziatives Array Key=>Value
-* @param successHandler = Funktions-Handle für Erfolgsfall
-* @param errorHandler = Funktions-Handle für Fehlerfall
-*/
+ * Funktion zum Absetzen eines GET-Requests die falls gerade keine Online-Verbindung
+ * besteht, ein ggf. verfügbares passendes Cache-Element verwendet
+ * @param controller = Bezeichnung des Controllers als String (wie in URL)
+ * @param action = Bezeichnung der Action als String
+ * @param parameters = Parameter als assoziatives Array Key=>Value
+ * @param successHandler = Funktions-Handle für Erfolgsfall
+ * @param errorHandler = Funktions-Handle für Fehlerfall
+ */
 function doGETwithCache(controller, action, parameters, successHandler, errorHandler) {
     if(broker.isConnected) {
-        doGET(controller, action, parameters, 
+        doGET(controller, action, parameters,
             function(data) {
                 broker.cache.storeToCache(controller, action, parameters, data);
                 successHandler(data);
-            }, 
+            },
             function(error) {
                 if(error.status === 404) {
                     doGETwithCache(controller, action, parameters, successHandler, errorHandler);
@@ -126,16 +126,15 @@ function doPOSTwithQueue(controller, action, parameterObject, successHandler, er
         broker.queue.enqueue(ref.controller, ref.action, ref.parameterObject);
         broker.reconnectHandler.add(function() {
             var item = broker.queue.dequeue(ref.controller, ref.action);
-            if(!(item === undefined)) {
-                doPOST(item.controller, item.action, item.parameterObject
-                       , successHandler, errorHandler);
+            if(item !== "undefined") {
+                doPOST(item.controller, item.action, item.parameterObject, successHandler, errorHandler);
             }
         });
     };
 
     // Behandlung der unterschiedlichen Verbindungszustände
     if(broker.isConnected) {
-        doPOST(controller, action, parameterObject, 
+        doPOST(controller, action, parameterObject,
             function(successData) {
                 successHandler(successData);
             },
@@ -166,7 +165,7 @@ var broker = {
     reconnectHandler: {
         // Array zur Aufnahme der Handler
         handlers: [],
-        
+
         add:function(handler) {
             broker.reconnectHandler.handlers.push(handler);
         },
@@ -195,7 +194,7 @@ var broker = {
             broker.reconnectHandler.call(broker);
         }
     },
-        
+
     /*
     * Setzt das isConnected-Flag auf false und initiiert einen regelmäßigen
     * überprüfungslauf, der prüft, ob evtl. wieder eine Verbindung besteht.
@@ -212,7 +211,7 @@ var broker = {
     * Die Datei ping.php muss in manifest.php explizit in der Section NETWORK stehen!
     */
     checkConnection:function() {
-        $.get("./ping.php").done( 
+        $.get("./ping.php").done(
             function() {
                 broker.setConnected();
             }).fail(
@@ -221,89 +220,89 @@ var broker = {
             });
     },
     /*
-    * Warteschlange, die die Payloads der POST-Requests im Offline-Fall zwischenspeichert, 
+    * Warteschlange, die die Payloads der POST-Requests im Offline-Fall zwischenspeichert,
     * (bei doPOSTwithQueue: bis diese wieder an den Server uebertragen werden koennen).
     */
     queue: {
-         itemAddedListeners : [],
-         itemRemovedListeners: [],
-         /**
+        itemAddedListeners : [],
+        itemRemovedListeners: [],
+        /**
          * Listener für das Ereignis "Neues Item hinzugefügt" registrieren
          */
-         addNewItemAddedListener: function(listener) {
-             if($.isFunction(listener)) {
-                 broker.queue.itemAddedListeners.push(listener);
-             }
-         },
-         /**
+        addNewItemAddedListener: function(listener) {
+            if($.isFunction(listener)) {
+                broker.queue.itemAddedListeners.push(listener);
+            }
+        },
+        /**
          * Listener für das Ereignis "Item entfernt" registrieren
          */
-         addItemRemovedListener: function(listener) {
-             if($.isFunction(listener)) {
-                 broker.queue.itemRemovedListeners.push(listener);
-             }
-         },
+        addItemRemovedListener: function(listener) {
+            if($.isFunction(listener)) {
+                broker.queue.itemRemovedListeners.push(listener);
+            }
+        },
 
-         /**
+        /**
          * Erstellen einer Liste mit den eingereihten Buchungseinträgen
          */
-         list: function(controller, action) {
-             if(localStorage.getItem('#QUEUE:'+controller+':'+action) === null) {
-                 return [];
-             } else {
-                 var list = JSON.parse(localStorage.getItem('#QUEUE:'+controller+':'+action));
-                 return list;
-             }
-         },
-         /**
+        list: function(controller, action) {
+            if(localStorage.getItem('#QUEUE:'+controller+':'+action) === null) {
+                return [];
+            } else {
+                var list = JSON.parse(localStorage.getItem('#QUEUE:'+controller+':'+action));
+                return list;
+            }
+        },
+        /**
          * Eintragen eines Eintrags in die Queue
          */
-         enqueue: function(controller, action, parameterObject) {
+        enqueue: function(controller, action, parameterObject) {
 
-             if(localStorage.getItem('#QUEUE:'+controller+':'+action) === null) {
-                 localStorage.setItem('#QUEUE:'+controller+':'+action, '[]');
-             }
+            if(localStorage.getItem('#QUEUE:'+controller+':'+action) === null) {
+                localStorage.setItem('#QUEUE:'+controller+':'+action, '[]');
+            }
 
-             var queue = JSON.parse(localStorage.getItem('#QUEUE:'+controller+':'+action));
-             queue.push({
-                 'controller':controller,
-                 'action':action,
-                 'parameterObject':parameterObject,
-             });
-             localStorage.setItem('#QUEUE:'+controller+':'+action, JSON.stringify(queue));
-             // Und am Ende noch die registrierten Listener aufrufen
-             for(var key in broker.queue.itemAddedListeners) {
-                 broker.queue.itemAddedListeners[key]();
-             }
-         },
+            var queue = JSON.parse(localStorage.getItem('#QUEUE:'+controller+':'+action));
+            queue.push({
+                'controller':controller,
+                'action':action,
+                'parameterObject':parameterObject,
+            });
+            localStorage.setItem('#QUEUE:'+controller+':'+action, JSON.stringify(queue));
+            // Und am Ende noch die registrierten Listener aufrufen
+            for(var key in broker.queue.itemAddedListeners) {
+                broker.queue.itemAddedListeners[key]();
+            }
+        },
 
-         /**
-          * Auslesen und entfernen des aeltesten Eintrags aus der Queue
-          */
-         dequeue: function(controller, action) {
-             var queue = JSON.parse(localStorage.getItem('#QUEUE:'+controller+':'+action));
-             queue = queue.reverse();
-             var item = queue.pop();
-             queue = queue.reverse();
-             localStorage.setItem('#QUEUE:'+controller+':'+action, JSON.stringify(queue));
-             
-             // Und am Ende noch die registrierten Listener aufrufen
-             for(var key in broker.queue.itemRemovedListeners) {
-                 broker.queue.itemRemovedListeners[key]();
-             }
+        /**
+         * Auslesen und entfernen des aeltesten Eintrags aus der Queue
+         */
+        dequeue: function(controller, action) {
+            var queue = JSON.parse(localStorage.getItem('#QUEUE:'+controller+':'+action));
+            queue = queue.reverse();
+            var item = queue.pop();
+            queue = queue.reverse();
+            localStorage.setItem('#QUEUE:'+controller+':'+action, JSON.stringify(queue));
 
-             return item;
-         },
+            // Und am Ende noch die registrierten Listener aufrufen
+            for(var key in broker.queue.itemRemovedListeners) {
+                broker.queue.itemRemovedListeners[key]();
+            }
+
+            return item;
+        },
     },
     cache: {
         /**
-        * Liest das angeforderte Element aus dem Cache aus, falls es sich bereits darin
-        * befindet. Wenn nicht wird ein Fehler weitergegeben.
-        */
+         * Liest das angeforderte Element aus dem Cache aus, falls es sich bereits darin
+         * befindet. Wenn nicht wird ein Fehler weitergegeben.
+         */
         getFromCache: function(controller, action, parameters, successHandler, errorHandler) {
             var key = broker.cache.getKey(controller, action, parameters);
             var object = JSON.parse(localStorage.getItem(key));
-            if(!!object) { 
+            if(!!object) {
                 // Wenn das Objekt existiert
                 successHandler(object);
             } else {
@@ -319,7 +318,7 @@ var broker = {
         storeToCache: function(controller, action, parameters, object) {
             var key = broker.cache.getKey(controller, action, parameters);
             localStorage.setItem(key, JSON.stringify(object));
-        }, 
+        },
 
         /*
         * Wandelt den Request in einen eindeutigen Key um...
@@ -331,6 +330,5 @@ var broker = {
             }
             return key;
         }
-    },
-
+    }
 };

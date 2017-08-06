@@ -26,25 +26,25 @@ hhb.model.MainModel = null;
 * Root-Knoten des Knockout.js Models
 */
 hhb.model.types.MainModel = function() {
-  var self = this;
-  self.i18n = hhb.i18n;
+    var self = this;
+    self.i18n = hhb.i18n;
 
-  if($("#login_user").length != 0){
-      self.login = ko.observable(new hhb.model.types.LoginModel());
-  } else {
-      // Modelbestandteile laden
-      self.kontenarten = ko.observableArray([]);
-      hhb.model.types.Kontenart.load(self.kontenarten);
-      self.navigation = ko.observable(new hhb.model.types.NavigationModel());
-      self.buchen = ko.observable(new hhb.model.types.BuchungenModel());
-      self.konten = ko.observable(new hhb.model.types.KontenModel());
-      self.schnellbuchungen = ko.observable(new hhb.model.types.SchnellbuchungModel());
-      self.ergebnis = ko.observable(new hhb.model.types.ErgebnisModel());
-      self.verlauf = ko.observable(new hhb.model.types.VerlaufModel());
-      self.exporte = ko.observable(new hhb.model.types.ExportModel());
-      self.configuration = ko.observable(new hhb.model.types.ConfigurationModel());
-      self.ergebnis().initialize();
-  }
+    if($("#login_user").length != 0){
+        self.login = ko.observable(new hhb.model.types.LoginModel());
+    } else {
+        // Modelbestandteile laden
+        self.kontenarten = ko.observableArray([]);
+        hhb.model.types.Kontenart.load(self.kontenarten);
+        self.navigation = ko.observable(new hhb.model.types.NavigationModel());
+        self.buchen = ko.observable(new hhb.model.types.BuchungenModel());
+        self.konten = ko.observable(new hhb.model.types.KontenModel());
+        self.schnellbuchungen = ko.observable(new hhb.model.types.SchnellbuchungModel());
+        self.ergebnis = ko.observable(new hhb.model.types.ErgebnisModel());
+        self.verlauf = ko.observable(new hhb.model.types.VerlaufModel());
+        self.exporte = ko.observable(new hhb.model.types.ExportModel());
+        self.configuration = ko.observable(new hhb.model.types.ConfigurationModel());
+        self.ergebnis().initialize();
+    }
 
 
 
@@ -55,14 +55,14 @@ hhb.model.types.MainModel = function() {
 * Knockout.js Model initialisieren und binden
 */
 $(document).ready(function() {
-  hhb.model.MainModel = new hhb.model.types.MainModel();
-  ko.applyBindings(hhb.model.MainModel);
-  jQuery.mobile.changePage("#");
+    hhb.model.MainModel = new hhb.model.types.MainModel();
+    ko.applyBindings(hhb.model.MainModel);
+    jQuery.mobile.changePage("#");
 });
 
 /*
 * Fade-In bei Seitenwechsel deaktivieren
 */
 $(document).bind('pageinit', function () {
-  $.mobile.defaultPageTransition = 'none';
+    $.mobile.defaultPageTransition = 'none';
 });

@@ -112,9 +112,9 @@ hhb.model.types.VerlaufModel = function() {
         self.konten_selected.removeAll();
         self.konten_selectable.removeAll();
         hhb.model.MainModel.konten().refreshKonten(function(kontenModel) {
-             for(var i = 0; i < kontenModel.konten().length; i++) {
-                 self.konten_selectable.push(kontenModel.konten()[i]);
-             }
+            for(var i = 0; i < kontenModel.konten().length; i++) {
+                self.konten_selectable.push(kontenModel.konten()[i]);
+            }
             jQuery.mobile.changePage("#verlauf_kontenauswahl");
             $(".konten_liste2").listview();
             $(".konten_liste2").listview("refresh");
@@ -146,7 +146,7 @@ hhb.model.types.VerlaufModel = function() {
         var kontoNumbers = "";
         var length = self.konten_selected().length;
         self.verlauf_einfach.removeAll();
-        
+
         for(var i = 0; i < length; i++) {
             kontoNumbers += self.konten_selected()[i].kontonummer();
             if(i < length-1) {
